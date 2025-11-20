@@ -1,0 +1,45 @@
+
+import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
+import { FundamentalsTool } from '../types';
+
+interface FundamentalsSubNavProps {
+  activeTool: FundamentalsTool;
+  onToolChange: (tool: FundamentalsTool) => void;
+}
+
+const FundamentalsSubNav: React.FC<FundamentalsSubNavProps> = ({ activeTool, onToolChange }) => {
+  const { t } = useLanguage();
+
+  const navItems: { key: FundamentalsTool; label: string }[] = [
+    { key: 'ideaValidation', label: t('fundamentalsNavIdeaValidation') },
+    { key: 'problemValidation', label: t('fundamentalsNavProblemValidation') },
+    { key: 'competitorAnalysis', label: t('fundamentalsNavCompetitorAnalysis') },
+    { key: 'customerValidation', label: t('fundamentalsNavCustomerValidation') },
+    { key: 'brandIdentity', label: t('fundamentalsNavBrandIdentity') },
+    { key: 'riskFeasibility', label: t('fundamentalsNavRiskFeasibility') },
+    { key: 'validationTracker', label: t('fundamentalsNavValidationTracker') },
+    { key: 'experimentBuilder', label: t('fundamentalsNavExperimentBuilder') },
+  ];
+
+  return (
+    <div className="flex items-center space-x-1 sm:space-x-2 rounded-full bg-black/20 p-1 max-w-4xl mx-auto overflow-x-auto">
+      {navItems.map(({ key, label }) => (
+        <button
+          key={key}
+          onClick={() => onToolChange(key)}
+          className={`w-full px-2 sm:px-3 py-2 text-xs sm:text-sm font-bold rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-brand-teal focus:ring-offset-2 focus:ring-offset-black/20 whitespace-nowrap ${
+            activeTool === key
+              ? 'bg-brand-teal text-white shadow-md'
+              : 'text-brand-light hover:bg-brand-accent/50'
+          }`}
+          aria-pressed={activeTool === key}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+export default FundamentalsSubNav;

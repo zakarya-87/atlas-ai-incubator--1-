@@ -1,0 +1,56 @@
+
+version: '3.8'
+
+services:
+  atlas-backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://atlas_user:atlas_prod_password@postgres:5432/atlas_prod_db
+      # You must supply these via environment variables on the host machine
+      - API_KEY=${API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+    networks:
+      - atlas-network
+
+  atlas-frontend:
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - atlas-backend
+    restart: always
+    networks:
+      - atlas-network
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: atlas_user
+      POSTGRES_PASSWORD: atlas_prod_password
+      POSTGRES_DB: atlas_prod_db
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - atlas-network
+
+  redis:
+    image: redis:alpine
+    restart: always
+    networks:
+      - atlas-network
+
+volumes:
+  postgres_prod_data:
+
+networks:
+  atlas-network:

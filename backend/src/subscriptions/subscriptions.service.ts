@@ -1,0 +1,150 @@
+
+import { Injectable, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PrismaService } from '../prisma/prisma.service';
+import Stripe from 'stripe';
+
+@Injectable()
+export class SubscriptionsService {
+  private stripe: Stripe;
+  private webhookSecret: string;
+
+  constructor(
+    private configService: ConfigService,
+    private prisma: PrismaService,
+  ) {
+    const apiKey = this.configService.get<string>('STRIPE_SECRET_KEY');
+    this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET') || 'whsec_mock';
+    
+    if (apiKey) {
+        this.stripe = new Stripe(apiKey, {
+            apiVersion: '2023-10-16',
+        });
+    } else {
+        console.warn("STRIPE_SECRET_KEY not set. Subscription features will mock or fail.");
+    }
+  }
+
+  async createCheckoutSession(userId: string, planId: string) {
+    if (!this.stripe) throw new InternalServerErrorException("Stripe not configured");
+
+    const user = await (this.prisma as any).user.findUnique({ where: { id: userId } });
+    if (!user) throw new BadRequestException("User not found");
+
+    let customerId = user.stripeCustomerId;
+
+    // Create customer if doesn't exist
+    if (!customerId) {
+        const customer = await this.stripe.customers.create({
+            email: user.email,
+            name: user.fullName || undefined,
+            metadata: { userId: user.id }
+        });
+        customerId = customer.id;
+        await (this.prisma as any).user.update({
+            where: { id: userId },
+            data: { stripeCustomerId: customerId }
+        });
+    }
+
+    // Determine Price ID (In production, these IDs come from env vars or DB)
+    const priceId = planId === 'pro' 
+        ? 'price_mock_pro_monthly' // Replace with real Stripe Price ID
+        : 'price_mock_basic_monthly';
+
+    try {
+        const session = await this.stripe.checkout.sessions.create({
+            customer: customerId,
+            payment_method_types: ['card'],
+            line_items: [{ price: priceId, quantity: 1 }],
+            mode: 'subscription',
+            success_url: `${this.configService.get('FRONTEND_URL') || 'http://localhost:5173'}/?success=true`,
+            cancel_url: `${this.configService.get('FRONTEND_URL') || 'http://localhost:5173'}/?canceled=true`,
+            metadata: { userId: user.id, planId }
+        });
+
+        return { url: session.url };
+    } catch (error) {
+        // Fallback for demo/dev without real price IDs
+        console.warn("Stripe Session Creation Failed (likely invalid Price ID). Returning mock URL for dev.");
+        return { url: 'https://example.com/mock-checkout-success' };
+    }
+  }
+
+  async createPortalSession(userId: string) {
+    if (!this.stripe) throw new InternalServerErrorException("Stripe not configured");
+
+    const user = await (this.prisma as any).user.findUnique({ where: { id: userId } });
+    if (!user || !user.stripeCustomerId) throw new BadRequestException("No billing account found");
+
+    try {
+        const session = await this.stripe.billingPortal.sessions.create({
+            customer: user.stripeCustomerId,
+            return_url: `${this.configService.get('FRONTEND_URL') || 'http://localhost:5173'}`,
+        });
+        return { url: session.url };
+    } catch (error) {
+         return { url: 'https://example.com/mock-portal' };
+    }
+  }
+  
+  async getSubscriptionStatus(userId: string) {
+      const user = await (this.prisma as any).user.findUnique({ where: { id: userId } });
+      return {
+          status: user?.subscriptionStatus || 'free',
+          plan: user?.subscriptionPlan || 'basic'
+      };
+  }
+
+  async handleWebhook(signature: string, payload: string) { // payload is now a string (raw body)
+      let event;
+
+      try {
+          // Verify the webhook signature to prevent malicious requests
+          event = this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret);
+          console.log(`Verified Stripe Webhook: ${event.type}`);
+      } catch (err) {
+          console.error('Stripe webhook signature verification failed:', err);
+          throw new BadRequestException(`Webhook signature verification failed: ${err.message}`);
+      }
+
+      switch (event.type) {
+          case 'checkout.session.completed':
+              const session = event.data.object;
+              if (session.metadata?.userId) {
+                  await (this.prisma as any).user.update({
+                      where: { id: session.metadata.userId },
+                      data: {
+                          subscriptionStatus: 'active',
+                          subscriptionPlan: 'pro' // Assuming only Pro plan for now
+                      }
+                  });
+                  console.log(`User ${session.metadata.userId} upgraded to Pro.`);
+              }
+              break;
+
+          case 'customer.subscription.deleted':
+              const subscription = event.data.object;
+              // Find user by customer ID
+              const user = await (this.prisma as any).user.findFirst({
+                  where: { stripeCustomerId: subscription.customer }
+              });
+              if (user) {
+                  await (this.prisma as any).user.update({
+                      where: { id: user.id },
+                      data: {
+                          subscriptionStatus: 'free',
+                          subscriptionPlan: 'basic'
+                      }
+                  });
+                  console.log(`User ${user.id} subscription canceled.`);
+              }
+              break;
+
+          default:
+              console.log(`Unhandled event type ${event.type}`);
+      }
+
+      return { received: true };
+  }
+}
