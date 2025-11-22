@@ -3,6 +3,12 @@
 
 **An Agentic, AI-Powered SaaS Platform for Venture Building.**
 
+[![CI - All Unit Tests](https://github.com/YOUR_USERNAME/YOUR_REPO/workflows/CI%20-%20All%20Unit%20Tests/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions)
+[![Frontend Tests](https://github.com/YOUR_USERNAME/YOUR_REPO/workflows/Frontend%20Unit%20Tests/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions)
+[![Backend Tests](https://github.com/YOUR_USERNAME/YOUR_REPO/workflows/Backend%20Unit%20Tests/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO/actions)
+
+> **Note:** Replace `YOUR_USERNAME/YOUR_REPO` with your actual GitHub username and repository name in the badges above.
+
 ATLAS is a comprehensive platform designed to guide entrepreneurs from raw idea to funding. It leverages a multi-agent AI architecture to generate SWOT analyses, financial models, pitch decks, and market research, all contextualized by a "Venture Memory" that ensures consistency across different business modules.
 
 ---
