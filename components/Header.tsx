@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -16,7 +16,7 @@ interface HeaderProps {
   onShareClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onNavigate, onStartTour, onShareClick }) => {
+const Header: React.FC<HeaderProps> = memo(({ onNavigate, onStartTour, onShareClick }) => {
   const { t } = useLanguage();
   const { user, isAuthenticated, isAdmin, logout, signInAsAdminDemo } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -169,6 +169,6 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, onStartTour, onShareClick }
     <UserProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
     </>
   );
-};
+});
 
 export default Header;

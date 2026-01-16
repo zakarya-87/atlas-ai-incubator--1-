@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Header from './Header';
 import SidebarNav from './SidebarNav';
@@ -59,6 +59,9 @@ const Layout: React.FC<LayoutProps> = ({
   const { t } = useLanguage();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
+  const handleStartTour = useCallback(() => setIsTourOpen(true), [setIsTourOpen]);
+  const handleShareClick = useCallback(() => setIsShareModalOpen(true), []);
+
   return (
     <div className={`min-h-screen bg-brand-primary transition-all duration-300 ${isTourOpen ? 'overflow-hidden' : ''}`}>
       
@@ -88,7 +91,7 @@ const Layout: React.FC<LayoutProps> = ({
                 exit={{ opacity: 0, y: -50 }}
                 className="sticky top-0 z-50"
             >
-                <Header onNavigate={onNavigate} onStartTour={() => setIsTourOpen(true)} onShareClick={() => setIsShareModalOpen(true)} />
+                <Header onNavigate={onNavigate} onStartTour={handleStartTour} onShareClick={handleShareClick} />
             </motion.div>
         )}
       </AnimatePresence>
