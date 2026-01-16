@@ -18,10 +18,10 @@ export class DefaultAgent extends BaseAgent {
     images?: string[]
   ): Promise<AgentGenerationResponse> {
     const fullPrompt = `${prompt}\n${context}`;
-    
-    // Default to Flash model for speed and efficiency on standard tasks
+
+    // Default to Pro model for advanced reasoning and comprehensive analysis
     return this.executeGeminiCall(
-      'gemini-2.5-flash',
+      'gemini-2.5-pro',
       fullPrompt,
       schema,
       systemInstruction,

@@ -18,7 +18,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onNavigate, onStartTour, onShareClick }) => {
   const { t } = useLanguage();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout, signInAsAdminDemo } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
@@ -27,6 +27,12 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, onStartTour, onShareClick }
   // Fetch credits periodically or on load
   useEffect(() => {
       if (isAuthenticated) {
+          // In demo admin mode, skip backend calls and show stub values
+          if (isAdmin) {
+              setCredits(100);
+              setIsPro(true);
+              return;
+          }
           const loadCredits = async () => {
               try {
                   const profile = await fetchUserProfile();
@@ -44,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, onStartTour, onShareClick }
           setCredits(null);
           setIsPro(false);
       }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isAdmin]);
 
   return (
     <>
@@ -64,6 +70,12 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, onStartTour, onShareClick }
              
              {isAuthenticated ? (
                 <div className="flex items-center gap-4 border-l border-white/10 pl-4 ml-2">
+                   {/* Admin badge for demo */}
+                   {isAdmin && (
+                     <span className="px-2 py-0.5 rounded text-2xs font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-400/30">
+                       Demo Admin
+                     </span>
+                   )}
                    {/* Credit Display */}
                    <Tooltip content={isPro ? "Unlimited Access" : "Remaining AI Generations"} position="bottom">
                        <div className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 border ${
@@ -107,12 +119,22 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, onStartTour, onShareClick }
                    </div>
                 </div>
              ) : (
+               <div className="flex items-center gap-2">
                  <button
                     onClick={() => setIsAuthModalOpen(true)}
                     className="ml-2 px-4 py-1.5 text-xs font-bold bg-brand-accent/20 text-brand-teal border border-brand-teal/50 rounded-full hover:bg-brand-teal hover:text-white transition-all"
                  >
                     Sign In
                  </button>
+                 {(import.meta as any).env.MODE !== 'production' && (
+                   <button
+                      onClick={signInAsAdminDemo}
+                      className="ml-2 px-3 py-1.5 text-xs font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-400/40 rounded-full hover:bg-yellow-400/30 transition-all"
+                   >
+                      Demo Admin
+                   </button>
+                 )}
+               </div>
              )}
 
              <div className="w-px h-6 bg-white/10 mx-1"></div>

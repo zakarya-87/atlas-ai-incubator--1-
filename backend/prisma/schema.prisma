@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // ==========================================
@@ -19,7 +19,7 @@ model User {
   email             String   @unique
   password          String
   fullName          String?
-  role              String   @default("user") // user, admin
+  role              String   @default("USER") // USER, ADMIN
   credits           Int      @default(100) // For usage quotas
   subscriptionStatus String  @default("free") // free, active, cancelled, past_due
   subscriptionPlan  String   @default("free") // free, starter, pro, enterprise
@@ -32,6 +32,7 @@ model User {
   ventureMemberships VentureMember[]
   analyses          Analysis[]
   refreshTokens     RefreshToken[]
+  jobs              Job[]
 
   @@index([email])
   @@map("users")
@@ -109,8 +110,8 @@ model Analysis {
   userId       String
   module       String   // strategy, marketAnalysis, finance, etc.
   tool         String   // swot, pestel, budgetGenerator, etc.
-  inputContext String   @db.Text // User's business description
-  resultData   Json     // Structured analysis result
+  inputContext String   // User's business description
+  resultData   String   // Structured analysis result (JSON string)
   parentId     String?  // For refinement/versioning
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -139,8 +140,8 @@ model Integration {
   userId     String
   provider   String   // slack, notion, gdrive, etc.
   status     String   @default("disconnected") // connected, disconnected
-  tokens     Json?    // OAuth tokens (encrypted in practice)
-  metadata   Json?    // Additional config
+  tokens     String?  // OAuth tokens (encrypted in practice) (JSON string)
+  metadata   String?  // Additional config (JSON string)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -170,6 +171,32 @@ model Subscription {
 }
 
 // ==========================================
+// BACKGROUND JOBS (For async processing)
+// ==========================================
+
+model Job {
+  id          String   @id @default(uuid())
+  userId      String
+  type        String   // e.g., 'analysis-generate', 'report-export'
+  status      String   // pending, processing, completed, failed
+  input       String?  // Job input data (JSON string)
+  result      String?  // Job result data (JSON string)
+  error       String?  // Error message if job failed
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("jobs")
+}
+
+// ==========================================
 // AUDIT TRAIL (Optional - for compliance)
 // ==========================================
 
@@ -179,7 +206,7 @@ model AuditLog {
   action    String   // CREATE, UPDATE, DELETE, LOGIN, etc.
   entity    String   // User, Venture, Analysis, etc.
   entityId  String?
-  metadata  Json?
+  metadata  String?  // (JSON string)
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now())

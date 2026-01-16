@@ -34,17 +34,18 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: [
+    // Backend server removed for mock-only E2E tests
+    // {
+    //   command: 'npm run start:dev --prefix backend',
+    //   port: 3000,
+    //   timeout: 120 * 1000,
+    //   reuseExistingServer: !process.env.CI,
+    // },
     {
-      command: 'npm run start:dev --prefix backend',
-      port: 3000,
+      command: 'npm run dev',
+      port: 5173,
       timeout: 120 * 1000,
       reuseExistingServer: !process.env.CI,
-    },
-    {
-        command: 'npm run dev',
-        port: 5173,
-        timeout: 120 * 1000,
-        reuseExistingServer: !process.env.CI,
     }
   ],
 });

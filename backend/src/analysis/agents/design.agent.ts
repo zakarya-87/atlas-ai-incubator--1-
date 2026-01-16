@@ -18,68 +18,41 @@ export class DesignAgent extends BaseAgent {
     images?: string[]
   ): Promise<AgentGenerationResponse> {
     try {
-      // 1. Refine the prompt for Image Generation using a text model first
-      const refinementPrompt = `
+      // Generate brand identity concept (colors, rationale, prompt) using text model
+      // Note: Imagen image generation requires Vertex AI SDK which is not configured
+      const brandPrompt = `
         CONTEXT: ${context}
         USER INPUT: ${prompt}
         
-        TASK: Create a highly detailed image generation prompt for a modern, professional startup logo based on the context above.
+        TASK: Create a comprehensive brand identity concept for this business.
         
-        REQUIREMENTS:
-        - Describe the visual style (e.g., minimalist, geometric, abstract).
-        - Specify colors and mood.
-        - Do not include text in the logo description (generative models struggle with text).
-        - Output ONLY the raw prompt string, nothing else.
+        Generate a JSON response with:
+        1. "imagePrompt": A detailed prompt that could be used to generate a logo (describe the visual style, colors, symbols)
+        2. "rationale": Explain the design choices and how they connect to the brand values
+        3. "palette": An array of 5 hex color codes that form a cohesive brand palette
+        4. "logoImage": Set this to an empty string (image generation requires additional setup)
+        
+        Make the design modern, professional, and appropriate for the business type.
       `;
 
-      const refinementResponse = await this.executeGeminiCall(
-        'gemini-2.5-flash',
-        refinementPrompt,
-        undefined,
-        "You are a creative director."
+      const response = await this.executeGeminiCall(
+        'gemini-2.5-pro',
+        brandPrompt,
+        schema,
+        "You are a creative director and brand strategist specializing in startup branding."
       );
 
-      const imagePrompt = refinementResponse.text;
-
-      // 2. Generate Image using Imagen
-      const client = this.getClient();
-      const imageResponse = await client.models.generateImages({
-        model: 'imagen-3.0-generate-001', 
-        prompt: imagePrompt,
-        config: {
-          numberOfImages: 1,
-          aspectRatio: '1:1',
-          outputMimeType: 'image/jpeg',
-        }
-      });
-
-      if (!imageResponse.generatedImages || imageResponse.generatedImages.length === 0) {
-        throw new Error("No images generated.");
-      }
-
-      const base64Image = imageResponse.generatedImages[0].image.imageBytes;
-      
-      // 3. Generate Color Palette & Rationale (Text)
-      const palettePrompt = `
-        Based on this logo concept: "${imagePrompt}"
-        Generate a JSON object with a 'rationale' (string) explaining the design choice 
-        and a 'palette' (array of hex codes) that fits this brand identity.
-      `;
-      
-      const paletteResponse = await this.executeGeminiCall(
-          'gemini-2.5-flash',
-          palettePrompt,
-          schema,
-          "You are a brand strategist."
-      );
+      // Ensure the response has all required fields
+      const data = {
+        logoImage: response.data?.logoImage || "",
+        imagePrompt: response.data?.imagePrompt || "A modern, minimalist logo concept",
+        rationale: response.data?.rationale || "Brand identity designed to convey professionalism and innovation",
+        palette: response.data?.palette || ["#6366F1", "#818CF8", "#A5B4FC", "#1E293B", "#F8FAFC"]
+      };
 
       return {
-        text: "Logo generated successfully.",
-        data: {
-            ...paletteResponse.data,
-            logoImage: `data:image/jpeg;base64,${base64Image}`,
-            imagePrompt: imagePrompt
-        }
+        text: "Brand identity concept generated successfully. Note: Logo image generation requires Vertex AI setup.",
+        data: data
       };
 
     } catch (error: any) {

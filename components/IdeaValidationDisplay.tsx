@@ -91,7 +91,7 @@ const IdeaValidationDisplay: React.FC<IdeaValidationDisplayProps> = ({ data }) =
           <SectionCard
             key={sec.key}
             title={t(sec.titleKey)}
-            points={data[sec.key]}
+            points={data[sec.key] || []}
             icon={sec.icon}
             bgColorClass={sec.colors[0]}
             textColorClass={sec.colors[1]}

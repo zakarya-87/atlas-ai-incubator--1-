@@ -58,6 +58,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             exit={{ scale: 0.95, y: 20 }}
             className="bg-brand-secondary rounded-xl shadow-2xl w-full max-w-md border border-brand-accent overflow-hidden"
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-modal-title"
           >
             <div className="flex border-b border-brand-accent">
               <button

@@ -29,9 +29,11 @@ export class AnalysisService {
             // Format context using XML tags, which Gemini models parse highly effectively.
             // This distinguishes "Memory" from "Current Task".
             const contextRecords = history.map(record => {
-                // We strip potentially large JSON to a reasonable limit per record to save tokens,
-                // though Gemini's window is large, efficiency is good practice.
-                const dataString = JSON.stringify(record.resultData);
+                // resultData is already a JSON string from the database
+                // We just need to truncate it if too long
+                const dataString = typeof record.resultData === 'string'
+                    ? record.resultData
+                    : JSON.stringify(record.resultData);
                 const truncatedData = dataString.length > 4000
                     ? dataString.substring(0, 4000) + "...(truncated)"
                     : dataString;
@@ -79,7 +81,7 @@ export class AnalysisService {
         let promptKey = dto.prompt;
 
         if (!promptKey) {
-            schema = { type: Type.OBJECT, properties: { result: { type: Type.STRING } } };
+            schema = { type: SchemaType.OBJECT, properties: { result: { type: SchemaType.STRING } } };
             promptKey = `Analyze: ${dto.description}`;
         }
 
@@ -158,7 +160,7 @@ export class AnalysisService {
 
             TASK:
             Regenerate the analysis. Start with the "PREVIOUS ANALYSIS RESULT" as your baseline.
-            Modify, update, or expand it based STRICTLY on the "USER REFINEMENT REQUEST".
+            Modify, update, or expand it based on the "USER REFINEMENT REQUEST".
             Keep the same JSON structure/schema as the previous result.
           `;
 
@@ -183,7 +185,7 @@ You are the ATLAS AI Engine, a Lead Venture Architect and Tier-1 Strategy Consul
 Your objective is to build a coherent, viable, and scalable business case for the user.
 
 ### CORE DIRECTIVES:
-1. **Strategic Consistency:** Your output MUST align with the provided <venture_memory_bank>. 
+1. **Strategic Consistency:** Your output MUST align with the provided <venture_memory_bank>.
    - If the SWOT (in memory) identifies "Limited Capital" as a weakness, your Marketing Plan MUST focus on organic/low-cost channels.
    - If the Target Audience (in memory) is "Seniors", do not suggest "TikTok Influencers" as a channel.
 2. **Data-Driven Realism:** Avoid generic fluff. Use specific numbers, KPIs, and industry benchmarks where possible.
@@ -191,7 +193,7 @@ Your objective is to build a coherent, viable, and scalable business case for th
 4. **Structured Output:** You must return valid JSON conforming strictly to the requested schema.
 
 ### CONTEXT AWARENESS:
-The user has provided a description and potentially a history of previous work. 
+The user has provided a description and potentially a history of previous work.
 Synthesize this information to produce the next logical step in their business planning.
 `;
 
@@ -214,10 +216,11 @@ Synthesize this information to produce the next logical step in their business p
             const savedRecord = await (this.prisma as any).analysis.create({
                 data: {
                     ventureId: dto.ventureId,
+                    userId: userId,
                     module: dto.module,
                     tool: dto.tool,
                     inputContext: dto.refinementInstruction ? `Refinement: ${dto.refinementInstruction}` : dto.description,
-                    resultData: response.data,
+                    resultData: JSON.stringify(response.data), // Prisma expects a String, not an Object
                     parentId: dto.parentAnalysisId || undefined // Link versions if refining
                 }
             });

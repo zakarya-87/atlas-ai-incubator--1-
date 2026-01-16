@@ -1,6 +1,6 @@
 
-import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Get, Patch, Body, UseGuards, NotFoundException } from '@nestjs/common';
+
 import { UsersService } from './users.service';
 import { GetUser } from '../auth/get-user.decorator';
 import { User } from '@prisma/client';
@@ -10,15 +10,18 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('users')
-@UseGuards(AuthGuard('jwt'))
+
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Get('profile')
   @ApiOperation({ summary: 'Get the profile of the currently authenticated user' })
   async getProfile(@GetUser() user: User) {
     // Fetch fresh user data to ensure credits are up-to-date
     const freshUser = await this.usersService.findById(user.id);
+    if (!freshUser) {
+      throw new NotFoundException('User not found');
+    }
     const { password, ...result } = freshUser;
     return result;
   }

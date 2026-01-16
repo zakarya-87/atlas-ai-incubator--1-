@@ -337,7 +337,7 @@ const AppContent: React.FC = () => {
             <UndoRedoControls onUndo={undo} onRedo={redo} canUndo={canUndo} canRedo={canRedo} />
             <ViewControls isFocusMode={isFocusMode} onToggleFocusMode={() => setIsFocusMode(!isFocusMode)} />
             <ExportControls
-              analysisData={currentAnalysis}
+              analysisData={currentAnalysis as any}
               analysisType={activeTool as any}
               businessDescription={businessDescription}
               targetElementId="export-content-area"

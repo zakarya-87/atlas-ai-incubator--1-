@@ -1,7 +1,8 @@
 
 import { AuthCredentials } from '../types';
 
-const BACKEND_URL = (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000';
+import config from '../utils/config';
+const BACKEND_URL = config.apiBaseUrl;
 
 export interface AuthResponse {
   accessToken: string;

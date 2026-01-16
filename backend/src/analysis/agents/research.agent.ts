@@ -36,7 +36,8 @@ export class ResearchAgent extends BaseAgent {
     `;
 
     // Prepare content parts (Text + Optional Images)
-    let searchContents: any = [{ role: 'user', parts: [{ text: searchPrompt }] }];
+    // For generateContent: pass parts array directly, not wrapped with role
+    let searchContents: any;
 
     if (images && images.length > 0) {
       const parts: any[] = [{ text: searchPrompt }];
@@ -49,23 +50,28 @@ export class ResearchAgent extends BaseAgent {
           }
         });
       });
-      searchContents = [{ role: 'user', parts: parts }];
+      // Pass parts array directly for multimodal content
+      searchContents = parts;
+    } else {
+      // For text-only, pass as string
+      searchContents = searchPrompt;
     }
 
     // Use getClient() for lazy loading
-    const searchResponse = await this.getClient().models.generateContent({
-      model: 'gemini-2.5-flash', // Flash supports vision + tools
-      contents: searchContents,
-      config: {
-        tools: [{ googleSearch: {} }], // Enable Grounding
+    const model = this.getClient().getGenerativeModel({
+      model: 'gemini-2.5-pro',
+      tools: [{ googleSearch: {} } as any], // Enable Grounding
+      generationConfig: {
         temperature: 0.3, // Low temperature for factual accuracy
       },
     });
 
-    const rawText = searchResponse.text || '';
+    const searchResponse = await model.generateContent(searchContents);
+
+    const rawText = searchResponse.response.text();
 
     // Extract citations (Grounding Metadata)
-    const groundingChunks = searchResponse.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+    const groundingChunks = searchResponse.response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
     const sources = groundingChunks
       .map((chunk: any) => chunk.web?.uri ? { title: chunk.web.title, url: chunk.web.uri } : null)
       .filter((source: any) => source !== null);
@@ -86,7 +92,7 @@ export class ResearchAgent extends BaseAgent {
     `;
 
     const formattedResponse = await this.executeGeminiCall(
-      'gemini-2.5-flash',
+      'gemini-2.5-pro',
       formattingPrompt,
       schema,
       "You are a strict JSON formatting engine."

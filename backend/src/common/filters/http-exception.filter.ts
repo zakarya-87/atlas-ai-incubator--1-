@@ -1,44 +1,23 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(HttpExceptionFilter.name);
-
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-    const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse();
 
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
+    const status = exception instanceof HttpException 
+      ? exception.getStatus() 
+      : 500;
 
-    if (exception instanceof HttpException) {
-      status = (exception as HttpException).getStatus();
-      const res = (exception as HttpException).getResponse();
-      message = typeof res === 'string' ? res : (res as any).message || message;
-    } else if (exception instanceof Error) {
-       // Handle generic errors (like Prisma errors)
-       message = exception.message;
-       // Check for common Prisma error codes if needed, or keep it generic
-    }
-
-    this.logger.error(
-      `Status: ${status} Error: ${JSON.stringify(message)} Path: ${request.url}`,
-    );
+    const message = exception instanceof HttpException 
+      ? exception.getResponse() 
+      : 'Internal server error';
 
     response.status(status).json({
       statusCode: status,
       timestamp: new Date().toISOString(),
-      path: request.url,
-      message: message,
+      message: typeof message === 'string' ? message : JSON.stringify(message),
     });
   }
 }

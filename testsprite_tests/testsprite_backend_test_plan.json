@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "user login with valid credentials",
+    "description": "Test the /auth/login endpoint to verify that users can successfully log in with valid email and password, and receive a valid JWT token."
+  },
+  {
+    "id": "TC002",
+    "title": "user registration with new email",
+    "description": "Test the /auth/register endpoint to ensure new users can register with a unique email and password, and receive confirmation of successful registration."
+  },
+  {
+    "id": "TC003",
+    "title": "generate business analysis with valid input",
+    "description": "Test the /analysis/generate endpoint to verify that the system generates accurate AI-powered business analysis reports for given ventureId, module, tool, description, and language."
+  },
+  {
+    "id": "TC004",
+    "title": "create new venture with valid data",
+    "description": "Test the /ventures POST endpoint to ensure users can create a new venture by providing valid name and description, and the venture is persisted correctly."
+  },
+  {
+    "id": "TC005",
+    "title": "get venture details by id",
+    "description": "Test the /ventures/{id} GET endpoint to verify that the system returns correct venture details for a given venture ID."
+  },
+  {
+    "id": "TC006",
+    "title": "get analysis history for venture",
+    "description": "Test the /analysis/{ventureId} GET endpoint to ensure users can retrieve the historical analysis records associated with a specific venture."
+  },
+  {
+    "id": "TC007",
+    "title": "update user profile information",
+    "description": "Test the /users/profile PUT endpoint to verify that users can update their profile information and preferences, and changes are reflected in the system."
+  },
+  {
+    "id": "TC008",
+    "title": "create subscription with valid payment",
+    "description": "Test the /subscriptions POST endpoint to ensure users can create a subscription with valid payment details and the subscription status is updated accordingly."
+  },
+  {
+    "id": "TC009",
+    "title": "invite team member with valid details",
+    "description": "Test the /teams/invite POST endpoint to verify that team owners can invite members by providing ventureId, email, and role, and invitations are sent with correct access rights."
+  },
+  {
+    "id": "TC010",
+    "title": "export analysis in requested format",
+    "description": "Test the /export POST endpoint to ensure users can export analysis results by providing analysisId and format, and the exported document matches the requested format without data loss."
+  }
+]

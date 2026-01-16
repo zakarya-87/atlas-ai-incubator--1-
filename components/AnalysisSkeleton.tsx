@@ -54,13 +54,13 @@ const TableSkeleton = () => (
   <div className="w-full bg-brand-secondary/20 rounded-lg p-4 border border-white/5">
     <div className="flex space-x-4 mb-6 border-b border-white/10 pb-4">
       {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="h-6 w-full bg-brand-light/10 rounded"></div>
+        <div key={i} className="h-6 w-full bg-brand-light/10 rounded animate-pulse"></div>
       ))}
     </div>
     {[1, 2, 3, 4, 5, 6, 7, 8].map((row) => (
       <div key={row} className="flex space-x-4 mb-4">
         {[1, 2, 3, 4, 5, 6].map((col) => (
-          <div key={col} className="h-4 w-full bg-brand-light/5 rounded"></div>
+          <div key={col} className="h-4 w-full bg-brand-light/5 rounded animate-pulse"></div>
         ))}
       </div>
     ))}

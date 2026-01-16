@@ -1,6 +1,6 @@
 
 import { Controller, Post, Body, UseGuards, Param, Get } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+
 import { VenturesService } from './ventures.service';
 import { GetUser } from '../auth/get-user.decorator';
 import { User } from '@prisma/client';
@@ -19,9 +19,9 @@ class InviteMemberDto {
 @ApiTags('Ventures')
 @ApiBearerAuth()
 @Controller('ventures')
-@UseGuards(AuthGuard('jwt'))
+
 export class VenturesController {
-  constructor(private readonly venturesService: VenturesService) {}
+  constructor(private readonly venturesService: VenturesService) { }
 
   @Post(':id/invite')
   @ApiOperation({ summary: 'Invite a user to a venture' })

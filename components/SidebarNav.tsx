@@ -139,7 +139,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ activeModule, onModuleChange })
       </div>
 
       {/* Mobile Bottom Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-brand-secondary/90 backdrop-blur-lg border-t border-white/10 z-50 pb-safe">
+      <nav role="navigation" className="md:hidden fixed bottom-0 left-0 right-0 bg-brand-secondary/90 backdrop-blur-lg border-t border-white/10 z-50 pb-safe">
         <div className="flex justify-around items-center p-2 overflow-x-auto">
           {navigationConfig.map((item) => (
             <MobileNavItem
@@ -152,7 +152,7 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ activeModule, onModuleChange })
             />
           ))}
         </div>
-      </div>
+      </nav>
     </>
   );
 };

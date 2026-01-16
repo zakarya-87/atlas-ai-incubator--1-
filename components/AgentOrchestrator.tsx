@@ -23,6 +23,7 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({ activeTool, ventu
     const reconnectAttempts = useRef<number>(0);
     const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Define which agents are involved for each tool type for UI display (active status)
     const getAgentsForTool = (tool: AnyTool): AgentType[] => {
@@ -74,6 +75,10 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({ activeTool, ventu
             clearInterval(heartbeatIntervalRef.current);
             heartbeatIntervalRef.current = null;
         }
+        if (connectionTimeoutRef.current) {
+            clearTimeout(connectionTimeoutRef.current);
+            connectionTimeoutRef.current = null;
+        }
         if (socketRef.current) {
             socketRef.current.disconnect();
             socketRef.current = null;
@@ -102,6 +107,12 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({ activeTool, ventu
             logger.info('WebSocket connected successfully');
             setConnectionStatus('connected');
             reconnectAttempts.current = 0; // Reset on successful connection
+
+            // Clear connection timeout on successful connection
+            if (connectionTimeoutRef.current) {
+                clearTimeout(connectionTimeoutRef.current);
+                connectionTimeoutRef.current = null;
+            }
 
             // Join the venture room
             socketRef.current?.emit('joinRoom', ventureId);
@@ -145,16 +156,15 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({ activeTool, ventu
             logger.error('WebSocket error:', error);
         });
 
-        // Fallback: If no logs arrive within 2 seconds, start simulated logs
-        const timeoutId = setTimeout(() => {
-            if (logs.length === 0 && connectionStatus !== 'connected') {
+        // Fallback: If not connected within 2 seconds, start simulated logs
+        connectionTimeoutRef.current = setTimeout(() => {
+            if (!socketRef.current?.connected) {
                 logger.warn('WebSocket connection timeout, starting simulated logs');
                 startSimulatedLogs();
             }
         }, 2000);
 
-        return () => clearTimeout(timeoutId);
-    }, [ventureId, connectionStatus, logs.length]);
+    }, [ventureId]);
 
     // Handle reconnection with exponential backoff
     const handleReconnect = useCallback(() => {

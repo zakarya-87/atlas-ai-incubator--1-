@@ -14,8 +14,8 @@ import { EmailModule } from '../email/email.module';
     EmailModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: 'secretKey', // In production, use process.env.JWT_SECRET
-      signOptions: { expiresIn: '1h' },
+      secret: process.env.JWT_SECRET || 'CHANGE_ME_IN_ENV',
+      signOptions: { expiresIn: (process.env.JWT_TTL || '15m') as any, algorithm: 'HS256' as any },
     }),
   ],
   controllers: [AuthController],

@@ -43,7 +43,9 @@ export abstract class BaseAgent implements AiAgent {
       const client = this.getClient();
 
       // Construct content parts
-      let contents: any = fullPrompt;
+      // For text-only: pass string directly
+      // For multimodal (with images): pass array of parts
+      let contents: any;
 
       if (images && images.length > 0) {
         const parts: any[] = [{ text: fullPrompt }];
@@ -58,20 +60,39 @@ export abstract class BaseAgent implements AiAgent {
             }
           });
         });
-        contents = [{ role: 'user', parts: parts }];
+        // For multimodal content, pass the parts array directly
+        contents = parts;
+      } else {
+        // For text-only content, pass as string
+        contents = fullPrompt;
       }
 
-      const response = await client.models.generateContent({
+      const model = client.getGenerativeModel({
         model: modelName,
-        contents: contents,
-        config: {
+        systemInstruction: systemInstruction || "You are the ATLAS AI Engine. Provide actionable, structured business analysis.",
+        generationConfig: {
           responseMimeType: 'application/json',
           responseSchema: schema,
-          systemInstruction: systemInstruction || "You are the ATLAS AI Engine. Provide actionable, structured business analysis.",
-        },
+        }
       });
 
-      const resultText = response.text || '{}';
+      console.log(`[Gemini] Starting generation with model: ${modelName}`);
+      const startTime = Date.now();
+
+      // Add timeout for Gemini API call (90 seconds)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Gemini API timeout after 90 seconds')), 90000);
+      });
+
+      const response = await Promise.race([
+        model.generateContent(contents),
+        timeoutPromise
+      ]) as any;
+
+      const elapsed = Date.now() - startTime;
+      console.log(`[Gemini] Generation completed in ${elapsed}ms`);
+
+      const resultText = response.response.text();
       let resultData;
 
       try {
@@ -87,6 +108,18 @@ export abstract class BaseAgent implements AiAgent {
       };
     } catch (error: any) {
       console.error(`AI Agent Error [Model: ${modelName}]:`, error);
+
+      // Provide more specific error messages
+      if (error.message?.includes('timeout')) {
+        throw new InternalServerErrorException('AI analysis is taking too long. Please try a shorter description or try again later.');
+      }
+      if (error.message?.includes('API_KEY') || error.message?.includes('401')) {
+        throw new InternalServerErrorException('API configuration error. Please check your Gemini API key.');
+      }
+      if (error.message?.includes('429') || error.message?.includes('quota')) {
+        throw new InternalServerErrorException('API rate limit exceeded. Please wait a moment and try again.');
+      }
+
       throw new InternalServerErrorException(`AI Generation failed: ${error.message}`);
     }
   }

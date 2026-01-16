@@ -22,3 +22,21 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Database and Prisma artifacts
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+backend/prisma/migration_lock.toml
+
+# Test and report artifacts
+playwright-report/
+test-results/
+backend/coverage/
+backend/dist/
+
+# Environment files
+.env.local
+backend/.env.local
+
+# Misc
+.qodo/

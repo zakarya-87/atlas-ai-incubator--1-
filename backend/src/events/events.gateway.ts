@@ -6,6 +6,10 @@ import { Server, Socket } from 'socket.io';
   cors: {
     origin: '*', // Allow all origins for development
   },
+  transports: ['websocket', 'polling'],
+  pingInterval: 25000,
+  pingTimeout: 60000,
+  maxHttpBufferSize: 1e8,
 })
 export class EventsGateway {
   @WebSocketServer()

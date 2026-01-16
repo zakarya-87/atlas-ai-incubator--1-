@@ -1,0 +1,411 @@
+{
+  "meta": {
+    "project": "ATLAS AI Incubator",
+    "date": "2026-01-15",
+    "prepared_by": "Software Development Manager"
+  },
+  "product_overview": "The ATLAS AI Incubator is a comprehensive platform designed to empower users with AI-driven business analysis and venture management tools. It integrates advanced features including AI-powered SWOT, PESTEL, and Lean Canvas frameworks, user authentication, team collaboration, and subscription management, facilitating strategic decision-making for startups and enterprises.",
+  "core_goals": [
+    "Provide robust AI-powered business analysis tools that generate actionable insights using advanced strategic frameworks like SWOT, PESTEL, and Lean Canvas.",
+    "Enable users to create, manage, and track business ventures effectively with detailed analysis histories and profile customization.",
+    "Support seamless team collaboration by allowing users to invite members and manage access roles within ventures.",
+    "Ensure secure and reliable user authentication, subscription management, and multi-language support for a global user base.",
+    "Deliver a high-quality, maintainable, and scalable platform with comprehensive automated testing covering frontend and backend components."
+  ],
+  "key_features": [
+    "User Authentication system using JWT with email/password login and an admin demo mode for easy onboarding.",
+    "AI-powered Business Analysis Generation supporting multiple frameworks such as SWOT, PESTEL, and Lean Canvas with multi-language options.",
+    "Venture Management capabilities including creating, editing, and retrieving ventures and associated analyses.",
+    "Analysis History for viewing and managing previous analysis results linked to ventures.",
+    "User Profile Management with options to update preferences and language settings supporting internationalization.",
+    "Subscription Management integrated with payment solutions to handle user subscriptions seamlessly.",
+    "Team Collaboration tools allowing users to invite team members, assign roles, and manage access rights within ventures.",
+    "Export Functionality enabling users to export analysis results in various formats for reporting and presentation.",
+    "Undo/Redo Functionality to manage state changes within the application enhancing user experience and error correction.",
+    "Comprehensive Testing Suite integrating unit, integration, and end-to-end tests using Vitest, Jest, and Playwright to ensure reliability and performance."
+  ],
+  "user_flow_summary": [
+    "User registration and login through a secure authentication interface, including an admin demo mode for easy evaluation.",
+    "Users create a new venture providing essential details and then initiate AI-powered business analysis using chosen strategic frameworks.",
+    "Users view analysis results and can navigate to historical records for past ventures and analyses.",
+    "Users manage their profiles including updating personal information and language preferences for localized experience.",
+    "Team owners invite collaborators to ventures, assigning roles to control access and facilitate collaboration.",
+    "Users subscribe to premium plans via integrated payment systems to unlock advanced features.",
+    "Users export analysis reports into preferred formats for offline use or sharing.",
+    "State management supports undo/redo actions during analysis editing or venture configuration.",
+    "Tests run automatically in CI/CD pipeline verifying component functionality, API endpoints, and end-to-end user scenarios for quality assurance."
+  ],
+  "validation_criteria": [
+    "All authentication flows must support secure login, registration, and admin demo access with JWT tokens validated.",
+    "AI analysis generation must produce accurate and contextually relevant reports for SWOT, PESTEL, Lean Canvas, and other specified frameworks.",
+    "Venture creation and retrieval endpoints should operate with correct data persistence and retrieval consistency.",
+    "User profile updates and language preferences must be reflected correctly in the UI and backend data stores.",
+    "Team invitation and role assignment functions must deliver email invitations and maintain access controls.",
+    "Subscription processing should correctly handle payment transactions, status updates, and access level enforcement.",
+    "Exported analysis documents must conform to requested formats without data loss or corruption.",
+    "Undo and redo functionality must reliably track and reverse user actions without state inconsistencies.",
+    "Automated test coverage should meet or exceed 70% overall, with critical components achieving 80%+ coverage.",
+    "End-to-end tests must validate user journeys including login, venture management, analysis generation, collaboration, and export features without failures."
+  ],
+  "code_summary": {
+    "tech_stack": [
+      "TypeScript",
+      "React",
+      "Vite",
+      "NestJS",
+      "Prisma",
+      "PostgreSQL",
+      "Google Generative AI",
+      "Jest",
+      "Vitest",
+      "Playwright",
+      "Testing Library",
+      "Tailwind CSS",
+      "Framer Motion",
+      "Socket.IO",
+      "Stripe",
+      "Nodemailer"
+    ],
+    "features": [
+      {
+        "name": "User Authentication",
+        "description": "User authentication system with JWT, email/password login, and admin demo mode",
+        "files": [
+          "backend/src/auth/auth.controller.ts",
+          "backend/src/auth/auth.service.ts",
+          "backend/src/auth/auth.module.ts",
+          "backend/src/auth/jwt.strategy.ts",
+          "components/AuthModal.tsx",
+          "context/AuthContext.tsx",
+          "services/authService.ts"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/auth/login": {
+              "post": {
+                "summary": "User login",
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "email": {
+                            "type": "string"
+                          },
+                          "password": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "/auth/register": {
+              "post": {
+                "summary": "User registration",
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "email": {
+                            "type": "string"
+                          },
+                          "password": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Business Analysis Generation",
+        "description": "AI-powered business analysis tools including SWOT, PESTEL, Lean Canvas, and other strategic frameworks",
+        "files": [
+          "backend/src/analysis/analysis.controller.ts",
+          "backend/src/analysis/analysis.service.ts",
+          "backend/src/analysis/analysis.factory.ts",
+          "backend/src/analysis/agents/",
+          "components/SwotDisplay.tsx",
+          "components/PestelDisplay.tsx",
+          "components/LeanCanvasDisplay.tsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/analysis/generate": {
+              "post": {
+                "summary": "Generate business analysis",
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "ventureId": {
+                            "type": "string"
+                          },
+                          "module": {
+                            "type": "string"
+                          },
+                          "tool": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "language": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Venture Management",
+        "description": "Create and manage business ventures with associated analyses",
+        "files": [
+          "backend/src/ventures/ventures.controller.ts",
+          "backend/src/ventures/ventures.service.ts",
+          "backend/src/ventures/ventures.module.ts"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/ventures": {
+              "post": {
+                "summary": "Create new venture",
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "/ventures/{id}": {
+              "get": {
+                "summary": "Get venture details"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Analysis History",
+        "description": "View and manage historical analysis records",
+        "files": [
+          "backend/src/history/history.controller.ts",
+          "backend/src/history/history.service.ts"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/analysis/{ventureId}": {
+              "get": {
+                "summary": "Get analysis history for venture"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "User Profile Management",
+        "description": "Manage user profiles and preferences",
+        "files": [
+          "backend/src/users/users.controller.ts",
+          "backend/src/users/users.service.ts"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/users/profile": {
+              "get": {
+                "summary": "Get user profile"
+              },
+              "put": {
+                "summary": "Update user profile"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Subscription Management",
+        "description": "Handle user subscriptions and payments",
+        "files": [
+          "backend/src/subscriptions/subscriptions.controller.ts",
+          "backend/src/subscriptions/subscriptions.service.ts"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/subscriptions": {
+              "post": {
+                "summary": "Create subscription"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Team Collaboration",
+        "description": "Invite team members and manage access",
+        "files": [
+          "components/ShareModal.tsx",
+          "services/geminiService.ts"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/teams/invite": {
+              "post": {
+                "summary": "Invite team member",
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "ventureId": {
+                            "type": "string"
+                          },
+                          "email": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Export Functionality",
+        "description": "Export analysis results to various formats",
+        "files": [
+          "components/ExportControls.tsx",
+          "utils/exportUtils.ts"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/export": {
+              "post": {
+                "summary": "Export analysis",
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "analysisId": {
+                            "type": "string"
+                          },
+                          "format": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Internationalization",
+        "description": "Multi-language support for the application",
+        "files": [
+          "context/LanguageContext.tsx",
+          "locales/en.ts",
+          "locales/fr.ts",
+          "locales/ar.ts"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/language": {
+              "put": {
+                "summary": "Set user language preference",
+                "requestBody": {
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "language": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "Undo/Redo Functionality",
+        "description": "State management with undo/redo capabilities",
+        "files": [
+          "hooks/useUndoRedo.ts",
+          "components/UndoRedoControls.tsx"
+        ],
+        "api_doc": {
+          "openapi": "3.0.0",
+          "paths": {
+            "/state/undo": {
+              "post": {
+                "summary": "Undo last action"
+              }
+            },
+            "/state/redo": {
+              "post": {
+                "summary": "Redo last undone action"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

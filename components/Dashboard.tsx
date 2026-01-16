@@ -24,7 +24,7 @@ const itemVariants = {
 
 const Dashboard: React.FC<DashboardProps> = ({ ventureId, onNavigate }) => {
   const { t } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin } = useAuth();
   const [credits, setCredits] = useState<number | null>(null);
   const [isPro, setIsPro] = useState(false);
   const [history, setHistory] = useState<GenerationRecord[]>([]);
@@ -36,12 +36,18 @@ const Dashboard: React.FC<DashboardProps> = ({ ventureId, onNavigate }) => {
       setIsLoading(true);
       try {
         if (isAuthenticated) {
-          const profile = await fetchUserProfile();
-          setCredits(profile.credits);
-          setIsPro(profile.subscriptionStatus === 'active');
+          if (isAdmin) {
+            // Demo mode: stub values, skip backend
+            setCredits(100);
+            setIsPro(true);
+          } else {
+            const profile = await fetchUserProfile();
+            setCredits(profile.credits);
+            setIsPro(profile.subscriptionStatus === 'active');
+          }
         }
         
-        if (ventureId && isAuthenticated) {
+        if (ventureId && isAuthenticated && !isAdmin) {
             try {
                 const hist = await fetchVentureHistory(ventureId);
                 setHistory(hist.slice(0, 5)); // Top 5
@@ -50,6 +56,10 @@ const Dashboard: React.FC<DashboardProps> = ({ ventureId, onNavigate }) => {
             } catch(e) {
                 console.warn("Dashboard data partial fail", e);
             }
+        } else if (isAdmin) {
+            // Optional: provide demo placeholders
+            setHistory([]);
+            setIntegrations([]);
         }
       } catch (e) {
         console.error("Dashboard load error", e);
@@ -58,7 +68,7 @@ const Dashboard: React.FC<DashboardProps> = ({ ventureId, onNavigate }) => {
       }
     };
     loadData();
-  }, [isAuthenticated, ventureId]);
+  }, [isAuthenticated, isAdmin, ventureId]);
 
   const userName = user?.email.split('@')[0] || 'Founder';
 

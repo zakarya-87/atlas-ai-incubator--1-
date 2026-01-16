@@ -1,62 +1,37 @@
-
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { BullModule } from '@nestjs/bullmq';
-import { AnalysisModule } from './analysis/analysis.module';
-import { HistoryModule } from './history/history.module';
-import { PrismaModule } from './prisma/prisma.module';
+import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { AnalysisModule } from './analysis/analysis.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { EmailModule } from './email/email.module';
 import { EventsModule } from './events/events.module';
+import { HistoryModule } from './history/history.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { ReportsModule } from './reports/reports.module';
-import { VenturesModule } from './ventures/ventures.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
-import { EmailModule } from './email/email.module';
-import { HealthModule } from './health/health.module';
-import { RolesGuard } from './auth/roles.guard';
+import { VenturesModule } from './ventures/ventures.module';
+import { validateEnv } from './config/env.validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-    }),
-    // Rate Limiting: 10 requests per 60 seconds
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 10,
-    }]),
-    // BullMQ for async job processing
-    BullModule.forRoot({
-      connection: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379', 10),
-      },
+      validate: (config) => validateEnv(config),
     }),
     PrismaModule,
-    AnalysisModule,
-    HistoryModule,
+    HealthModule,
     AuthModule,
     UsersModule,
+    AnalysisModule,
+    EmailModule,
     EventsModule,
+    HistoryModule,
     IntegrationsModule,
     ReportsModule,
-    VenturesModule,
     SubscriptionsModule,
-    EmailModule,
-    HealthModule,
-  ],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    VenturesModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}

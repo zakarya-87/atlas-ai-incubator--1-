@@ -1,0 +1,327 @@
+{
+  "tech_stack": [
+    "TypeScript",
+    "React",
+    "Vite",
+    "NestJS",
+    "Prisma",
+    "PostgreSQL",
+    "Google Generative AI",
+    "Jest",
+    "Vitest",
+    "Playwright",
+    "Testing Library",
+    "Tailwind CSS",
+    "Framer Motion",
+    "Socket.IO",
+    "Stripe",
+    "Nodemailer"
+  ],
+  "features": [
+    {
+      "name": "User Authentication",
+      "description": "User authentication system with JWT, email/password login, and admin demo mode",
+      "files": [
+        "backend/src/auth/auth.controller.ts",
+        "backend/src/auth/auth.service.ts",
+        "backend/src/auth/auth.module.ts",
+        "backend/src/auth/jwt.strategy.ts",
+        "components/AuthModal.tsx",
+        "context/AuthContext.tsx",
+        "services/authService.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/auth/login": {
+            "post": {
+              "summary": "User login",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "email": {"type": "string"},
+                        "password": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/auth/register": {
+            "post": {
+              "summary": "User registration",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "email": {"type": "string"},
+                        "password": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Business Analysis Generation",
+      "description": "AI-powered business analysis tools including SWOT, PESTEL, Lean Canvas, and other strategic frameworks",
+      "files": [
+        "backend/src/analysis/analysis.controller.ts",
+        "backend/src/analysis/analysis.service.ts",
+        "backend/src/analysis/analysis.factory.ts",
+        "backend/src/analysis/agents/",
+        "components/SwotDisplay.tsx",
+        "components/PestelDisplay.tsx",
+        "components/LeanCanvasDisplay.tsx"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/analysis/generate": {
+            "post": {
+              "summary": "Generate business analysis",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "ventureId": {"type": "string"},
+                        "module": {"type": "string"},
+                        "tool": {"type": "string"},
+                        "description": {"type": "string"},
+                        "language": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Venture Management",
+      "description": "Create and manage business ventures with associated analyses",
+      "files": [
+        "backend/src/ventures/ventures.controller.ts",
+        "backend/src/ventures/ventures.service.ts",
+        "backend/src/ventures/ventures.module.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/ventures": {
+            "post": {
+              "summary": "Create new venture",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "name": {"type": "string"},
+                        "description": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/ventures/{id}": {
+            "get": {
+              "summary": "Get venture details"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Analysis History",
+      "description": "View and manage historical analysis records",
+      "files": [
+        "backend/src/history/history.controller.ts",
+        "backend/src/history/history.service.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/analysis/{ventureId}": {
+            "get": {
+              "summary": "Get analysis history for venture"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "User Profile Management",
+      "description": "Manage user profiles and preferences",
+      "files": [
+        "backend/src/users/users.controller.ts",
+        "backend/src/users/users.service.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/users/profile": {
+            "get": {
+              "summary": "Get user profile"
+            },
+            "put": {
+              "summary": "Update user profile"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Subscription Management",
+      "description": "Handle user subscriptions and payments",
+      "files": [
+        "backend/src/subscriptions/subscriptions.controller.ts",
+        "backend/src/subscriptions/subscriptions.service.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/subscriptions": {
+            "post": {
+              "summary": "Create subscription"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Team Collaboration",
+      "description": "Invite team members and manage access",
+      "files": [
+        "components/ShareModal.tsx",
+        "services/geminiService.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/teams/invite": {
+            "post": {
+              "summary": "Invite team member",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "ventureId": {"type": "string"},
+                        "email": {"type": "string"},
+                        "role": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Export Functionality",
+      "description": "Export analysis results to various formats",
+      "files": [
+        "components/ExportControls.tsx",
+        "utils/exportUtils.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/export": {
+            "post": {
+              "summary": "Export analysis",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "analysisId": {"type": "string"},
+                        "format": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Internationalization",
+      "description": "Multi-language support for the application",
+      "files": [
+        "context/LanguageContext.tsx",
+        "locales/en.ts",
+        "locales/fr.ts",
+        "locales/ar.ts"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/language": {
+            "put": {
+              "summary": "Set user language preference",
+              "requestBody": {
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "language": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Undo/Redo Functionality",
+      "description": "State management with undo/redo capabilities",
+      "files": [
+        "hooks/useUndoRedo.ts",
+        "components/UndoRedoControls.tsx"
+      ],
+      "api_doc": {
+        "openapi": "3.0.0",
+        "paths": {
+          "/state/undo": {
+            "post": {
+              "summary": "Undo last action"
+            }
+          },
+          "/state/redo": {
+            "post": {
+              "summary": "Redo last undone action"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

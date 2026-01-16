@@ -25,9 +25,9 @@ export const STORAGE_KEYS = {
 
 export const API_CONFIG = {
     BACKEND_URL: (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000',
-    REQUEST_TIMEOUT: 30000, // 30 seconds
-    RETRY_ATTEMPTS: 3,
-    RETRY_DELAY: 1000, // 1 second
+    REQUEST_TIMEOUT: 120000, // 2 minutes - Gemini Pro can take longer for complex analyses
+    RETRY_ATTEMPTS: 2,
+    RETRY_DELAY: 2000, // 2 seconds
 } as const;
 
 // ==========================================

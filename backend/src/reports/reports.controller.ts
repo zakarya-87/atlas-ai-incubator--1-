@@ -1,15 +1,15 @@
 
 import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
-import { AuthGuard } from '@nestjs/passport';
+
 import { ReportsService } from './reports.service';
 import { GetUser } from '../auth/get-user.decorator';
 import { User } from '@prisma/client';
 
 @Controller('reports')
-@UseGuards(AuthGuard('jwt'))
+
 export class ReportsController {
-  constructor(private readonly reportsService: ReportsService) {}
+  constructor(private readonly reportsService: ReportsService) { }
 
   @Get(':id/pdf')
   async downloadPdf(

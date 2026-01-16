@@ -1,0 +1,550 @@
+[
+  {
+    "id": "TC001",
+    "title": "User Authentication Success",
+    "description": "Verify that user can successfully log in using correct credentials via authentication modal and context.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the authentication modal."
+      },
+      {
+        "type": "action",
+        "description": "Input valid username and password."
+      },
+      {
+        "type": "action",
+        "description": "Submit login form."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm user is authenticated and redirected to dashboard."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that authentication context is properly set."
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "User Authentication Failure",
+    "description": "Verify that login attempt fails for invalid credentials and error messages appear within modal.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open the authentication modal."
+      },
+      {
+        "type": "action",
+        "description": "Input invalid username or password."
+      },
+      {
+        "type": "action",
+        "description": "Submit login form."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm login is rejected."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify relevant error message is displayed inside the modal."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure authentication context state remains unset."
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Dashboard Rendering and Metrics Display",
+    "description": "Verify dashboard and all business metrics components render correctly with valid data.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in successfully."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to main dashboard page."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm dashboard layout loads including header, sidebar navigation, and main content."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify market, competitor, financial, risk, and brand identity analysis components are rendered."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all displayed metrics contain realistic and consistent data."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "SWOT Analysis Component Rendering",
+    "description": "Validate SWOT analysis display component renders all strengths, weaknesses, opportunities, and threats correctly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to SWOT analysis section on dashboard."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all SWOT categories (Strengths, Weaknesses, Opportunities, Threats) are displayed distinctly."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm data in each category matches input or backend source."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Undo/Redo Hook Functionality",
+    "description": "Test undo and redo operations within an editable business analysis input form using custom hook.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Input sample data into business input form."
+      },
+      {
+        "type": "action",
+        "description": "Modify input fields."
+      },
+      {
+        "type": "action",
+        "description": "Execute undo operation."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm form fields revert to prior state."
+      },
+      {
+        "type": "action",
+        "description": "Execute redo operation."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm form fields return to modified state."
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Internationalization Language Switching",
+    "description": "Verify language switcher component toggles UI content among English, French, and Arabic accurately.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load application with default language (English)."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify UI text shows in English."
+      },
+      {
+        "type": "action",
+        "description": "Switch language to French via language switcher."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm all relevant UI text updates to French localized strings."
+      },
+      {
+        "type": "action",
+        "description": "Switch language to Arabic via language switcher."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm all relevant UI text updates to Arabic localized strings and right-to-left layout formats where applicable."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Google Gemini AI Service Integration Success",
+    "description": "Test successful integration and response handling when invoking Google Gemini API for business insights.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Provide valid business data inputs."
+      },
+      {
+        "type": "action",
+        "description": "Trigger AI insights generation via Gemini service."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm API call is made to mock Gemini API and returns expected AI analysis data."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify AI-generated insights are displayed correctly on dashboard components."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Google Gemini API Error Handling",
+    "description": "Verify robust error handling and user feedback if Gemini API returns error or times out.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Simulate Gemini API failure or timeout response."
+      },
+      {
+        "type": "action",
+        "description": "Trigger AI insights generation call."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm error boundary or message component captures API error."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify user receives a clear, actionable error notification without app crash."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Error Boundaries Capture and Display Errors",
+    "description": "Test that React error boundaries catch rendering or runtime errors and display user-friendly messages.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Force a runtime error in a child component of dashboard."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify error boundary catches the error and prevents app crash."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm user friendly error message is displayed in UI."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Business Data Input Form Validation and Submission",
+    "description": "Ensure business data input form accepts valid input, performs client validation, and submits successfully.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open business data input form."
+      },
+      {
+        "type": "action",
+        "description": "Fill in all required fields with valid data."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that submit button is enabled after valid input."
+      },
+      {
+        "type": "action",
+        "description": "Submit form."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify backend API is called with correct data payload."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm success toast notification appears."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Business Data Input Form Validation Errors",
+    "description": "Ensure invalid or missing inputs prevent form submission and show validation errors.",
+    "category": "error handling",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open business data input form."
+      },
+      {
+        "type": "action",
+        "description": "Leave required fields empty or input invalid data formats."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify validation error messages appear next to invalid fields."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm submit button is disabled or submission blocked."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Toast Notifications Appear on User Actions",
+    "description": "Verify toast notifications are displayed appropriately on user actions such as form submission, errors, and language switch.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Perform a successful data submission."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm success toast notification appears and disappears after timeout."
+      },
+      {
+        "type": "action",
+        "description": "Trigger an error condition manually."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm error toast notification appears with correct message."
+      },
+      {
+        "type": "action",
+        "description": "Change application language."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify informational toast, if any, respects current locale."
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Export Controls Data Export Integrity",
+    "description": "Test export functionality exports current analysis results correctly in expected format and data integrity is maintained.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to export controls component."
+      },
+      {
+        "type": "action",
+        "description": "Trigger data export operation."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify exported file contains accurate and complete analysis results."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm export file format matches specification."
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Loading States with Spinners and Skeletons",
+    "description": "Ensure loading spinners and skeleton components display during data fetching or processing states.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Start a data fetch operation on dashboard and business modules."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm loading spinner is visible during fetch."
+      },
+      {
+        "type": "assertion",
+        "description": "Check skeleton components render appropriately in place of data until loading finishes."
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Backend API Endpoint Unit and Integration Tests",
+    "description": "Validate correctness of backend NestJS API endpoints for user, analysis, ventures, and subscription modules through unit and integration tests.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Execute unit tests covering each API endpoint controller and service logic."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify correct status codes and response payloads returned for valid requests."
+      },
+      {
+        "type": "action",
+        "description": "Execute integration tests involving real Prisma database operations and API calls."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure database interaction correctness and rollback behavior for error cases."
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "State Management Hook Persistence",
+    "description": "Test custom persisted state hooks correctly save and load state data across sessions.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Modify state using custom persisted state hook."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm updated state is saved to persistent storage."
+      },
+      {
+        "type": "action",
+        "description": "Reload application or component."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify persisted state is restored correctly on load."
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Real-time Updates via WebSocket",
+    "description": "Confirm that real-time updates are delivered through WebSocket connection for collaborative analysis workflows.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Establish WebSocket connection after user login."
+      },
+      {
+        "type": "action",
+        "description": "Trigger data change from one client/session."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm other connected clients receive updates in real time."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify UI components update accordingly without manual refresh."
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "End-to-End Workflow Testing with Playwright",
+    "description": "Execute and verify full user workflows including login, dashboard access, data input, AI insights generation, language switching, undo/redo, and export via Playwright E2E tests.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Run Playwright E2E script covering login and authentication flow."
+      },
+      {
+        "type": "action",
+        "description": "Navigate main dashboard and verify component load."
+      },
+      {
+        "type": "action",
+        "description": "Perform data input, triggering AI analysis generation."
+      },
+      {
+        "type": "action",
+        "description": "Validate undo and redo feature on input forms."
+      },
+      {
+        "type": "action",
+        "description": "Switch languages using language switcher."
+      },
+      {
+        "type": "action",
+        "description": "Trigger data export and verify success."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm all steps complete without errors and UI behaves as expected."
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Performance Benchmark of Dashboard Loading",
+    "description": "Measure dashboard load times under different data volume scenarios to ensure responsiveness within acceptable thresholds.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Load dashboard with small dataset."
+      },
+      {
+        "type": "assertion",
+        "description": "Record load time and verify it is under defined SLA."
+      },
+      {
+        "type": "action",
+        "description": "Load dashboard with large, complex dataset."
+      },
+      {
+        "type": "assertion",
+        "description": "Record load time and verify it meets performance benchmarks."
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "Accessibility Compliance Verification",
+    "description": "Verify that key UI components meet accessibility standards including keyboard navigation and screen reader labels.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate through application using keyboard only."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify all interactive elements are reachable and usable via keyboard."
+      },
+      {
+        "type": "action",
+        "description": "Use screen reader to review UI component labels."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm semantic roles and ARIA labels are present and accurate."
+      }
+    ]
+  }
+]

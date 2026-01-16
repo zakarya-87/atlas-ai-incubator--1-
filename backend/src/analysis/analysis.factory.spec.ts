@@ -3,11 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AnalysisAgentFactory } from './analysis.factory';
 import { DefaultAgent } from './agents/default.agent';
 import { ResearchAgent } from './agents/research.agent';
-
-declare const describe: any;
-declare const beforeEach: any;
-declare const it: any;
-declare const expect: any;
+import { DesignAgent } from './agents/design.agent';
 
 describe('AnalysisAgentFactory', () => {
   let factory: AnalysisAgentFactory;
@@ -20,6 +16,7 @@ describe('AnalysisAgentFactory', () => {
         AnalysisAgentFactory,
         { provide: DefaultAgent, useValue: { name: 'DefaultAgent' } },
         { provide: ResearchAgent, useValue: { name: 'ResearchAgent' } },
+        { provide: DesignAgent, useValue: { name: 'DesignAgent' } },
       ],
     }).compile();
 

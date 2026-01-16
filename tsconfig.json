@@ -11,7 +11,9 @@
     ],
     "skipLibCheck": true,
     "types": [
-      "node"
+      "node",
+      "vitest/globals",
+      "playwright/test"
     ],
     "moduleResolution": "bundler",
     "isolatedModules": true,
@@ -25,5 +27,27 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "include": [
+    "index.tsx",
+    "App.tsx",
+    "types.ts",
+    "components/**/*.tsx",
+    "context/**/*.tsx",
+    "hooks/**/*.ts",
+    "utils/**/*.ts",
+    "services/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.tsx",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "e2e",
+    "test-results",
+    "playwright-report",
+    "backend"
+  ]
 }

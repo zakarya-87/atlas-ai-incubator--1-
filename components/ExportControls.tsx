@@ -173,6 +173,7 @@ const ExportControls: React.FC<ExportControlsProps> = ({ analysisData, analysisT
     <>
       <div
         id="export-controls"
+        data-testid="export-controls"
         className="absolute bottom-4 right-4 rtl:right-auto rtl:left-4 z-20 no-export"
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
