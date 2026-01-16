@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import type { ModuleType } from '../types';
 import { TranslationKey } from '../locales';
@@ -7,7 +7,7 @@ interface HeroProps {
   activeModule: ModuleType;
 }
 
-const Hero: React.FC<HeroProps> = ({ activeModule }) => {
+const Hero: React.FC<HeroProps> = memo(({ activeModule }) => {
   const { t } = useLanguage();
 
   const titleKey = `${activeModule}HeroTitle` as TranslationKey;
@@ -23,6 +23,6 @@ const Hero: React.FC<HeroProps> = ({ activeModule }) => {
       </p>
     </div>
   );
-};
+});
 
 export default Hero;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 // Mock performance API
@@ -62,7 +62,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Should render within 100ms for good UX
       expect(renderTime).toBeLessThan(100);
-      console.log(`BusinessInputForm render time: ${renderTime}ms`);
     });
 
     it('should render AnalysisSkeleton components quickly', () => {
@@ -75,20 +74,22 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Skeleton should render very quickly (< 50ms)
       expect(renderTime).toBeLessThan(50);
-      console.log(`AnalysisSkeleton render time: ${renderTime}ms`);
     });
 
     it('should render LoadingSpinner instantly', () => {
       const startTime = performance.now();
 
-      render(<LoadingSpinner />);
+      render(
+        <LanguageProvider>
+          <LoadingSpinner />
+        </LanguageProvider>
+      );
 
       const endTime = performance.now();
       const renderTime = endTime - startTime;
 
       // Loading spinner should be nearly instant (< 10ms)
       expect(renderTime).toBeLessThan(10);
-      console.log(`LoadingSpinner render time: ${renderTime}ms`);
     });
 
     it('should render ExportControls with acceptable performance', () => {
@@ -118,7 +119,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Should render within 100ms
       expect(renderTime).toBeLessThan(100);
-      console.log(`ExportControls render time: ${renderTime}ms`);
     });
   });
 
@@ -145,7 +145,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Should handle large text within reasonable time (< 200ms)
       expect(renderTime).toBeLessThan(200);
-      console.log(`Large text render time: ${renderTime}ms`);
 
       // Character count should be accurate
       expect(screen.getByText('10000')).toBeInTheDocument();
@@ -190,7 +189,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Should handle complex data within reasonable time (< 300ms)
       expect(renderTime).toBeLessThan(300);
-      console.log(`Complex data render time: ${renderTime}ms`);
     });
   });
 
@@ -227,10 +225,9 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Loading state transition should be fast (< 50ms)
       expect(transitionTime).toBeLessThan(50);
-      console.log(`Loading state transition time: ${transitionTime}ms`);
 
       // Should show loading state
-      expect(screen.getByText('buttonGenerating')).toBeInTheDocument();
+      expect(screen.getByText(/Generating/i)).toBeInTheDocument();
     });
 
     it('should display skeleton loading states immediately', () => {
@@ -251,7 +248,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Multiple skeletons should render quickly (< 100ms)
       expect(renderTime).toBeLessThan(100);
-      console.log(`Multiple skeletons render time: ${renderTime}ms`);
 
       // Should have multiple skeleton blocks
       const skeletonBlocks = document.querySelectorAll('.animate-pulse');
@@ -303,8 +299,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
       // Max re-render time should be reasonable (< 50ms)
       expect(maxRenderTime).toBeLessThan(50);
 
-      console.log(`Average re-render time: ${averageRenderTime}ms`);
-      console.log(`Max re-render time: ${maxRenderTime}ms`);
     });
 
     it('should maintain performance with state updates', () => {
@@ -340,7 +334,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Text input updates should be fast (< 20ms average)
       expect(averageUpdateTime).toBeLessThan(20);
-      console.log(`Average text input update time: ${averageUpdateTime}ms`);
     });
   });
 
@@ -368,7 +361,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Toast with animation should render reasonably fast (< 100ms)
       expect(renderTime).toBeLessThan(100);
-      console.log(`Toast render time: ${renderTime}ms`);
     });
 
     it('should handle export menu animations smoothly', () => {
@@ -396,7 +388,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Menu trigger should be instant (< 10ms)
       expect(animationTriggerTime).toBeLessThan(10);
-      console.log(`Menu animation trigger time: ${animationTriggerTime}ms`);
     });
   });
 
@@ -414,7 +405,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Dynamic imports should be reasonable (< 500ms in test environment)
       expect(importTime).toBeLessThan(500);
-      console.log(`Dynamic import time: ${importTime}ms`);
 
       // Verify component can be rendered
       expect(BusinessInputFormDynamic).toBeDefined();
@@ -431,7 +421,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
 
       // Lazy-loaded skeleton should render instantly (< 20ms)
       expect(lazyLoadTime).toBeLessThan(20);
-      console.log(`Lazy load render time: ${lazyLoadTime}ms`);
     });
   });
 
@@ -455,9 +444,7 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
       expect(performanceMetrics.textInputUpdateTime).toContain('< 20ms');
       expect(performanceMetrics.largeDatasetHandling).toContain('< 300ms');
 
-      console.log('Performance SLA Requirements:');
       Object.entries(performanceMetrics).forEach(([metric, requirement]) => {
-        console.log(`  ${metric}: ${requirement}`);
       });
     });
 
@@ -468,7 +455,11 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
       for (let i = 0; i < 5; i++) {
         const startTime = performance.now();
 
-        render(<LoadingSpinner />);
+        render(
+          <LanguageProvider>
+            <LoadingSpinner />
+          </LanguageProvider>
+        );
 
         const endTime = performance.now();
         renderTimes.push(endTime - startTime);
@@ -482,10 +473,6 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
       expect(standardDeviation).toBeLessThan(5);
       expect(averageTime).toBeLessThan(10);
 
-      console.log(`Performance consistency - Average: ${averageTime}ms, StdDev: ${standardDeviation}ms`);
     });
   });
-});</content>
-<task_progress>
-- [x] TC019: Performance Benchmark of Dashboard Loading
-</task_progress>
+});

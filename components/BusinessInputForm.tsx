@@ -4,6 +4,13 @@ import { useLanguage } from '../context/LanguageContext';
 import { TranslationKey } from '../locales';
 import type { AnyTool } from '../types';
 
+const PROMPT_HELPERS: { labelKey: TranslationKey; templateKey: TranslationKey }[] = [
+    { labelKey: 'promptHelperAudience', templateKey: 'promptTemplateAudience' },
+    { labelKey: 'promptHelperProblem', templateKey: 'promptTemplateProblem' },
+    { labelKey: 'promptHelperSolution', templateKey: 'promptTemplateSolution' },
+    { labelKey: 'promptHelperRevenue', templateKey: 'promptTemplateRevenue' },
+];
+
 interface BusinessInputFormProps {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -115,13 +122,6 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
     case 'connectors': labelKey = 'inputLabelIntegrations'; placeholderKey = 'inputPlaceholderIntegrations'; break;
   }
 
-  const promptHelpers: { labelKey: TranslationKey; templateKey: TranslationKey }[] = [
-      { labelKey: 'promptHelperAudience', templateKey: 'promptTemplateAudience' },
-      { labelKey: 'promptHelperProblem', templateKey: 'promptTemplateProblem' },
-      { labelKey: 'promptHelperSolution', templateKey: 'promptTemplateSolution' },
-      { labelKey: 'promptHelperRevenue', templateKey: 'promptTemplateRevenue' },
-  ];
-
   return (
     <div>
       <div className="flex justify-between items-end mb-2">
@@ -149,7 +149,7 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
           
           {/* Helper Chips */}
           <div className="absolute bottom-3 right-3 flex gap-2 overflow-x-auto max-w-[90%] justify-end opacity-80 group-hover:opacity-100 transition-opacity">
-              {promptHelpers.map((helper) => (
+              {PROMPT_HELPERS.map((helper) => (
                   <button
                     key={helper.labelKey}
                     onClick={() => addPromptTemplate(helper.templateKey)}

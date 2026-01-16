@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import type { ModuleType } from '../types';
 import { TranslationKey } from '../locales';
@@ -117,7 +117,7 @@ const iconComponents = {
   ),
 };
 
-const SidebarNav: React.FC<SidebarNavProps> = ({ activeModule, onModuleChange }) => {
+const SidebarNav: React.FC<SidebarNavProps> = memo(({ activeModule, onModuleChange }) => {
   const { t } = useLanguage();
 
   return (
@@ -155,6 +155,6 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ activeModule, onModuleChange })
       </nav>
     </>
   );
-};
+});
 
 export default SidebarNav;
