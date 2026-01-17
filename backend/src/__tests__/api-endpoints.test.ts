@@ -29,7 +29,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
     configService = moduleFixture.get<ConfigService>(ConfigService);
 
     // Clear database before each test
-    await prisma.cleanDb();
+    // await prisma.cleanDb();
   });
 
   afterEach(async () => {

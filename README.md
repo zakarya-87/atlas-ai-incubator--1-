@@ -37,6 +37,26 @@ ATLAS follows a **Modular Monolith** architecture, designed for easy transition 
 *   **Infrastructure**: Docker, Nginx.
 
 ---
+## 📂 Project Structure
+
+The repository is organized as a monorepo with a clear separation of concerns:
+
+| Path                  | Description                                                                                              |
+| --------------------- | -------------------------------------------------------------------------------------------------------- |
+| `backend/`            | The core NestJS backend application. Contains all modules, services, and controllers for the API.        |
+| `backend/src/`        | Source code for the backend.                                                                             |
+| `backend/src/analysis/` | Contains the logic for the AI agentic workflows.                                                         |
+| `backend/src/prisma/`   | Prisma schema, migrations, and database client configuration.                                            |
+| `components/`         | Shared React components used across the frontend application.                                            |
+| `context/`            | React Context providers for managing global state (e.g., Authentication, Language).                      |
+| `e2e/`                | End-to-end tests written with Playwright to simulate user workflows.                                     |
+| `hooks/`              | Custom React hooks for reusable logic (e.g., `useWebSocket`, `useUndoRedo`).                             |
+| `locales/`            | Internationalization (i18n) translation files for multi-language support.                                |
+| `services/`           | Frontend service layer for making API requests to the backend.                                           |
+| `testsprite_tests/`   | A directory for automated tests.                                                                          |
+| `utils/`              | Utility functions shared across the frontend.                                                             |
+
+---
 
 ## 🚀 Quick Start (Development)
 

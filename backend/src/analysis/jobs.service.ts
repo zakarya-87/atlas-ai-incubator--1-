@@ -1,6 +1,8 @@
+
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue, Job } from 'bullmq';
+import { Queue } from 'bullmq';
+import { GenerateAnalysisDto } from './dto/generate-analysis.dto';
 
 export interface JobStatusResponse {
     jobId: string;
@@ -17,6 +19,10 @@ export class JobsService {
     constructor(
         @InjectQueue('analysis') private analysisQueue: Queue,
     ) { }
+
+    async queueAnalysis(jobId: string, dto: GenerateAnalysisDto, userId: string): Promise<void> {
+        await this.analysisQueue.add('generate', { dto, userId }, { jobId });
+    }
 
     async getJobStatus(jobId: string): Promise<JobStatusResponse> {
         const job = await this.analysisQueue.getJob(jobId);

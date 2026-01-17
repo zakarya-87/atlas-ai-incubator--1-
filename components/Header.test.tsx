@@ -1,8 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import Header from './Header';
 import { AuthContext } from '../context/AuthContext';
 import { LanguageContext } from '../context/LanguageContext';
+import { ToastProvider } from '../context/ToastContext';
 
 describe('Header Component', () => {
   const mockAuthContext = {
@@ -22,11 +24,15 @@ describe('Header Component', () => {
 
   const renderHeader = () => {
     return render(
-      <AuthContext.Provider value={mockAuthContext}>
-        <LanguageContext.Provider value={mockLanguageContext}>
-          <Header />
-        </LanguageContext.Provider>
-      </AuthContext.Provider>
+      <MemoryRouter>
+        <AuthContext.Provider value={mockAuthContext}>
+          <LanguageContext.Provider value={mockLanguageContext}>
+            <ToastProvider>
+              <Header />
+            </ToastProvider>
+          </LanguageContext.Provider>
+        </AuthContext.Provider>
+      </MemoryRouter>
     );
   };
 
@@ -49,14 +55,18 @@ describe('Header Component', () => {
     };
 
     render(
-      <AuthContext.Provider value={unauthContext}>
-        <LanguageContext.Provider value={mockLanguageContext}>
-          <Header />
-        </LanguageContext.Provider>
-      </AuthContext.Provider>
+      <MemoryRouter>
+        <AuthContext.Provider value={unauthContext}>
+          <LanguageContext.Provider value={mockLanguageContext}>
+            <ToastProvider>
+              <Header />
+            </ToastProvider>
+          </LanguageContext.Provider>
+        </AuthContext.Provider>
+      </MemoryRouter>
     );
 
-    expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
   });
 
   it('should call login when login button is clicked', () => {
@@ -66,14 +76,18 @@ describe('Header Component', () => {
     };
 
     render(
-      <AuthContext.Provider value={unauthContext}>
-        <LanguageContext.Provider value={mockLanguageContext}>
-          <Header />
-        </LanguageContext.Provider>
-      </AuthContext.Provider>
+      <MemoryRouter>
+        <AuthContext.Provider value={unauthContext}>
+          <LanguageContext.Provider value={mockLanguageContext}>
+            <ToastProvider>
+              <Header />
+            </ToastProvider>
+          </LanguageContext.Provider>
+        </AuthContext.Provider>
+      </MemoryRouter>
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /login/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Sign In/i }));
     expect(unauthContext.login).toHaveBeenCalled();
   });
 
@@ -84,11 +98,15 @@ describe('Header Component', () => {
     };
 
     render(
-      <AuthContext.Provider value={loadingContext}>
-        <LanguageContext.Provider value={mockLanguageContext}>
-          <Header />
-        </LanguageContext.Provider>
-      </AuthContext.Provider>
+      <MemoryRouter>
+        <AuthContext.Provider value={loadingContext}>
+          <LanguageContext.Provider value={mockLanguageContext}>
+            <ToastProvider>
+              <Header />
+            </ToastProvider>
+          </LanguageContext.Provider>
+        </AuthContext.Provider>
+      </MemoryRouter>
     );
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -96,14 +114,12 @@ describe('Header Component', () => {
 
   it('should show language switcher', () => {
     renderHeader();
-    expect(screen.getByRole('button', { name: /language/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /English/i })).toBeInTheDocument();
   });
 
   it('should call setLanguage when language is changed', () => {
     renderHeader();
-    fireEvent.click(screen.getByRole('button', { name: /language/i }));
-    fireEvent.click(screen.getByRole('menuitem', { name: /french/i }));
-
+    fireEvent.click(screen.getByRole('button', { name: /Français/i }));
     expect(mockLanguageContext.setLanguage).toHaveBeenCalledWith('fr');
   });
 

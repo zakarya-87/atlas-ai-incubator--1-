@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -15,24 +16,22 @@ datasource db {
 // ==========================================
 
 model User {
-  id                String   @id @default(uuid())
-  email             String   @unique
-  password          String
-  fullName          String?
-  role              String   @default("USER") // USER, ADMIN
-  credits           Int      @default(100) // For usage quotas
-  subscriptionStatus String  @default("free") // free, active, cancelled, past_due
-  subscriptionPlan  String   @default("free") // free, starter, pro, enterprise
-  stripeCustomerId  String?  @unique
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  // Relations
-  ownedVentures     Venture[]
+  id                 String         @id @default(uuid())
+  email              String         @unique
+  password           String
+  fullName           String?
+  role               String         @default("USER") // USER, ADMIN
+  credits            Int            @default(100) // For usage quotas
+  subscriptionStatus String         @default("free") // free, active, cancelled, past_due
+  subscriptionPlan   String         @default("free") // free, starter, pro, enterprise
+  stripeCustomerId   String?        @unique
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  ownedVentures      Venture[]
   ventureMemberships VentureMember[]
-  analyses          Analysis[]
-  refreshTokens     RefreshToken[]
-  jobs              Job[]
+  analyses           Analysis[]
+  refreshTokens      RefreshToken[]
+  jobs               Job[]
 
   @@index([email])
   @@map("users")
@@ -60,16 +59,14 @@ model RefreshToken {
 // ==========================================
 
 model Venture {
-  id          String   @id @default(uuid())
+  id          String          @id @default(uuid())
   name        String
   description String?
   industry    String?
-  stage       String?  // idea, validation, mvp, growth, scale
-  userId      String   // Owner
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
+  stage       String? // idea, validation, mvp, growth, scale
+  userId      String // Owner
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   owner       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   members     VentureMember[]
   analyses    Analysis[]
@@ -83,16 +80,14 @@ model Venture {
 // ==========================================
 
 model VentureMember {
-  id         String   @id @default(uuid())
-  ventureId  String
-  userId     String
-  role       String   @default("viewer") // owner, editor, viewer
-  invitedBy  String?
-  joinedAt   DateTime @default(now())
-
-  // Relations
-  venture    Venture  @relation(fields: [ventureId], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  ventureId String
+  userId    String
+  role      String   @default("viewer") // owner, editor, viewer
+  invitedBy String?
+  joinedAt  DateTime @default(now())
+  venture   Venture  @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([ventureId, userId])
   @@index([ventureId])
@@ -105,20 +100,18 @@ model VentureMember {
 // ==========================================
 
 model Analysis {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   ventureId    String
   userId       String
-  module       String   // strategy, marketAnalysis, finance, etc.
-  tool         String   // swot, pestel, budgetGenerator, etc.
-  inputContext String   // User's business description
-  resultData   String   // Structured analysis result (JSON string)
-  parentId     String?  // For refinement/versioning
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relations
-  venture      Venture  @relation(fields: [ventureId], references: [id], onDelete: Cascade)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module       String // strategy, marketAnalysis, finance, etc.
+  tool         String // swot, pestel, budgetGenerator, etc.
+  inputContext String // User's business description
+  resultData   String // Structured analysis result (JSON string)
+  parentId     String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  venture      Venture   @relation(fields: [ventureId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   parent       Analysis? @relation("AnalysisVersions", fields: [parentId], references: [id], onDelete: SetNull)
   children     Analysis[] @relation("AnalysisVersions")
 
@@ -136,14 +129,14 @@ model Analysis {
 // ==========================================
 
 model Integration {
-  id         String   @id @default(uuid())
-  userId     String
-  provider   String   // slack, notion, gdrive, etc.
-  status     String   @default("disconnected") // connected, disconnected
-  tokens     String?  // OAuth tokens (encrypted in practice) (JSON string)
-  metadata   String?  // Additional config (JSON string)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(uuid())
+  userId    String
+  provider  String // slack, notion, gdrive, etc.
+  status    String   @default("disconnected") // connected, disconnected
+  tokens    String? // OAuth tokens (encrypted in practice) (JSON string)
+  metadata  String? // Additional config (JSON string)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, provider])
   @@index([userId])
@@ -158,8 +151,8 @@ model Subscription {
   id                   String   @id @default(uuid())
   userId               String
   stripeSubscriptionId String   @unique
-  plan                 String   // starter, pro, enterprise
-  status               String   // active, cancelled, past_due, trialing
+  plan                 String // starter, pro, enterprise
+  status               String // active, cancelled, past_due, trialing
   currentPeriodEnd     DateTime
   cancelAtPeriodEnd    Boolean  @default(false)
   createdAt            DateTime @default(now())
@@ -175,20 +168,18 @@ model Subscription {
 // ==========================================
 
 model Job {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   userId      String
-  type        String   // e.g., 'analysis-generate', 'report-export'
-  status      String   // pending, processing, completed, failed
-  input       String?  // Job input data (JSON string)
-  result      String?  // Job result data (JSON string)
-  error       String?  // Error message if job failed
+  type        String // e.g., 'analysis-generate', 'report-export'
+  status      String // pending, processing, completed, failed
+  input       String? // Job input data (JSON string)
+  result      String? // Job result data (JSON string)
+  error       String? // Error message if job failed
   startedAt   DateTime?
   completedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
@@ -203,10 +194,10 @@ model Job {
 model AuditLog {
   id        String   @id @default(uuid())
   userId    String?
-  action    String   // CREATE, UPDATE, DELETE, LOGIN, etc.
-  entity    String   // User, Venture, Analysis, etc.
+  action    String // CREATE, UPDATE, DELETE, LOGIN, etc.
+  entity    String // User, Venture, Analysis, etc.
   entityId  String?
-  metadata  String?  // (JSON string)
+  metadata  String? // (JSON string)
   ipAddress String?
   userAgent String?
   createdAt DateTime @default(now())
