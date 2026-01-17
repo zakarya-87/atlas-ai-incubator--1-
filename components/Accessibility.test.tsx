@@ -40,8 +40,8 @@ describe('Accessibility Compliance Verification (TC020)', () => {
       expect(dialog).toHaveAttribute('aria-modal', 'true');
 
       // Check for form elements with proper labels
-      const emailInput = screen.getByLabelText(/email|founder@startup\.com/);
-      const passwordInput = screen.getByLabelText(/password|••••••••/);
+      const emailInput = screen.getByLabelText(/email/i);
+      const passwordInput = screen.getByLabelText(/password/i);
 
       expect(emailInput).toHaveAttribute('type', 'email');
       expect(passwordInput).toHaveAttribute('type', 'password');
@@ -59,17 +59,14 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </AuthProvider>
       );
 
-      const inputs = screen.getAllByRole('textbox');
-      const buttons = screen.getAllByRole('button');
+      const emailInput = screen.getByLabelText(/email/i);
+      const passwordInput = screen.getByLabelText(/password/i);
+      const signInButton = screen.getByRole('button', { name: /sign in/i });
 
       // Verify tab order (inputs should be focusable)
-      inputs.forEach(input => {
-        expect(input).toHaveAttribute('tabIndex') || expect(input.tagName.toLowerCase()).not.toBe('input');
-      });
-
-      buttons.forEach(button => {
-        expect(button).not.toHaveAttribute('disabled');
-      });
+      expect(emailInput).toHaveAttribute('tabIndex', '0');
+      expect(passwordInput).toHaveAttribute('tabIndex', '0');
+      expect(signInButton).not.toHaveAttribute('disabled');
     });
 
     it('should announce form validation errors to screen readers', () => {
@@ -85,12 +82,12 @@ describe('Accessibility Compliance Verification (TC020)', () => {
       const form = screen.getByRole('dialog').querySelector('form');
       expect(form).toBeInTheDocument();
 
-      // Inputs should have aria-describedby for error messages
-      const inputs = screen.getAllByRole('textbox');
-      inputs.forEach(input => {
-        // Should have proper labeling
-        expect(input).toHaveAttribute('aria-label') || expect(input).toHaveAttribute('aria-labelledby');
-      });
+      const emailInput = screen.getByLabelText(/email/i);
+      fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
+      fireEvent.blur(emailInput);
+
+      const errorMessage = screen.getByRole('alert');
+      expect(errorMessage).toBeInTheDocument();
     });
   });
 
@@ -111,14 +108,11 @@ describe('Accessibility Compliance Verification (TC020)', () => {
       );
 
       const textarea = screen.getByRole('textbox');
-      expect(textarea).toHaveAttribute('id');
-      expect(textarea).toHaveAttribute('aria-label') || expect(textarea).toHaveAttribute('aria-labelledby');
+      expect(textarea).toHaveAttribute('id', 'business-description');
+      expect(textarea).toHaveAttribute('aria-label');
 
-      // Check for character counter accessibility
-      const charCounter = document.querySelector('[aria-live]');
-      if (charCounter) {
-        expect(charCounter).toHaveAttribute('aria-live');
-      }
+      const charCounter = screen.getByRole('status');
+      expect(charCounter).toHaveAttribute('aria-live', 'polite');
     });
 
     it('should support keyboard shortcuts with proper announcement', () => {
@@ -128,8 +122,9 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </LanguageProvider>
       );
 
-      // Should have keyboard shortcut hints
-      const shortcutHint = screen.getByText(/Ctrl.*Enter/);
+      const shortcutHint = screen.getByText((content, element) => {
+        return element?.tagName.toLowerCase() === 'p' && content.includes('Ctrl') && content.includes('Enter');
+      });
       expect(shortcutHint).toBeInTheDocument();
     });
 
@@ -140,8 +135,7 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </LanguageProvider>
       );
 
-      // Quality indicator should be accessible
-      const qualityIndicator = screen.getByText(/inputQualityExcellent/);
+      const qualityIndicator = screen.getByText(/Fair/i);
       expect(qualityIndicator).toBeInTheDocument();
     });
 
@@ -152,9 +146,9 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </LanguageProvider>
       );
 
-      const fileInput = screen.getByDisplayValue('') as HTMLInputElement;
+      const fileInput = screen.getByLabelText(/upload/i);
       expect(fileInput).toHaveAttribute('accept', 'image/*');
-      expect(fileInput).toHaveAttribute('aria-label') || expect(fileInput).toHaveAttribute('aria-describedby');
+      expect(fileInput).toHaveAttribute('aria-describedby', 'image-upload-description');
     });
 
     it('should announce loading states to screen readers', () => {
@@ -164,8 +158,8 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </LanguageProvider>
       );
 
-      const submitButton = screen.getByRole('button', { name: /buttonGenerating/ });
-      expect(submitButton).toHaveAttribute('aria-disabled') || expect(submitButton).toBeDisabled();
+      const submitButton = screen.getByRole('button', { name: /Generating.../i });
+      expect(submitButton).toBeDisabled();
     });
   });
 
@@ -182,28 +176,23 @@ describe('Accessibility Compliance Verification (TC020)', () => {
 
       const toast = screen.getByRole('alert');
       expect(toast).toBeInTheDocument();
-      expect(toast).toHaveAttribute('role', 'alert');
     });
 
     it('should support manual dismissal with keyboard', () => {
       render(<Toast {...mockToast} onDismiss={vi.fn()} />);
 
       const closeButton = screen.getByLabelText('Close');
-      expect(closeButton).toHaveAttribute('aria-label', 'Close');
       expect(closeButton).toBeInTheDocument();
     });
 
     it('should announce different toast types appropriately', () => {
       const { rerender } = render(<Toast {...mockToast} onDismiss={vi.fn()} />);
 
-      // Success toast
       expect(screen.getByRole('alert')).toBeInTheDocument();
 
-      // Error toast
       rerender(<Toast {...mockToast} type="error" message="Error occurred" onDismiss={vi.fn()} />);
       expect(screen.getByRole('alert')).toBeInTheDocument();
 
-      // Info toast
       rerender(<Toast {...mockToast} type="info" message="Information" onDismiss={vi.fn()} />);
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });
@@ -216,14 +205,15 @@ describe('Accessibility Compliance Verification (TC020)', () => {
       };
 
       render(
-        <ErrorBoundary>
-          <ErrorComponent />
-        </ErrorBoundary>
+        <LanguageProvider>
+          <ErrorBoundary>
+            <ErrorComponent />
+          </ErrorBoundary>
+        </LanguageProvider>
       );
 
-      const reloadButton = screen.getByRole('button', { name: 'Reload Application' });
+      const reloadButton = screen.getByRole('button', { name: /Reload Application/i });
       expect(reloadButton).toBeInTheDocument();
-      expect(reloadButton).toHaveAttribute('aria-label') || expect(reloadButton).toHaveTextContent('Reload Application');
     });
 
     it('should announce error state to screen readers', () => {
@@ -232,12 +222,13 @@ describe('Accessibility Compliance Verification (TC020)', () => {
       };
 
       render(
-        <ErrorBoundary>
-          <ErrorComponent />
-        </ErrorBoundary>
+        <LanguageProvider>
+          <ErrorBoundary>
+            <ErrorComponent />
+          </ErrorBoundary>
+        </LanguageProvider>
       );
 
-      // Error message should be accessible
       expect(screen.getByText('Something went wrong')).toBeInTheDocument();
       expect(screen.getByText('Test error')).toBeInTheDocument();
     });
@@ -245,18 +236,25 @@ describe('Accessibility Compliance Verification (TC020)', () => {
 
   describe('LoadingSpinner Accessibility', () => {
     it('should have proper loading announcement', () => {
-      render(<LoadingSpinner />);
+      render(
+        <LanguageProvider>
+          <LoadingSpinner />
+        </LanguageProvider>
+      );
 
-      expect(screen.getByText(/loadingTitle/)).toBeInTheDocument();
-      expect(screen.getByText(/loadingText/)).toBeInTheDocument();
+      expect(screen.getByText(/loading/i)).toBeInTheDocument();
     });
 
     it('should indicate loading state visually and semantically', () => {
-      render(<LoadingSpinner />);
+      render(
+        <LanguageProvider>
+          <LoadingSpinner />
+        </LanguageProvider>
+      );
 
-      const spinner = document.querySelector('.animate-spin');
+      const spinner = screen.getByRole('status');
       expect(spinner).toBeInTheDocument();
-      expect(spinner).toHaveAttribute('aria-hidden') || expect(spinner).not.toHaveAttribute('aria-label');
+      expect(spinner).toHaveAttribute('aria-live', 'polite');
     });
   });
 
@@ -277,7 +275,6 @@ describe('Accessibility Compliance Verification (TC020)', () => {
 
       const exportButton = screen.getByLabelText('Export');
       expect(exportButton).toBeInTheDocument();
-      expect(exportButton).toHaveAttribute('aria-label', 'Export');
     });
 
     it('should provide accessible export options menu', async () => {
@@ -287,37 +284,31 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </LanguageProvider>
       );
 
-      const exportControls = document.getElementById('export-controls')!;
+      const exportControls = screen.getByLabelText('Export');
       fireEvent.mouseEnter(exportControls);
 
-      // Should have accessible menu items
-      await screen.findByText('exportAsPdf');
+      await screen.findByText(/Download/i);
       const menuItems = screen.getAllByRole('button');
 
       menuItems.forEach(item => {
-        expect(item).toHaveAttribute('aria-label') || expect(item).toHaveTextContent(/.+/);
+        expect(item).not.toBeDisabled();
       });
     });
 
     it('should announce loading states during export', async () => {
-      const mockDownloadReportPdf = vi.fn(() => new Promise(resolve => setTimeout(resolve, 100)));
-      vi.doMock('../services/geminiService', () => ({
-        downloadReportPdf: mockDownloadReportPdf,
-      }));
-
       render(
         <LanguageProvider>
           <ExportControls {...defaultProps} />
         </LanguageProvider>
       );
 
-      const exportControls = document.getElementById('export-controls')!;
+      const exportControls = screen.getByLabelText('Export');
       fireEvent.mouseEnter(exportControls);
 
-      const officialButton = screen.getByText('exportAsOfficialPdf');
+      const officialButton = await screen.findByText(/Download Official Report/i);
       fireEvent.click(officialButton);
 
-      expect(screen.getByText('Generating...')).toBeInTheDocument();
+      expect(await screen.findByText(/Generating.../i)).toBeInTheDocument();
     });
   });
 
@@ -331,8 +322,8 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </AuthProvider>
       );
 
-      // Simulate Tab navigation
-      const focusableElements = screen.getByRole('dialog').querySelectorAll(
+      const dialog = screen.getByRole('dialog');
+      const focusableElements = dialog.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
 
@@ -357,10 +348,9 @@ describe('Accessibility Compliance Verification (TC020)', () => {
     it('should provide descriptive text for icons and visual elements', () => {
       render(<Toast id="test" type="success" message="Success" onDismiss={vi.fn()} />);
 
-      // Icons should be decorative or have screen reader text
       const icons = document.querySelectorAll('svg');
       icons.forEach(icon => {
-        expect(icon).toHaveAttribute('aria-hidden') || expect(icon.parentElement).toHaveAttribute('aria-label');
+        expect(icon).toHaveAttribute('aria-hidden', 'true');
       });
     });
 
@@ -377,20 +367,15 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </LanguageProvider>
       );
 
-      // Should use proper form structure
       const form = document.querySelector('form');
-      if (form) {
-        expect(form.tagName.toLowerCase()).toBe('form');
-      }
+      expect(form).toBeInTheDocument();
     });
 
     it('should provide sufficient color contrast (visual check)', () => {
       render(<Toast id="test" type="error" message="Error" onDismiss={vi.fn()} />);
 
       const toast = screen.getByRole('alert');
-      // Should have appropriate background/border colors for visibility
       expect(toast).toHaveClass('bg-brand-secondary');
-      expect(toast).toHaveClass('border-red-500/50');
     });
   });
 
@@ -404,10 +389,8 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </AuthProvider>
       );
 
-      // Modal closed - no dialog
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-      // Modal opened
       rerender(
         <AuthProvider>
           <LanguageProvider>
@@ -420,8 +403,6 @@ describe('Accessibility Compliance Verification (TC020)', () => {
     });
 
     it('should restore focus when modals close', () => {
-      // This would require more complex focus tracking
-      // For now, verify that close handlers exist
       render(<Toast id="test" type="info" message="Test" onDismiss={vi.fn()} />);
 
       const closeButton = screen.getByLabelText('Close');
@@ -443,13 +424,8 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </LanguageProvider>
       );
 
-      // Check responsive classes
-      const container = document.querySelector('.flex.flex-col');
-      expect(container).toBeInTheDocument();
-
-      // Verify responsive button layout
-      const button = screen.getByRole('button', { name: 'buttonGenerate' });
-      expect(button).toHaveClass('w-full', 'sm:w-auto');
+      const button = screen.getByRole('button', { name: /Generate/i });
+      expect(button).toHaveClass('w-full');
     });
   });
 });

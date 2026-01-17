@@ -40,3 +40,5 @@ backend/.env.local
 
 # Misc
 .qodo/
+backend/.env
+.idx/

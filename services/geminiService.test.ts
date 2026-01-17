@@ -2,6 +2,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ERROR_CODES } from '../utils/constants';
 
+const mockLogger = {
+  log: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+};
+vi.mock('../utils/logger', () => ({
+  logger: mockLogger,
+}));
+
 // Mock the geminiService module before importing
 vi.mock('./geminiService', async () => {
   const actual = await vi.importActual<typeof import('./geminiService')>('./geminiService');
@@ -46,15 +55,6 @@ describe('geminiService', () => {
     key: vi.fn(),
   };
   vi.stubGlobal('localStorage', mockLocalStorage);
-
-  const mockLogger = {
-    log: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  };
-  vi.mock('../utils/logger', () => ({
-    logger: mockLogger,
-  }));
 
   beforeEach(() => {
     vi.clearAllMocks();
