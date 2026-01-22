@@ -3,7 +3,7 @@ import { Controller, Post, Body, UseGuards, Param, Get } from '@nestjs/common';
 
 import { VenturesService } from './ventures.service';
 import { GetUser } from '../auth/get-user.decorator';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { IsString, IsEmail, IsNotEmpty } from 'class-validator';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 

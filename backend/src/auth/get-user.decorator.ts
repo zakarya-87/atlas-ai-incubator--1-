@@ -1,4 +1,3 @@
-
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export const GetUser = createParamDecorator(
@@ -16,3 +15,16 @@ export const GetUser = createParamDecorator(
     return request.user;
   },
 );
+
+// Mock factory for testing
+export const createMockGetUser = (mockUser: any) => {
+  return createParamDecorator(
+    (data: unknown, ctx: ExecutionContext) => {
+      const request = ctx.switchToHttp().getRequest();
+      if (!request.user) {
+        return mockUser;
+      }
+      return request.user;
+    },
+  );
+};

@@ -3,7 +3,7 @@ import { Controller, Post, Get, Body, UseGuards, Headers, Req, BadRequestExcepti
 
 import { SubscriptionsService } from './subscriptions.service';
 import { GetUser } from '../auth/get-user.decorator';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 

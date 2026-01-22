@@ -13,6 +13,7 @@ export default defineConfig({
       'context/**/*.{test,spec}.{ts,tsx}',
       'utils/**/*.{test,spec}.{ts,tsx}',
       'services/**/*.{test,spec}.{ts,tsx}',
+      'test/**/*.{test,spec}.{ts,tsx}',
     ],
     // Exclude backend tests (they use Jest) and E2E tests (use Playwright)
     exclude: [
@@ -38,12 +39,24 @@ export default defineConfig({
       ],
       thresholds: {
         global: {
-          statements: 15, // Start low, increase gradually
-          branches: 10,
-          functions: 5,
-          lines: 15,
+          statements: 25,
+          branches: 15,
+          functions: 15,
+          lines: 25,
         },
-        // Specific thresholds for key components
+        // Specific thresholds for high-coverage components
+        './services/geminiService.ts': {
+          statements: 90,
+          branches: 80,
+          functions: 90,
+          lines: 90,
+        },
+        './components/Layout.tsx': {
+          statements: 85,
+          branches: 70,
+          functions: 80,
+          lines: 85,
+        },
         './components/AuthModal.tsx': {
           statements: 80,
           branches: 70,
@@ -58,5 +71,6 @@ export default defineConfig({
         },
       },
     },
+
   },
 });

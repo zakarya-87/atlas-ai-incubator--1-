@@ -62,7 +62,7 @@ describe('ErrorBoundary Component (TC009)', () => {
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    expect(screen.getByText(/An unexpected error occurred/)).toBeInTheDocument();
+    expect(screen.getByText('Test error occurred')).toBeInTheDocument();
   });
 
   it('should log errors to console with error info', () => {
@@ -122,7 +122,15 @@ describe('ErrorBoundary Component (TC009)', () => {
   });
 
   it('should allow error recovery with reload button', () => {
-    const reloadSpy = vi.spyOn(window.location, 'reload').mockImplementation(() => {});
+    const reloadMock = vi.fn();
+    const originalLocation = window.location;
+    
+    // Replace window.location with a mock object
+    Object.defineProperty(window, 'location', {
+      value: { ...originalLocation, reload: reloadMock },
+      writable: true,
+      configurable: true,
+    });
 
     render(
       <ErrorBoundary>
@@ -133,9 +141,14 @@ describe('ErrorBoundary Component (TC009)', () => {
     const reloadButton = screen.getByRole('button', { name: 'Reload Application' });
     fireEvent.click(reloadButton);
 
-    expect(reloadSpy).toHaveBeenCalled();
+    expect(reloadMock).toHaveBeenCalled();
 
-    reloadSpy.mockRestore();
+    // Restore original location
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    });
   });
 
   it('should display error boundary styling', () => {

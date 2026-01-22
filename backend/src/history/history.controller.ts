@@ -3,7 +3,7 @@ import { Controller, Get, Delete, Param, UseGuards, Post, Body } from '@nestjs/c
 
 import { HistoryService } from './history.service';
 import { GetUser } from '../auth/get-user.decorator';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { CreateVersionDto } from './dto/create-version.dto';

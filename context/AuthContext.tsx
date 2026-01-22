@@ -85,6 +85,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       // Clear demo admin if present
       localStorage.removeItem(DEMO_ADMIN_KEY);
+      // Clear venture ID to prevent ownership mismatch on next login
+      localStorage.removeItem('atlas_venture_id');
       // Call backend to clear the authentication cookie
       await fetch(`${(import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/logout`, {
         method: 'POST',

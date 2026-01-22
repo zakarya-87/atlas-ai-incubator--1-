@@ -1,5 +1,18 @@
 
 export const fr = {
+  // Auth Modal
+  signIn: 'Se Connecter',
+  signUp: 'S\'inscrire',
+  welcomeBack: 'Bon Retour',
+  createAccount: 'Créer un Compte',
+  accessWorkspace: 'Accédez à votre espace ATLAS',
+  getStarted: 'Commencez votre aventure',
+  email: 'Email',
+  emailPlaceholder: 'fondateur@startup.com',
+  password: 'Mot de passe',
+  loginFailed: 'Échec de la connexion. Veuillez vérifier vos identifiants.',
+  signUpFailed: 'Échec de l\'inscription. Veuillez réessayer.',
+
   // ... previous keys ...
   auditTrailDeleteButton: 'Supprimer l\'enregistrement',
   errorRateLimit: 'Limite de taux dépassée::Vous avez fait trop de demandes récemment. Veuillez patienter une minute avant de réessayer.',

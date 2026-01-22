@@ -3,7 +3,7 @@ import { Controller, Get, Patch, Body, UseGuards, NotFoundException } from '@nes
 
 import { UsersService } from './users.service';
 import { GetUser } from '../auth/get-user.decorator';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 

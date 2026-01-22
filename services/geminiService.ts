@@ -760,21 +760,17 @@ async function generateAnalysis<T>(
   } catch (error) {
     logger.error("Error generating analysis from Backend:", error);
     if (error instanceof Error) {
-      if (error.message.includes('Authentication Required') || error.message === ERROR_CODES.RATE_LIMIT) {
+      // Rethrow known error codes or specific auth messages
+      if (
+        Object.values(ERROR_CODES).includes(error.message as any) ||
+        error.message.includes('Authentication Required')
+      ) {
         throw error;
       }
-      if (error.message === ERROR_CODES.TIMEOUT) {
-        logger.error(`Request timeout after ${API_CONFIG.REQUEST_TIMEOUT}ms`);
-        throw error;
-      }
+
       if (error.message === 'Failed to fetch') {
         logger.error(`[Network Error] Could not connect to ${API_CONFIG.BACKEND_URL}.`);
-        logger.error(`1. Ensure the backend server is running (npm run start:dev).`);
-        logger.error(`2. Check if port 3000 is exposed.`);
         throw new Error(ERROR_CODES.NETWORK_ERROR);
-      }
-      if ([ERROR_CODES.SERVER_ERROR as string, ERROR_CODES.NETWORK_ERROR as string, ERROR_CODES.GENERIC as string].includes(error.message)) {
-        throw error;
       }
     }
     throw new Error(ERROR_CODES.GENERIC);

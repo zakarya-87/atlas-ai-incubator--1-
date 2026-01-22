@@ -9,7 +9,7 @@ export class IntegrationsService {
   async getIntegrations(ventureId: string, userId: string) {
     await this.validateVentureAccess(ventureId, userId);
 
-    return (this.prisma as any).integration.findMany({
+    return this.prisma.integration.findMany({
       where: { ventureId },
     });
   }
@@ -18,14 +18,12 @@ export class IntegrationsService {
     await this.validateVentureAccess(ventureId, userId);
 
     if (connect) {
-      // Simulate OAuth Flow: In a real app, this would involve redirecting to the provider
-      // and exchanging a code for a token. Here we just mock the connected state.
       const mockConfig = JSON.stringify({
           accessToken: `mock_${provider}_token_${Date.now()}`,
           connectedAt: new Date().toISOString()
       });
 
-      return (this.prisma as any).integration.upsert({
+      return this.prisma.integration.upsert({
         where: {
           ventureId_provider: {
             ventureId,
@@ -44,8 +42,7 @@ export class IntegrationsService {
         },
       });
     } else {
-      // Disconnect
-      return (this.prisma as any).integration.update({
+      return this.prisma.integration.update({
         where: {
           ventureId_provider: {
             ventureId,
@@ -61,13 +58,12 @@ export class IntegrationsService {
   }
 
   private async validateVentureAccess(ventureId: string, userId: string) {
-      const venture = await (this.prisma as any).venture.findUnique({
+      const venture = await this.prisma.venture.findUnique({
           where: { id: ventureId }
       });
 
       if (!venture) {
-           // Auto-create if missing (Dev convenience)
-           await (this.prisma as any).venture.create({
+           await this.prisma.venture.create({
               data: { id: ventureId, userId, name: 'My Venture' }
            });
            return;

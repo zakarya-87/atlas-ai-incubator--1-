@@ -3,7 +3,7 @@ import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
 
 import { IntegrationsService } from './integrations.service';
 import { GetUser } from '../auth/get-user.decorator';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { IsBoolean, IsString, IsNotEmpty } from 'class-validator';
 
 class ToggleIntegrationDto {
