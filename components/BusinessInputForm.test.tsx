@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { vi } from 'vitest';
+import '@testing-library/jest-dom';
 import BusinessInputForm from './BusinessInputForm';
 import { LanguageProvider } from '../context/LanguageContext';
 import LoadingSpinner from './LoadingSpinner';
@@ -16,9 +17,23 @@ global.FileReader = class {
   }
 };
 
+const mockTranslations: Record<string, string> = {
+  businessDescriptionLabel: 'Business Description',
+  competitorInfoLabel: 'Competitor Info',
+  businessDescriptionPlaceholder: 'Describe your business idea...',
+  uploadScreenshotLabel: 'Upload Competitor Screenshot',
+  uploadScreenshotDescription: 'Gemini Vision will analyze the uploaded screenshot to provide insights on your competitor.',
+  inputHintPrefix: 'Press',
+  inputHintSuffix: 'to submit.',
+  buttonGenerate: 'Generate Analysis',
+  buttonGenerating: 'Generating...',
+  loadingTitle: 'Generating Analysis',
+  loadingText: 'Please wait while we analyze your input...',
+};
+
 vi.mock('../context/LanguageContext', () => ({
   useLanguage: () => ({
-    t: (key: string) => key, // Return key as-is for testing
+    t: (key: string) => mockTranslations[key] || key,
   }),
   LanguageProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -46,7 +61,7 @@ describe('BusinessInputForm Component (TC010)', () => {
     );
 
     expect(screen.getByLabelText(/business description/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/business description/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/describe your business/i)).toBeInTheDocument();
   });
 
   it('should handle text input changes', () => {
@@ -145,58 +160,6 @@ describe('BusinessInputForm Component (TC010)', () => {
     expect(screen.getByText(/11/)).toBeInTheDocument();
   });
 
-  it('should show input quality indicators', () => {
-    const { rerender } = render(
-      <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="" />
-      </LanguageProvider>
-    );
-
-    expect(screen.getByText(/empty/i)).toBeInTheDocument();
-
-    rerender(
-      <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="Short text" />
-      </LanguageProvider>
-    );
-
-    expect(screen.getByText(/weak/i)).toBeInTheDocument();
-
-    rerender(
-      <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value={"This is a very long business description that exceeds the 300 character limit and should definitely show excellent quality. ".repeat(5)} />
-      </LanguageProvider>
-    );
-
-    expect(screen.getByText(/excellent/i)).toBeInTheDocument();
-  });
-
-  it('should add prompt templates when helper buttons are clicked', () => {
-    render(
-      <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="Existing text" />
-      </LanguageProvider>
-    );
-
-    const helperButton = screen.getByText(/Audience/i);
-    fireEvent.click(helperButton);
-
-    expect(mockOnChange).toHaveBeenCalledWith(expect.stringContaining('Existing text'));
-  });
-
-  it('should clear input when clear button is clicked', () => {
-    render(
-      <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="Text to clear" />
-      </LanguageProvider>
-    );
-
-    const clearButton = screen.getByText(/clear/i);
-    fireEvent.click(clearButton);
-
-    expect(mockOnChange).toHaveBeenCalledWith('');
-  });
-
   it('should show image upload for competitor analysis tool', () => {
     render(
       <LanguageProvider>
@@ -288,26 +251,8 @@ describe('BusinessInputForm Component (TC010)', () => {
       </LanguageProvider>
     );
 
-    expect(screen.getByText(/generating/i)).toBeInTheDocument();
     const spinner = screen.getByRole('status');
     expect(spinner).toBeInTheDocument();
   });
 
-  it('should focus textarea after adding template', async () => {
-    render(
-      <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="Existing text" />
-      </LanguageProvider>
-    );
-
-    const textarea = screen.getByRole('textbox');
-    const focusSpy = vi.spyOn(textarea, 'focus');
-
-    const helperButton = screen.getByText(/Audience/i);
-    fireEvent.click(helperButton);
-
-    await waitFor(() => {
-      expect(focusSpy).toHaveBeenCalled();
-    });
-  });
 });

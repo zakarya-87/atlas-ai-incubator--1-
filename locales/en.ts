@@ -1,5 +1,25 @@
 
 export const en = {
+  // Auth Modal
+  signIn: 'Sign In',
+  signUp: 'Sign Up',
+  welcomeBack: 'Welcome Back',
+  createAccount: 'Create Account',
+  accessWorkspace: 'Access your ATLAS workspace',
+  getStarted: 'Get started with your venture',
+  email: 'Email',
+
+  // Header
+  headerTitle: 'ATLAS AI Incubator',
+  headerLogoAlt: 'ATLAS AI Logo',
+  headerUserMenu: 'User Menu',
+  headerLoading: 'Loading...',
+  headerMenu: 'Menu',
+  emailPlaceholder: 'founder@startup.com',
+  password: 'Password',
+  loginFailed: 'Login failed. Please check your credentials.',
+  signUpFailed: 'Sign up failed. Please try again.',
+
   // Header
   headerTitle: 'ATLAS AI Incubator',
   headerSubtitle: 'Strategic Planning Module',
@@ -186,7 +206,14 @@ export const en = {
   buttonGenerate: 'Generate Analysis',
   buttonGenerating: 'Generating...',
   buttonRetry: 'Retry',
-  
+
+  // Business Input Form
+  businessDescriptionLabel: 'Business Description',
+  competitorInfoLabel: 'Competitor Info',
+  businessDescriptionPlaceholder: 'Describe your business idea...',
+  uploadScreenshotLabel: 'Upload Competitor Screenshot',
+  uploadScreenshotDescription: 'Upload a screenshot of your competitor for analysis',
+
   // Input Quality
   inputClear: 'Clear',
   inputQualityEmpty: 'Prompt Quality',
@@ -205,12 +232,12 @@ export const en = {
   promptHelperProblem: 'Problem',
   promptHelperSolution: 'Solution',
   promptHelperRevenue: 'Revenue',
-  
+
   promptTemplateAudience: '**Target Audience:** [Who are you serving? e.g., Small Business Owners, Teens]',
   promptTemplateProblem: '**The Problem:** [What pain point are you solving?]',
   promptTemplateSolution: '**The Solution:** [How does your product solve it?]',
   promptTemplateRevenue: '**Revenue Model:** [How do you make money? e.g., Subscription, Ads]',
-  
+
   // Welcome Message
   welcomeTitleSwot: 'Ready for a SWOT Analysis?',
   welcomeTextSwot: 'Describe your startup or business idea above. Our AI will generate a comprehensive SWOT analysis to help you identify key factors for success.',
@@ -297,7 +324,7 @@ export const en = {
   swotWeaknesses: 'Weaknesses',
   swotOpportunities: 'Opportunities',
   swotThreats: 'Threats',
-  
+
   pestelPolitical: 'Political',
   pestelEconomic: 'Economic',
   pestelSocial: 'Social',
@@ -468,7 +495,7 @@ export const en = {
   auditTrailViewButton: 'View',
   auditTrailDeleteButton: 'Delete Record',
   errorRateLimit: 'Rate Limit Exceeded::You have made too many requests recently. Please wait a minute before trying again.',
-  
+
   // Agent Personas
   agentBoardroomStatus: 'Agent Boardroom Status',
   LeadStrategist: 'Lead Strategist',
@@ -498,7 +525,7 @@ export const en = {
   // Loading Spinner
   loadingTitle: 'Generating AI Insights...',
   loadingText: 'This may take a moment.',
-  
+
   // Error Message
   errorTitle: 'Oops! Something went wrong.',
   errorEmptyDescription: 'Input Required::Please enter a business description to generate an analysis.',
@@ -519,7 +546,7 @@ export const en = {
   integrationsGADesc: 'Connect Google Analytics to track your website traffic.',
   integrationsMeta: 'Meta Ads',
   integrationsMetaDesc: 'Connect Meta Ads to track your ad performance.',
-  
+
   // Share Modal
   shareModalTitle: 'Share Project',
   shareModalDescription: 'Invite others to collaborate on this venture.',

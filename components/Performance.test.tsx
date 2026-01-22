@@ -147,10 +147,11 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
       expect(renderTime).toBeLessThan(200);
 
       // Character count should be accurate
-      expect(screen.getByText('10000')).toBeInTheDocument();
+      expect(screen.getByText(/10000/)).toBeInTheDocument();
     });
 
     it('should handle complex analysis data structures', () => {
+
       const complexData = {
         id: 'complex-test',
         strengths: Array.from({ length: 50 }, (_, i) => ({
@@ -227,7 +228,7 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
       expect(transitionTime).toBeLessThan(50);
 
       // Should show loading state
-      expect(screen.getByText(/Generating/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/Generating/i).length).toBeGreaterThan(0);
     });
 
     it('should display skeleton loading states immediately', () => {

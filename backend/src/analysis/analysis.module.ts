@@ -10,12 +10,29 @@ import { HistoryModule } from '../history/history.module';
 import { UsersModule } from '../users/users.module';
 import { EventsModule } from '../events/events.module';
 import { JobsController } from './jobs.controller';
+import { JobsService } from './jobs.service';
+import { BullModule } from '@nestjs/bullmq';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [PrismaModule, HistoryModule, UsersModule, EventsModule],
+  imports: [
+    ConfigModule,
+    PrismaModule,
+    HistoryModule,
+    UsersModule,
+    EventsModule,
+    BullModule.registerQueue({
+      name: 'analysis',
+      connection: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+      },
+    }),
+  ],
   controllers: [AnalysisController, JobsController],
   providers: [
     AnalysisService,
+    JobsService,
     AnalysisAgentFactory,
     DefaultAgent,
     ResearchAgent,

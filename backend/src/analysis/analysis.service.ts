@@ -95,12 +95,12 @@ export class AnalysisService {
             this.emitLog(dto.ventureId, 'Systems Architect', 'agentLogAnalyzingContext');
 
             // 1. Security & Access Check (Owner OR Member)
-            const venture = await (this.prisma as any).venture.findUnique({
+            const venture = await this.prisma.venture.findUnique({
                 where: { id: dto.ventureId }
             });
 
             if (!venture) {
-                await (this.prisma as any).venture.create({
+                await this.prisma.venture.create({
                     data: {
                         id: dto.ventureId,
                         name: 'My Venture',
@@ -112,7 +112,7 @@ export class AnalysisService {
                 let isMember = false;
 
                 if (!isOwner) {
-                    const member = await (this.prisma as any).ventureMember.findUnique({
+                    const member = await this.prisma.ventureMember.findUnique({
                         where: {
                             ventureId_userId: {
                                 ventureId: dto.ventureId,
@@ -124,7 +124,18 @@ export class AnalysisService {
                 }
 
                 if (!isOwner && !isMember) {
-                    if (userId === 'dev-test-user-id') {
+                    // Venture exists but user doesn't have access
+                    // Check if this looks like a pre-auth venture (localStorage UUID)
+                    // If so, transfer ownership to the authenticated user
+                    const isPreAuthVenture = dto.ventureId.includes('-') && dto.ventureId.length > 30;
+                    
+                    if (isPreAuthVenture) {
+                        console.log(`Transferring pre-auth venture ${dto.ventureId} to user ${userId}`);
+                        await this.prisma.venture.update({
+                            where: { id: dto.ventureId },
+                            data: { userId: userId }
+                        });
+                    } else if (userId === 'dev-test-user-id') {
                         console.warn(`Venture ${dto.ventureId} owner mismatch. Proceeding as Dev Admin.`);
                     } else {
                         throw new ForbiddenException("Venture ID mismatch or unauthorized access.");

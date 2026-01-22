@@ -1,5 +1,18 @@
 
 export const ar = {
+  // Auth Modal
+  signIn: 'تسجيل الدخول',
+  signUp: 'إنشاء حساب',
+  welcomeBack: 'مرحباً بعودتك',
+  createAccount: 'إنشاء حساب جديد',
+  accessWorkspace: 'الوصول إلى مساحة عمل ATLAS الخاصة بك',
+  getStarted: 'ابدأ مشروعك',
+  email: 'البريد الإلكتروني',
+  emailPlaceholder: 'founder@startup.com',
+  password: 'كلمة المرور',
+  loginFailed: 'فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد الخاصة بك.',
+  signUpFailed: 'فشل إنشاء الحساب. يرجى المحاولة مرة أخرى.',
+
   // ... previous keys ...
   auditTrailDeleteButton: 'حذف السجل',
   errorRateLimit: 'تم تجاوز حد المعدل::لقد قمت بإجراء عدد كبير جدًا من الطلبات مؤخرًا. يرجى الانتظار لمدة دقيقة قبل المحاولة مرة أخرى.',

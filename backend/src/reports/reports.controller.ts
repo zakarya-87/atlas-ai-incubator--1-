@@ -4,7 +4,7 @@ import { Response } from 'express';
 
 import { ReportsService } from './reports.service';
 import { GetUser } from '../auth/get-user.decorator';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 
 
 @Controller('reports')

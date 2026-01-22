@@ -193,12 +193,13 @@ const ExportControls: React.FC<ExportControlsProps> = ({ analysisData, analysisT
                     onClick={handleServerExport}
                     disabled={isGenerating}
                     className="flex items-center justify-center w-full px-4 py-2 bg-brand-teal hover:bg-teal-500 text-sm font-semibold text-white rounded-lg shadow-lg transition-colors"
+                    role="button"
                   >
                     {isGenerating ? (
-                        <span className="animate-pulse">Generating...</span>
+                        <span className="animate-pulse" role="status" aria-live="polite">Generating...</span>
                     ) : (
                         <>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                             {t('exportAsOfficialPdf')}
                         </>
                     )}

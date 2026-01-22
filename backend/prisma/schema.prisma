@@ -130,16 +130,15 @@ model Analysis {
 
 model Integration {
   id        String   @id @default(uuid())
-  userId    String
+  ventureId String
   provider  String // slack, notion, gdrive, etc.
   status    String   @default("disconnected") // connected, disconnected
-  tokens    String? // OAuth tokens (encrypted in practice) (JSON string)
-  metadata  String? // Additional config (JSON string)
+  config    String?  // Configuration data (JSON string)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, provider])
-  @@index([userId])
+  @@unique([ventureId, provider])
+  @@index([ventureId])
   @@map("integrations")
 }
 

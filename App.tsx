@@ -311,7 +311,7 @@ const AppContent: React.FC = () => {
         <div className="max-w-4xl mx-auto mb-8">
           <BusinessInputForm
             value={businessDescription}
-            onChange={(e) => setBusinessDescription(e.target.value)}
+            onChange={(value) => setBusinessDescription(value)}
             onSubmit={(img) => handleGenerate(img)}
             isLoading={isLoading}
             activeTool={activeTool}

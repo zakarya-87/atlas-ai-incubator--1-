@@ -16,12 +16,26 @@ async function bootstrap() {
     // --- CORS ---
     app.enableCors({
       origin: (origin, callback) => {
-        const allowed = [
+        const allowedOrigins = [
           process.env.FRONTEND_URL,
           'http://localhost:5173',
-          'http://localhost:5174'
+          'http://localhost:5174',
+          'http://127.0.0.1:5173',
+          'http://127.0.0.1:5174',
         ].filter(Boolean) as string[];
-        if (!origin || allowed.includes(origin)) {
+
+        if (!origin) {
+          if (process.env.NODE_ENV === 'production') {
+            callback(new Error('Origin required in production'));
+          } else {
+            callback(null, true);
+          }
+          return;
+        }
+
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else if (process.env.NODE_ENV !== 'production') {
           callback(null, true);
         } else {
           callback(new Error(`CORS blocked: ${origin}`));
@@ -52,17 +66,6 @@ async function bootstrap() {
 
     // Listen on environment port or default to 3000
     const port = process.env.PORT || 3000;
-
-    // Basic env validation
-    const required = ['JWT_SECRET', 'API_KEY'];
-    const missing = required.filter((k) => !process.env[k]);
-    if (missing.length) {
-      console.warn(`WARNING: Missing env vars: ${missing.join(', ')}`);
-    }
-
-    if (!process.env.API_KEY) {
-      console.warn("WARNING: API_KEY is not set in backend/.env. AI generation will fail.");
-    }
 
     // Start HTTP listener
     await app.listen(port, '0.0.0.0');

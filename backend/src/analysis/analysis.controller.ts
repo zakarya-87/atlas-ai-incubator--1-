@@ -9,7 +9,7 @@ import { JobStatusResponse, JobsService } from './jobs.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { GenerateAnalysisDto } from './dto/generate-analysis.dto';
 import { GetUser } from '../auth/get-user.decorator';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 
 @ApiTags('analysis')
 @Controller('analysis')
@@ -27,11 +27,48 @@ export class AnalysisController {
   ) {
     const jobId = uuidv4();
     try {
-      // Use the injected JobsService to queue the analysis
-      this.jobsService.queueAnalysis(jobId, generateAnalysisDto, user.id);
-      return { jobId };
+      // Check if Redis is configured (via REDIS_HOST env var)
+      const hasRedis = !!process.env.REDIS_HOST || !!process.env.REDIS_URL;
+
+      if (hasRedis) {
+        // Use BullMQ queue for production with Redis
+        await this.jobsService.queueAnalysis(jobId, generateAnalysisDto, user.id);
+        setJob(jobId, { jobId, status: 'queued', createdAt: Date.now() });
+        return { jobId };
+      } else {
+        // Fallback: Run synchronously for development without Redis
+        console.log(`[Dev Mode] Running analysis synchronously for job ${jobId}`);
+        setJob(jobId, { jobId, status: 'active', progress: 0, createdAt: Date.now() });
+
+        // Run in background to allow polling
+        setImmediate(async () => {
+          try {
+            setJob(jobId, { jobId, status: 'active', progress: 30, createdAt: Date.now() });
+            const result = await this.analysisService.generateAnalysis(generateAnalysisDto, user.id);
+            setJob(jobId, {
+              jobId,
+              status: 'completed',
+              progress: 100,
+              result,
+              createdAt: Date.now(),
+              finishedAt: Date.now()
+            });
+          } catch (error: any) {
+            console.error(`[Dev Mode] Job ${jobId} failed:`, error);
+            setJob(jobId, {
+              jobId,
+              status: 'failed',
+              error: error.message || 'Analysis failed',
+              createdAt: Date.now(),
+              finishedAt: Date.now()
+            });
+          }
+        });
+
+        return { jobId };
+      }
     } catch (error: any) {
-      console.error('Error queueing analysis:', error);
+      console.error('Error starting analysis:', error);
       return { error: 'Failed to start analysis job.' };
     }
   }

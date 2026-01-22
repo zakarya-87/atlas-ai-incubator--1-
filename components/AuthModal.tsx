@@ -13,17 +13,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const { login, signUp } = useAuth();
+  const { login, register } = useAuth();
   const { t } = useLanguage();
 
   const handleAuthAction = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     try {
+      const credentials = { email, password };
       if (isLogin) {
-        await login(email, password);
+        await login(credentials);
       } else {
-        await signUp(email, password);
+        await register(credentials);
       }
       onClose();
     } catch (err: any) {
@@ -76,12 +77,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <button
                 className={`flex-1 py-4 text-sm font-bold transition-colors ${isLogin ? 'bg-brand-teal/10 text-brand-teal border-b-2 border-brand-teal' : 'text-brand-light hover:text-brand-text'}`}
                 onClick={() => setIsLogin(true)}
+                tabIndex={0}
               >
                 {t('signIn')}
               </button>
               <button
                 className={`flex-1 py-4 text-sm font-bold transition-colors ${!isLogin ? 'bg-brand-teal/10 text-brand-teal border-b-2 border-brand-teal' : 'text-brand-light hover:text-brand-text'}`}
                 onClick={() => setIsLogin(false)}
+                tabIndex={0}
               >
                 {t('signUp')}
               </button>
@@ -102,6 +105,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   <input
                     id="email"
                     aria-label={t('email')}
+                    aria-required="true"
                     className="w-full p-3 bg-brand-primary/50 border border-brand-accent rounded-lg focus:ring-2 focus:ring-brand-teal focus:outline-none text-brand-text"
                     type="email"
                     placeholder={t('emailPlaceholder')}
@@ -129,6 +133,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <button
                   type="submit"
                   className="w-full py-3 bg-brand-teal hover:bg-teal-500 text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                  tabIndex={0}
+                  aria-label={`Submit ${isLogin ? t('signIn') : t('signUp')}`}
                 >
                   {isLogin ? t('signIn') : t('signUp')}
                 </button>

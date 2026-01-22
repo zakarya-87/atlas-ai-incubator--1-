@@ -8,6 +8,13 @@ export const EnvSchema = z.object({
     'JWT_SECRET must be at least 20 characters.').nonempty(),
   JWT_TTL: z.string().default('15m'),
   API_KEY: z.string().nonempty('API_KEY is required'),
+  DATABASE_URL: z.string().nonempty('DATABASE_URL is required'),
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

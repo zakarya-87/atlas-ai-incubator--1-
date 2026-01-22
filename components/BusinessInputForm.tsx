@@ -3,19 +3,34 @@ import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { FaUpload, FaTimes } from 'react-icons/fa';
 import LoadingSpinner from './LoadingSpinner';
+import type { AnyTool } from '../types';
 
 interface BusinessInputFormProps {
   value: string;
   onChange: (value: string) => void;
-  onSubmit: (e?: React.FormEvent) => void;
+  onSubmit: (image?: string) => void;
   isLoading: boolean;
-  activeTool: 'swot' | 'competitorAnalysis';
+  activeTool: AnyTool;
+  extraFields?: React.ReactNode;
 }
 
-const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, onSubmit, isLoading, activeTool }) => {
+const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, onSubmit, isLoading, activeTool, extraFields }) => {
   const { t } = useLanguage();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const getInputQuality = () => {
+    const length = value.trim().length;
+    if (length === 0) return null;
+    if (length < 30) return 'Poor';
+    if (length < 80) return 'Fair';
+    return 'Good';
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(imagePreview || undefined);
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -24,6 +39,10 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
       };
+      reader.onerror = () => {
+        // Handle file read error gracefully
+        console.error('Error reading file');
+      };
       reader.readAsDataURL(file);
     } else {
       // Handle invalid file type
@@ -31,7 +50,7 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" role="form" aria-label={activeTool === 'swot' ? "SWOT Analysis Input Form" : "Competitor Analysis Input Form"}>
       <div>
         <label htmlFor="business-description" className="block text-lg font-semibold text-brand-light mb-2">
           {activeTool === 'swot' ? t('businessDescriptionLabel') : t('competitorInfoLabel')}
@@ -39,14 +58,22 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
         <div className="relative">
           <textarea
             id="business-description"
-            aria-label={t('businessDescriptionLabel')}
+            aria-label={activeTool === 'swot' ? t('businessDescriptionLabel') : t('competitorInfoLabel')}
+            aria-describedby="char-count"
             className="w-full h-40 p-4 bg-brand-primary/50 border-2 border-brand-accent rounded-xl focus:ring-2 focus:ring-brand-teal focus:outline-none transition-all duration-300 resize-y text-brand-text placeholder-brand-accent/60 leading-relaxed font-sans"
             placeholder={t('businessDescriptionPlaceholder')}
             value={value}
-            onChange={e => onChange(e.target.value)}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={(e) => {
+              if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !isLoading && value.trim().length >= 10) {
+                onSubmit(imagePreview || undefined);
+              }
+            }}
             disabled={isLoading}
+            rows={5}
           />
-          <div aria-live="polite" className="text-sm text-brand-light/50 absolute bottom-2 right-2">
+          <div id="char-count" aria-live="polite" role={isLoading ? undefined : "status"} className="text-sm text-brand-light/50 absolute bottom-2 right-2">
+            {getInputQuality() && <span className="mr-2">{getInputQuality()}</span>}
             {value.length} / 2000
           </div>
         </div>
@@ -66,6 +93,7 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
             className="hidden"
             ref={fileInputRef}
             aria-describedby="image-upload-description"
+            disabled={isLoading}
           />
           <p id="image-upload-description" className="text-xs text-brand-light/50 mt-1">
             {t('uploadScreenshotDescription')}
@@ -85,8 +113,10 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
         </div>
       )}
 
+      {extraFields}
+
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
-        <p className="text-sm text-brand-light text-center sm:text-left order-2 sm:order-1">
+        <p className="text-sm text-brand-light text-center sm:text-left order-2 sm:order-1" role="note">
           {t('inputHintPrefix')} <kbd className="font-sans px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Ctrl</kbd> + <kbd className="font-sans px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Enter</kbd> {t('inputHintSuffix')}
         </p>
         <motion.button
@@ -95,12 +125,14 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
           disabled={isLoading || value.trim().length < 10}
           whileHover={{ scale: !isLoading ? 1.05 : 1 }}
           whileTap={{ scale: !isLoading ? 0.95 : 1 }}
+          aria-label={isLoading ? t('buttonGenerating') : t('buttonGenerate')}
         >
           {isLoading ? (
-            <>
+            <div className="flex flex-col items-center justify-center text-center text-brand-light">
               <LoadingSpinner />
-              {t('buttonGenerating')}
-            </>
+              <p className="mt-4 text-lg font-semibold">{t('loadingTitle')}</p>
+              <p className="text-sm">{t('loadingText')}</p>
+            </div>
           ) : (
             t('buttonGenerate')
           )}

@@ -31,12 +31,30 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: vi.fn((key: string) => store[key] || null),
+    setItem: vi.fn((key: string, value: string) => {
+      store[key] = value.toString();
+    }),
+    removeItem: vi.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: vi.fn(() => {
+      store = {};
+    }),
+    length: 0,
+    key: vi.fn((index: number) => Object.keys(store)[index] || null),
+  };
+})();
+
 Object.defineProperty(window, 'localStorage', {
-  value: {
-    getItem: vi.fn(() => null),
-    setItem: vi.fn(() => null),
-    removeItem: vi.fn(() => null),
-    clear: vi.fn(() => null),
-  },
+  value: localStorageMock,
   writable: true,
 });
+
+// Also define on global for Node environments
+if (typeof global !== 'undefined') {
+  (global as any).localStorage = localStorageMock;
+}
