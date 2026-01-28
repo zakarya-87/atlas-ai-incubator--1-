@@ -6,7 +6,7 @@ import {
   AgentGenerationResponse,
 } from '../interfaces/ai-agent.interface';
 import { AIProviderFactory } from '../providers/ai-provider.factory';
-import { AIProvider } from '../interfaces/ai-provider.interface';
+import { AIProvider, AIProviderInterface } from '../interfaces/ai-provider.interface';
 
 export abstract class BaseAgent implements AiAgent {
   protected aiClient: GoogleGenerativeAI | undefined;
@@ -182,13 +182,16 @@ export abstract class BaseAgent implements AiAgent {
             for (const fallbackProvider of fallbackProviders) {
               console.log(`[Fallback] Attempting ${fallbackProvider} due to Gemini rate limits...`);
               try {
-                const fallbackResponse = await this.providerFactory.complete({
+                const provider = this.providerFactory.getProvider(fallbackProvider);
+                if (!provider) continue;
+
+                const fallbackResponse = await provider.complete({
                   prompt: fullPrompt,
                   context: '',
                   schema,
                   systemInstruction: systemInstruction || 'You are the ATLAS AI Engine. Provide actionable, structured business analysis.',
                   images,
-                }, fallbackProvider);
+                });
 
                 return {
                   text: fallbackResponse.text,
