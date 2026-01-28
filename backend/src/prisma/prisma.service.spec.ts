@@ -1,4 +1,3 @@
-
 import { PrismaService } from './prisma.service';
 
 describe('PrismaService', () => {

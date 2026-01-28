@@ -20,49 +20,64 @@ describe('AnalysisController (e2e)', () => {
   let jwtService: JwtService;
 
   // Mock User matching the JWT Strategy expectation
-  const user = { id: 'user-123', email: 'test@example.com', role: 'USER', password: 'hashed_password' };
-  
+  const user = {
+    id: 'user-123',
+    email: 'test@example.com',
+    role: 'USER',
+    password: 'hashed_password',
+  };
+
   beforeEach(async () => {
     // Mock Prisma (Database)
     prismaService = {
-      user: { 
+      user: {
         findUnique: jest.fn().mockImplementation((args) => {
-            if (args.where.email === user.email) return Promise.resolve(user);
-            return Promise.resolve(null);
-        }) 
+          if (args.where.email === user.email) return Promise.resolve(user);
+          return Promise.resolve(null);
+        }),
       },
-      venture: { 
-        findUnique: jest.fn().mockResolvedValue({ id: 'v1', userId: user.id }), 
-        create: jest.fn() 
+      venture: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'v1', userId: user.id }),
+        create: jest.fn(),
       },
-      analysis: { create: jest.fn(), findMany: jest.fn().mockResolvedValue([]) },
+      analysis: {
+        create: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([]),
+      },
     };
 
     // Mock AI Agent Factory (prevent Google API calls)
     const mockAgentFactory = {
       getAgent: jest.fn().mockReturnValue({
-        generate: jest.fn().mockResolvedValue({ text: '{"result":"success"}', data: { result: 'success' } })
-      })
+        generate: jest
+          .fn()
+          .mockResolvedValue({
+            text: '{"result":"success"}',
+            data: { result: 'success' },
+          }),
+      }),
     };
 
     // Mock Events Gateway (prevent WebSocket errors)
     const mockEventsGateway = {
-        emitLog: jest.fn()
+      emitLog: jest.fn(),
     };
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-    .overrideProvider(PrismaService)
-    .useValue(prismaService)
-    .overrideProvider(AnalysisAgentFactory)
-    .useValue(mockAgentFactory)
-    .overrideProvider(EventsGateway)
-    .useValue(mockEventsGateway)
-    .compile();
+      .overrideProvider(PrismaService)
+      .useValue(prismaService)
+      .overrideProvider(AnalysisAgentFactory)
+      .useValue(mockAgentFactory)
+      .overrideProvider(EventsGateway)
+      .useValue(mockEventsGateway)
+      .compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true })
+    );
     await app.init();
 
     jwtService = moduleFixture.get<JwtService>(JwtService);
@@ -75,33 +90,21 @@ describe('AnalysisController (e2e)', () => {
   it('/analysis/generate (POST) - should accept requests (auth mocked)', () => {
     return request(app.getHttpServer())
       .post('/analysis/generate')
-      .send({ 
+      .send({
         ventureId: 'v1',
         module: 'strategy',
         tool: 'swot',
         description: 'Test Business',
-        language: 'en'
+        language: 'en',
       })
       .expect(201);
   });
 
   it('/analysis/generate (POST) - should succeed with valid DTO', async () => {
-    const token = await jwtService.signAsync({ email: user.email }, { secret: 'secretKey' });
-    return request(app.getHttpServer())
-      .post('/analysis/generate')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ 
-        ventureId: 'v1',
-        module: 'strategy',
-        tool: 'swot',
-        description: 'Test Business',
-        language: 'en'
-      })
-      .expect(201);
-  });
-
-  it('/analysis/generate (POST) - should return jobId on success', async () => {
-    const token = await jwtService.signAsync({ email: user.email }, { secret: 'secretKey' });
+    const token = await jwtService.signAsync(
+      { email: user.email },
+      { secret: 'secretKey' }
+    );
     return request(app.getHttpServer())
       .post('/analysis/generate')
       .set('Authorization', `Bearer ${token}`)
@@ -110,12 +113,30 @@ describe('AnalysisController (e2e)', () => {
         module: 'strategy',
         tool: 'swot',
         description: 'Test Business',
-        language: 'en'
+        language: 'en',
+      })
+      .expect(201);
+  });
+
+  it('/analysis/generate (POST) - should return jobId on success', async () => {
+    const token = await jwtService.signAsync(
+      { email: user.email },
+      { secret: 'secretKey' }
+    );
+    return request(app.getHttpServer())
+      .post('/analysis/generate')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        ventureId: 'v1',
+        module: 'strategy',
+        tool: 'swot',
+        description: 'Test Business',
+        language: 'en',
       })
       .expect(201)
       .expect((res) => {
-          expect(res.body.jobId).toBeDefined();
-          expect(typeof res.body.jobId).toBe('string');
+        expect(res.body.jobId).toBeDefined();
+        expect(typeof res.body.jobId).toBe('string');
       });
   });
 });

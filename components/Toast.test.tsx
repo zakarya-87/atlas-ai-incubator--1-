@@ -32,7 +32,9 @@ describe('Toast Component (TC012)', () => {
   it('should render success toast with correct content', () => {
     render(<Toast {...defaultToast} onDismiss={mockOnDismiss} />);
 
-    expect(screen.getByText('Operation completed successfully')).toBeInTheDocument();
+    expect(
+      screen.getByText('Operation completed successfully')
+    ).toBeInTheDocument();
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(screen.getByLabelText('Close')).toBeInTheDocument();
   });
@@ -67,7 +69,9 @@ describe('Toast Component (TC012)', () => {
 
   it('should display appropriate icons for each toast type', () => {
     // Success toast
-    const { rerender } = render(<Toast {...defaultToast} onDismiss={mockOnDismiss} />);
+    const { rerender } = render(
+      <Toast {...defaultToast} onDismiss={mockOnDismiss} />
+    );
     expect(document.querySelector('svg')).toBeInTheDocument();
 
     // Error toast
@@ -119,7 +123,8 @@ describe('Toast Component (TC012)', () => {
   });
 
   it('should handle long messages with word wrapping', () => {
-    const longMessage = 'This is a very long message that should wrap properly within the toast component and not break the layout or cause any overflow issues. It contains multiple sentences and should be handled gracefully by the component styling.';
+    const longMessage =
+      'This is a very long message that should wrap properly within the toast component and not break the layout or cause any overflow issues. It contains multiple sentences and should be handled gracefully by the component styling.';
     const longToast: ToastMessage = {
       ...defaultToast,
       message: longMessage,
@@ -133,7 +138,9 @@ describe('Toast Component (TC012)', () => {
   });
 
   it('should clear timeout when component unmounts', () => {
-    const { unmount } = render(<Toast {...defaultToast} onDismiss={mockOnDismiss} />);
+    const { unmount } = render(
+      <Toast {...defaultToast} onDismiss={mockOnDismiss} />
+    );
 
     unmount();
 
@@ -252,6 +259,13 @@ describe('Toast Component (TC012)', () => {
     // The icon should be in a container with specific styling
     const iconContainer = document.querySelector('.inline-flex');
     expect(iconContainer).toBeInTheDocument();
-    expect(iconContainer).toHaveClass('items-center', 'justify-center', 'flex-shrink-0', 'w-8', 'h-8', 'rounded-lg');
+    expect(iconContainer).toHaveClass(
+      'items-center',
+      'justify-center',
+      'flex-shrink-0',
+      'w-8',
+      'h-8',
+      'rounded-lg'
+    );
   });
 });

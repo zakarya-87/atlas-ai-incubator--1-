@@ -16,7 +16,9 @@ function getEnv(key: string, fallback?: string): string {
 }
 
 export const config: FrontendConfig = {
-  apiBaseUrl: ((import.meta as any).env?.VITE_BACKEND_URL as string) || 'http://localhost:3000',
+  apiBaseUrl:
+    ((import.meta as any).env?.VITE_BACKEND_URL as string) ||
+    'http://localhost:3000',
   mode: ((import.meta as any).env?.MODE as string) || 'development',
 };
 

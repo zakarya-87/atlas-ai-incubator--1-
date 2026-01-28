@@ -1,33 +1,32 @@
-
 name: Deploy to Production
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   workflow_dispatch:
 
 jobs:
   deploy:
     needs: [pr-check] # Wait for checks to pass (referencing the workflow, or usually separate jobs in same workflow if simpler)
-    # In this structure, we assume pr-check runs on push too. 
+    # In this structure, we assume pr-check runs on push too.
     # Ideally, we use 'needs' if defined in same file, or rely on branch protection rules.
     # For this file, we just define the deploy steps.
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Build Frontend
-      run: |
-        npm ci
-        npm run build
-        
-    - name: Build Backend
-      run: |
-        cd backend
-        npm ci
-        npm run build
-        
-    - name: Deploy (Placeholder)
-      run: echo "🚀 Deploying to Production Infrastructure (e.g., AWS/Render)..."
+      - uses: actions/checkout@v4
+
+      - name: Build Frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build Backend
+        run: |
+          cd backend
+          npm ci
+          npm run build
+
+      - name: Deploy (Placeholder)
+        run: echo "🚀 Deploying to Production Infrastructure (e.g., AWS/Render)..."

@@ -7,7 +7,10 @@ interface MarketAnalysisSubNavProps {
   onToolChange: (tool: MarketAnalysisTool) => void;
 }
 
-const MarketAnalysisSubNav: React.FC<MarketAnalysisSubNavProps> = ({ activeTool, onToolChange }) => {
+const MarketAnalysisSubNav: React.FC<MarketAnalysisSubNavProps> = ({
+  activeTool,
+  onToolChange,
+}) => {
   const { t } = useLanguage();
 
   const navItems: { key: MarketAnalysisTool; label: string }[] = [

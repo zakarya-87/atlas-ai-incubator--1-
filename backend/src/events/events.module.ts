@@ -1,4 +1,3 @@
-
 import { Module, Global } from '@nestjs/common';
 import { EventsGateway } from './events.gateway';
 

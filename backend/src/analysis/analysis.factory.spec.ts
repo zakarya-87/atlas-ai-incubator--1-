@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { AnalysisAgentFactory } from './analysis.factory';
 import { DefaultAgent } from './agents/default.agent';
@@ -31,7 +30,9 @@ describe('AnalysisAgentFactory', () => {
   });
 
   it('should return ResearchAgent for specific research tools', () => {
-    expect(factory.getAgent('strategy', 'competitorAnalysis')).toBe(researchAgent);
+    expect(factory.getAgent('strategy', 'competitorAnalysis')).toBe(
+      researchAgent
+    );
     expect(factory.getAgent('strategy', 'marketResearch')).toBe(researchAgent);
     expect(factory.getAgent('funding', 'investorDatabase')).toBe(researchAgent);
   });

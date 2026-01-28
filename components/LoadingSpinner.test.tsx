@@ -14,7 +14,9 @@ vi.mock('../context/LanguageContext', () => ({
       return translations[key] || key;
     },
   }),
-  LanguageProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  LanguageProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 describe('LoadingSpinner Component', () => {
@@ -39,7 +41,9 @@ describe('LoadingSpinner Component', () => {
   it('should display loading description text', () => {
     render(<LoadingSpinner />);
 
-    const description = screen.getByText('Please wait while we analyze your input...');
+    const description = screen.getByText(
+      'Please wait while we analyze your input...'
+    );
     expect(description).toBeInTheDocument();
     expect(description.tagName.toLowerCase()).toBe('p');
     expect(description).toHaveClass('text-sm');
@@ -58,7 +62,9 @@ describe('LoadingSpinner Component', () => {
     render(<LoadingSpinner />);
 
     const container = screen.getByRole('status');
-    expect(container).toHaveClass('flex flex-col items-center justify-center text-center text-brand-light');
+    expect(container).toHaveClass(
+      'flex flex-col items-center justify-center text-center text-brand-light'
+    );
   });
 
   it('should render without crashing', () => {

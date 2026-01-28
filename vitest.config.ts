@@ -1,4 +1,3 @@
-
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -16,12 +15,7 @@ export default defineConfig({
       'test/**/*.{test,spec}.{ts,tsx}',
     ],
     // Exclude backend tests (they use Jest) and E2E tests (use Playwright)
-    exclude: [
-      'backend/**',
-      'e2e/**',
-      '**/node_modules/**',
-      '**/dist/**'
-    ],
+    exclude: ['backend/**', 'e2e/**', '**/node_modules/**', '**/dist/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -71,6 +65,5 @@ export default defineConfig({
         },
       },
     },
-
   },
 });

@@ -1,14 +1,17 @@
-
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BaseAgent } from './base.agent';
 import { AgentGenerationResponse } from '../interfaces/ai-agent.interface';
 import { Tool } from '@google/generative-ai';
+import { AIProviderFactory } from '../providers/ai-provider.factory';
 
 @Injectable()
 export class ResearchAgent extends BaseAgent {
-  constructor(configService: ConfigService) {
-    super(configService);
+  constructor(
+    configService: ConfigService,
+    protected readonly providerFactory: AIProviderFactory
+  ) {
+    super(configService, providerFactory);
   }
 
   async generate(
@@ -18,7 +21,6 @@ export class ResearchAgent extends BaseAgent {
     systemInstruction?: string,
     images?: string[]
   ): Promise<AgentGenerationResponse> {
-
     // --- PASS 1: GATHER INTELLIGENCE (Google Search + Vision) ---
     // We cannot use responseSchema with googleSearch, so we get raw text first.
     const searchPrompt = `
@@ -41,13 +43,13 @@ export class ResearchAgent extends BaseAgent {
 
     if (images && images.length > 0) {
       const parts: any[] = [{ text: searchPrompt }];
-      images.forEach(imgBase64 => {
-        const cleanBase64 = imgBase64.replace(/^data:image\/\w+;base64,/, "");
+      images.forEach((imgBase64) => {
+        const cleanBase64 = imgBase64.replace(/^data:image\/\w+;base64,/, '');
         parts.push({
           inlineData: {
             mimeType: 'image/jpeg',
-            data: cleanBase64
-          }
+            data: cleanBase64,
+          },
         });
       });
       // Pass parts array directly for multimodal content
@@ -57,23 +59,25 @@ export class ResearchAgent extends BaseAgent {
       searchContents = searchPrompt;
     }
 
-    // Use getClient() for lazy loading
-    const model = this.getClient().getGenerativeModel({
-      model: 'gemini-2.5-pro',
-      tools: [{ googleSearch: {} } as any], // Enable Grounding
-      generationConfig: {
-        temperature: 0.3, // Low temperature for factual accuracy
-      },
-    });
+    const searchResponse = await this.executeGeminiCall(
+      'gemini-2.0-flash-lite',
+      searchPrompt,
+      null, // No schema for research pass
+      systemInstruction || 'You are the ATLAS AI Engine. Conduct comprehensive market research.',
+      images,
+      [{ googleSearch: {} } as any] // Pass tools for Grounding
+    );
 
-    const searchResponse = await model.generateContent(searchContents);
+    const rawText = searchResponse.text;
 
-    const rawText = searchResponse.response.text();
-
-    // Extract citations (Grounding Metadata)
-    const groundingChunks = searchResponse.response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+    // Extract citations (Grounding Metadata) from rawResponse
+    const groundingChunks =
+      searchResponse.rawResponse?.response?.candidates?.[0]?.groundingMetadata
+        ?.groundingChunks || [];
     const sources = groundingChunks
-      .map((chunk: any) => chunk.web?.uri ? { title: chunk.web.title, url: chunk.web.uri } : null)
+      .map((chunk: any) =>
+        chunk.web?.uri ? { title: chunk.web.title, url: chunk.web.uri } : null
+      )
       .filter((source: any) => source !== null);
 
     // --- PASS 2: STRUCTURE DATA (JSON Formatting) ---
@@ -92,22 +96,22 @@ export class ResearchAgent extends BaseAgent {
     `;
 
     const formattedResponse = await this.executeGeminiCall(
-      'gemini-2.5-pro',
+      'gemini-2.0-flash-lite',
       formattingPrompt,
       schema,
-      "You are a strict JSON formatting engine."
+      'You are a strict JSON formatting engine.'
     );
 
     // --- MERGE & RETURN ---
     // Inject the sources into the result data so the frontend can display them
     const finalData = {
       ...formattedResponse.data,
-      _sources: sources
+      _sources: sources,
     };
 
     return {
       text: formattedResponse.text,
-      data: finalData
+      data: finalData,
     };
   }
 }

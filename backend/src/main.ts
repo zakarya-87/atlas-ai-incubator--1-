@@ -42,14 +42,17 @@ async function bootstrap() {
         }
       },
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      allowedHeaders: 'Content-Type, Accept, Authorization',
       credentials: true,
     });
 
     // Global Validation Pipe for DTOs
-    app.useGlobalPipes(new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }));
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+      })
+    );
 
     // Global Error Handling
     app.useGlobalFilters(new HttpExceptionFilter());
@@ -57,7 +60,9 @@ async function bootstrap() {
     // --- SWAGGER CONFIGURATION ---
     const config = new DocumentBuilder()
       .setTitle('ATLAS AI Incubator API')
-      .setDescription('API documentation for the ATLAS AI platform backend services.')
+      .setDescription(
+        'API documentation for the ATLAS AI platform backend services.'
+      )
       .setVersion('1.0')
       .addBearerAuth()
       .build();
@@ -77,7 +82,7 @@ async function bootstrap() {
     console.log(`⭐️ Ready to accept requests on port ${port}`);
     console.log(`=================================================`);
   } catch (error) {
-    console.error("❌ Server failed to start:", error);
+    console.error('❌ Server failed to start:', error);
   }
 }
 bootstrap();

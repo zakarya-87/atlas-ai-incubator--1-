@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { HistoryService } from './history.service';
@@ -93,7 +92,10 @@ describe('HistoryService', () => {
     it('should return empty array for unauthorized user', async () => {
       prismaService.venture.findUnique.mockResolvedValue(mockVenture);
 
-      const result = await service.getVentureHistory('venture-123', 'other-user');
+      const result = await service.getVentureHistory(
+        'venture-123',
+        'other-user'
+      );
 
       expect(result).toEqual([]);
     });
@@ -101,7 +103,10 @@ describe('HistoryService', () => {
     it('should return empty array for non-existent venture', async () => {
       prismaService.venture.findUnique.mockResolvedValue(null);
 
-      const result = await service.getVentureHistory('non-existent', 'user-123');
+      const result = await service.getVentureHistory(
+        'non-existent',
+        'user-123'
+      );
 
       expect(result).toEqual([]);
     });
@@ -115,7 +120,10 @@ describe('HistoryService', () => {
       ];
       prismaService.analysis.findMany.mockResolvedValue(mockAnalyses);
 
-      const result = await service.getRecentAnalysesForContext('venture-123', 'swot');
+      const result = await service.getRecentAnalysesForContext(
+        'venture-123',
+        'swot'
+      );
 
       expect(prismaService.analysis.findMany).toHaveBeenCalledWith({
         where: {
@@ -157,7 +165,10 @@ describe('HistoryService', () => {
       });
       prismaService.analysis.delete.mockResolvedValue(mockAnalysis);
 
-      const result = await service.deleteAnalysis('analysis-123', mockAdminUser);
+      const result = await service.deleteAnalysis(
+        'analysis-123',
+        mockAdminUser
+      );
 
       expect(prismaService.analysis.delete).toHaveBeenCalledWith({
         where: { id: 'analysis-123' },
@@ -168,8 +179,9 @@ describe('HistoryService', () => {
     it('should throw NotFoundException for non-existent analysis', async () => {
       prismaService.analysis.findUnique.mockResolvedValue(null);
 
-      await expect(service.deleteAnalysis('non-existent', mockUser))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.deleteAnalysis('non-existent', mockUser)
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException for non-owner non-admin', async () => {
@@ -178,8 +190,9 @@ describe('HistoryService', () => {
         venture: { ...mockVenture, userId: 'other-user' },
       });
 
-      await expect(service.deleteAnalysis('analysis-123', mockUser))
-        .rejects.toThrow(ForbiddenException);
+      await expect(
+        service.deleteAnalysis('analysis-123', mockUser)
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -218,8 +231,9 @@ describe('HistoryService', () => {
         data: {},
       };
 
-      await expect(service.createManualVersion(dto, 'user-123'))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.createManualVersion(dto, 'user-123')
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException for unauthorized user', async () => {
@@ -233,8 +247,9 @@ describe('HistoryService', () => {
         data: {},
       };
 
-      await expect(service.createManualVersion(dto, 'other-user'))
-        .rejects.toThrow(ForbiddenException);
+      await expect(
+        service.createManualVersion(dto, 'other-user')
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 });

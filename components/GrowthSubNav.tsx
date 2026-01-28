@@ -7,7 +7,10 @@ interface GrowthSubNavProps {
   onToolChange: (tool: GrowthTool) => void;
 }
 
-const GrowthSubNav: React.FC<GrowthSubNavProps> = ({ activeTool, onToolChange }) => {
+const GrowthSubNav: React.FC<GrowthSubNavProps> = ({
+  activeTool,
+  onToolChange,
+}) => {
   const { t } = useLanguage();
 
   const navItems: { key: GrowthTool; label: string }[] = [

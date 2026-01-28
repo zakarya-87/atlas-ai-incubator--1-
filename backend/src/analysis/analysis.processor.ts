@@ -14,14 +14,14 @@ export class AnalysisProcessor extends WorkerHost {
   constructor(
     private analysisService: AnalysisService,
     private prisma: PrismaService,
-    private eventsGateway: EventsGateway,
+    private eventsGateway: EventsGateway
   ) {
     super();
   }
 
   async process(job: Job<AnalysisJobData>) {
     const { dto, userId } = job.data;
-    
+
     try {
       // Update job status to processing
       await this.prisma.job.update({
@@ -45,10 +45,10 @@ export class AnalysisProcessor extends WorkerHost {
       // Update job status to completed
       await this.prisma.job.update({
         where: { id: job.id.toString() },
-        data: { 
-          status: 'completed', 
+        data: {
+          status: 'completed',
           result: JSON.stringify(result),
-          completedAt: new Date() 
+          completedAt: new Date(),
         },
       });
 
@@ -67,10 +67,10 @@ export class AnalysisProcessor extends WorkerHost {
       // Update job status to failed
       await this.prisma.job.update({
         where: { id: job.id.toString() },
-        data: { 
-          status: 'failed', 
+        data: {
+          status: 'failed',
           error: error.message,
-          completedAt: new Date() 
+          completedAt: new Date(),
         },
       });
 

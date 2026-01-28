@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -7,7 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { EmailModule } from '../email/email.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -15,10 +14,14 @@ import { ConfigModule } from '@nestjs/config';
     EmailModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     ConfigModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'CHANGE_ME_IN_ENV',
-      signOptions: { expiresIn: process.env.JWT_TTL || '15m' as any },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: (config.get<string>('JWT_TTL') || '24h') as any },
+      }),
     }),
+
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

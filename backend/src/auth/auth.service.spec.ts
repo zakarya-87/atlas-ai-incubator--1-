@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -68,7 +67,7 @@ describe('AuthService', () => {
 
       expect(usersService.createUser).toHaveBeenCalledWith(
         credentials.email,
-        credentials.password,
+        credentials.password
       );
       expect(usersService.createUser).toHaveBeenCalledTimes(1);
     });
@@ -85,7 +84,9 @@ describe('AuthService', () => {
 
       // Note: We don't await the email in the service (fire and forget)
       // But we can verify it was called
-      expect(emailService.sendWelcomeEmail).toHaveBeenCalledWith(credentials.email);
+      expect(emailService.sendWelcomeEmail).toHaveBeenCalledWith(
+        credentials.email
+      );
     });
 
     it('should not fail if welcome email fails', async () => {
@@ -95,7 +96,9 @@ describe('AuthService', () => {
       };
 
       usersService.createUser.mockResolvedValue(undefined);
-      emailService.sendWelcomeEmail.mockRejectedValue(new Error('Email service down'));
+      emailService.sendWelcomeEmail.mockRejectedValue(
+        new Error('Email service down')
+      );
 
       // Should not throw even if email fails
       await expect(service.signUp(credentials)).resolves.toBeUndefined();
@@ -107,9 +110,13 @@ describe('AuthService', () => {
         password: 'password123',
       };
 
-      usersService.createUser.mockRejectedValue(new Error('Email already exists'));
+      usersService.createUser.mockRejectedValue(
+        new Error('Email already exists')
+      );
 
-      await expect(service.signUp(credentials)).rejects.toThrow('Email already exists');
+      await expect(service.signUp(credentials)).rejects.toThrow(
+        'Email already exists'
+      );
     });
   });
 
@@ -127,11 +134,14 @@ describe('AuthService', () => {
       const result = await service.signIn(credentials);
 
       expect(usersService.findOne).toHaveBeenCalledWith(credentials.email);
-      expect(bcrypt.compare).toHaveBeenCalledWith(credentials.password, mockUser.password);
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        credentials.password,
+        mockUser.password
+      );
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         email: credentials.email,
         role: mockUser.role,
-        id: mockUser.id
+        id: mockUser.id,
       });
       expect(result).toEqual({ accessToken: 'mock.jwt.token' });
     });
@@ -144,9 +154,11 @@ describe('AuthService', () => {
 
       usersService.findOne.mockResolvedValue(null);
 
-      await expect(service.signIn(credentials)).rejects.toThrow(UnauthorizedException);
       await expect(service.signIn(credentials)).rejects.toThrow(
-        'Please check your login credentials',
+        UnauthorizedException
+      );
+      await expect(service.signIn(credentials)).rejects.toThrow(
+        'Please check your login credentials'
       );
     });
 
@@ -159,7 +171,9 @@ describe('AuthService', () => {
       usersService.findOne.mockResolvedValue(mockUser);
       (bcrypt.compare as ReturnType<typeof jest.fn>).mockResolvedValue(false);
 
-      await expect(service.signIn(credentials)).rejects.toThrow(UnauthorizedException);
+      await expect(service.signIn(credentials)).rejects.toThrow(
+        UnauthorizedException
+      );
       expect(jwtService.signAsync).not.toHaveBeenCalled();
     });
 
@@ -170,7 +184,9 @@ describe('AuthService', () => {
       };
 
       usersService.findOne.mockResolvedValue(mockUser);
-      (bcrypt.compare as ReturnType<typeof jest.fn>).mockRejectedValue(new Error('Bcrypt error'));
+      (bcrypt.compare as ReturnType<typeof jest.fn>).mockRejectedValue(
+        new Error('Bcrypt error')
+      );
 
       await expect(service.signIn(credentials)).rejects.toThrow('Bcrypt error');
     });

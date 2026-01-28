@@ -13,11 +13,15 @@ vi.mock('../context/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
   }),
-  LanguageProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  LanguageProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 vi.mock('./Tooltip', () => ({
-  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }));
 
 describe('SidebarNav Component', () => {
@@ -47,10 +51,7 @@ describe('SidebarNav Component', () => {
   it('should accept activeModule prop', () => {
     const onModuleChange = vi.fn();
     const component = (
-      <SidebarNav 
-        activeModule="dashboard" 
-        onModuleChange={onModuleChange} 
-      />
+      <SidebarNav activeModule="dashboard" onModuleChange={onModuleChange} />
     );
     expect(component).toBeDefined();
   });

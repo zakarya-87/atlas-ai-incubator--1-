@@ -1,7 +1,7 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { ResearchAgent } from './research.agent';
 import { ConfigService } from '@nestjs/config';
+import { AIProviderFactory } from '../providers/ai-provider.factory';
 
 describe('ResearchAgent', () => {
   let agent: ResearchAgent;
@@ -14,9 +14,19 @@ describe('ResearchAgent', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string) => {
-              if (key === 'API_KEY') return 'test-api-key';
+              if (key === 'GEMINI_API_KEY') return 'test-api-key';
+              if (key === 'DEFAULT_AI_PROVIDER') return 'gemini';
               return null;
             }),
+          },
+        },
+        {
+          provide: AIProviderFactory,
+          useValue: {
+            getAvailableProviders: jest.fn().mockReturnValue(['gemini']),
+            complete: jest.fn().mockResolvedValue({ text: 'mock response', data: {} }),
+            getActiveProvider: jest.fn().mockReturnValue('gemini'),
+            isProviderAvailable: jest.fn().mockReturnValue(true),
           },
         },
       ],

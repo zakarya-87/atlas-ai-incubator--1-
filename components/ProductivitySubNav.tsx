@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { ProductivityTool } from '../types';
@@ -8,7 +7,10 @@ interface ProductivitySubNavProps {
   onToolChange: (tool: ProductivityTool) => void;
 }
 
-const ProductivitySubNav: React.FC<ProductivitySubNavProps> = ({ activeTool, onToolChange }) => {
+const ProductivitySubNav: React.FC<ProductivitySubNavProps> = ({
+  activeTool,
+  onToolChange,
+}) => {
   const { t } = useLanguage();
 
   const navItems: { key: ProductivityTool; label: string }[] = [

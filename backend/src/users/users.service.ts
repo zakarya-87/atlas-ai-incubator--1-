@@ -1,4 +1,3 @@
-
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
@@ -7,7 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async findOne(email: string): Promise<User | null> {
     return (this.prisma as any).user.findUnique({
@@ -50,7 +49,7 @@ export class UsersService {
 
     return (this.prisma as any).user.update({
       where: { id },
-      data: data
+      data: data,
     });
   }
 
@@ -68,13 +67,15 @@ export class UsersService {
 
     // 2. Check Balance
     if (user.credits <= 0) {
-      throw new ForbiddenException('Insufficient credits. Please upgrade to Pro to continue generating insights.');
+      throw new ForbiddenException(
+        'Insufficient credits. Please upgrade to Pro to continue generating insights.'
+      );
     }
 
     // 3. Deduct
     const updatedUser = await (this.prisma as any).user.update({
       where: { id: userId },
-      data: { credits: { decrement: 1 } }
+      data: { credits: { decrement: 1 } },
     });
 
     return updatedUser.credits;

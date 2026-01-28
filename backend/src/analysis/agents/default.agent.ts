@@ -1,13 +1,16 @@
-
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BaseAgent } from './base.agent';
 import { AgentGenerationResponse } from '../interfaces/ai-agent.interface';
+import { AIProviderFactory } from '../providers/ai-provider.factory';
 
 @Injectable()
 export class DefaultAgent extends BaseAgent {
-  constructor(configService: ConfigService) {
-    super(configService);
+  constructor(
+    configService: ConfigService,
+    protected readonly providerFactory: AIProviderFactory
+  ) {
+    super(configService, providerFactory);
   }
 
   async generate(
@@ -19,9 +22,8 @@ export class DefaultAgent extends BaseAgent {
   ): Promise<AgentGenerationResponse> {
     const fullPrompt = `${prompt}\n${context}`;
 
-    // Default to Pro model for advanced reasoning and comprehensive analysis
     return this.executeGeminiCall(
-      'gemini-2.5-pro',
+      'gemini-2.0-flash-lite',
       fullPrompt,
       schema,
       systemInstruction,

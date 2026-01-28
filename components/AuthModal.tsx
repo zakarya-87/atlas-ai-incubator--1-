@@ -71,7 +71,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             initial={{ y: 20, scale: 0.95 }}
             animate={{ y: 0, scale: 1 }}
             exit={{ y: 20, scale: 0.95 }}
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex border-b border-brand-accent">
               <button
@@ -90,16 +90,26 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               </button>
             </div>
             <div className="p-8">
-              <h3 id="auth-modal-title" className="text-2xl font-bold text-brand-text mb-2">
+              <h3
+                id="auth-modal-title"
+                className="text-2xl font-bold text-brand-text mb-2"
+              >
                 {isLogin ? t('welcomeBack') : t('createAccount')}
               </h3>
               <p className="text-sm text-brand-light mb-6">
                 {isLogin ? t('accessWorkspace') : t('getStarted')}
               </p>
-              {error && <p className="text-red-400 text-sm mb-4" role="alert">{error}</p>}
+              {error && (
+                <p className="text-red-400 text-sm mb-4" role="alert">
+                  {error}
+                </p>
+              )}
               <form onSubmit={handleAuthAction} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-brand-light uppercase mb-1" htmlFor="email">
+                  <label
+                    className="block text-xs font-bold text-brand-light uppercase mb-1"
+                    htmlFor="email"
+                  >
                     {t('email')}
                   </label>
                   <input
@@ -110,12 +120,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     type="email"
                     placeholder={t('emailPlaceholder')}
                     value={email}
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-brand-light uppercase mb-1" htmlFor="password">
+                  <label
+                    className="block text-xs font-bold text-brand-light uppercase mb-1"
+                    htmlFor="password"
+                  >
                     {t('password')}
                   </label>
                   <input
@@ -125,7 +138,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     type="password"
                     placeholder="••••••••"
                     value={password}
-                    onChange={e => setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={6}
                   />

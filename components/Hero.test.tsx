@@ -8,14 +8,17 @@ const mockTranslations: Record<string, string> = {
   dashboardHeroTitle: 'Welcome to ATLAS AI',
   dashboardHeroSubtitle: 'Your AI-powered business analysis platform',
   swotHeroTitle: 'SWOT Analysis',
-  swotHeroSubtitle: 'Identify strengths, weaknesses, opportunities, and threats',
+  swotHeroSubtitle:
+    'Identify strengths, weaknesses, opportunities, and threats',
 };
 
 vi.mock('../context/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
   }),
-  LanguageProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  LanguageProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 describe('Hero Component', () => {
@@ -35,7 +38,9 @@ describe('Hero Component', () => {
   it('should render subtitle paragraph', () => {
     render(<Hero activeModule="dashboard" />);
 
-    const subtitle = screen.getByText('Your AI-powered business analysis platform');
+    const subtitle = screen.getByText(
+      'Your AI-powered business analysis platform'
+    );
     expect(subtitle).toBeInTheDocument();
   });
 
@@ -61,7 +66,9 @@ describe('Hero Component', () => {
   it('should display translated subtitle', () => {
     render(<Hero activeModule="dashboard" />);
 
-    const subtitle = screen.getByText('Your AI-powered business analysis platform');
+    const subtitle = screen.getByText(
+      'Your AI-powered business analysis platform'
+    );
     expect(subtitle).toBeInTheDocument();
   });
 

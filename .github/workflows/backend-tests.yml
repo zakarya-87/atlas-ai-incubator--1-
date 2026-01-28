@@ -1,54 +1,54 @@
 name: Backend Unit Tests
 
 on:
-    push:
-        branches: [main, develop]
-        paths:
-            - "backend/**"
-            - "!backend/README.md"
-    pull_request:
-        branches: [main, develop]
-        paths:
-            - "backend/**"
-            - "!backend/README.md"
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '!backend/README.md'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+      - '!backend/README.md'
 
 jobs:
-    test:
-        name: Run Backend Tests
-        runs-on: ubuntu-latest
+  test:
+    name: Run Backend Tests
+    runs-on: ubuntu-latest
 
-        strategy:
-            matrix:
-                node-version: [18.x, 20.x]
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ matrix.node-version }}
-                  cache: "npm"
-                  cache-dependency-path: backend/package-lock.json
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
 
-            - name: Install backend dependencies
-              working-directory: backend
-              run: npm ci
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
 
-            - name: Run backend unit tests
-              working-directory: backend
-              run: npm test
+      - name: Run backend unit tests
+        working-directory: backend
+        run: npm test
 
-            - name: Generate coverage report
-              if: matrix.node-version == '20.x'
-              working-directory: backend
-              run: npm run test:cov
+      - name: Generate coverage report
+        if: matrix.node-version == '20.x'
+        working-directory: backend
+        run: npm run test:cov
 
-            - name: Upload coverage reports
-              if: matrix.node-version == '20.x'
-              uses: actions/upload-artifact@v4
-              with:
-                  name: backend-coverage
-                  path: backend/coverage/
-                  retention-days: 30
+      - name: Upload coverage reports
+        if: matrix.node-version == '20.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+          retention-days: 30

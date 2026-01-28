@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { EmailService } from './email.service';
 import { ConfigService } from '@nestjs/config';
@@ -16,11 +15,11 @@ describe('EmailService', () => {
     mockConfigService = {
       get: jest.fn((key: string) => {
         const config: Record<string, string> = {
-          'SMTP_HOST': 'smtp.test.com',
-          'SMTP_USER': 'test@test.com',
-          'SMTP_PASS': 'testpass',
-          'SMTP_PORT': '587',
-          'FRONTEND_URL': 'http://localhost:5173',
+          SMTP_HOST: 'smtp.test.com',
+          SMTP_USER: 'test@test.com',
+          SMTP_PASS: 'testpass',
+          SMTP_PORT: '587',
+          FRONTEND_URL: 'http://localhost:5173',
         };
         return config[key];
       }),
@@ -44,10 +43,10 @@ describe('EmailService', () => {
       const configWithSmtp = {
         get: jest.fn((key: string) => {
           const config: Record<string, string> = {
-            'SMTP_HOST': 'smtp.test.com',
-            'SMTP_USER': 'user@test.com',
-            'SMTP_PASS': 'pass123',
-            'SMTP_PORT': '587',
+            SMTP_HOST: 'smtp.test.com',
+            SMTP_USER: 'user@test.com',
+            SMTP_PASS: 'pass123',
+            SMTP_PORT: '587',
           };
           return config[key];
         }),

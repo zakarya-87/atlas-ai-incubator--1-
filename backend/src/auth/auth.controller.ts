@@ -1,11 +1,12 @@
-
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
+
   constructor(private authService: AuthService) {}
 
   @Post('/signup')
@@ -16,7 +17,7 @@ export class AuthController {
   @Post('/signin')
   async signIn(
     @Body() authCredentialsDto: AuthCredentialsDto,
-    @Res({ passthrough: true }) res: Response,
+    @Res({ passthrough: true }) res: Response
   ) {
     const { accessToken } = await this.authService.signIn(authCredentialsDto);
 
@@ -24,28 +25,34 @@ export class AuthController {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-      sameSite: 'strict', // Prevent CSRF
+      sameSite: 'lax', // Lax is safer for dev/localhost
       maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+      path: '/',
     });
 
-    // Return minimal response - token is now in cookie
-    return { success: true };
+    // Return token in body for Bearer auth + cookie for session auth (dual support)
+    return { success: true, access_token: accessToken };
   }
 
   @Post('/logout')
+  @UseGuards(JwtAuthGuard)
   logout(@Res({ passthrough: true }) res: Response) {
+
     // Clear the JWT cookie
     res.clearCookie('accessToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
+      path: '/',
     });
 
     return { success: true };
   }
 
   @Post('/refresh')
+  @UseGuards(JwtAuthGuard)
   async refresh(@Res({ passthrough: true }) res: Response) {
+
     // This endpoint will validate the cookie and return a success status
     // The JWT validation is handled by the AuthGuard which will refresh the cookie if needed
     return { success: true };

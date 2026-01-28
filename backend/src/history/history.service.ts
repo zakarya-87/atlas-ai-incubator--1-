@@ -1,15 +1,18 @@
-
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
 
 @Injectable()
 export class HistoryService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async getVentureHistory(ventureId: string, userId: string) {
     const venture = await (this.prisma as any).venture.findUnique({
-      where: { id: ventureId }
+      where: { id: ventureId },
     });
 
     // If venture doesn't exist or belongs to another user (and we are enforcing auth), return empty
@@ -25,19 +28,22 @@ export class HistoryService {
   }
 
   // Used by AnalysisService for Context Hydration
-  async getRecentAnalysesForContext(ventureId: string, excludeTool: string): Promise<any[]> {
+  async getRecentAnalysesForContext(
+    ventureId: string,
+    excludeTool: string
+  ): Promise<any[]> {
     return (this.prisma as any).analysis.findMany({
       where: {
         ventureId: ventureId,
-        tool: { not: excludeTool }
+        tool: { not: excludeTool },
       },
       orderBy: { createdAt: 'desc' },
       take: 5,
       select: {
         tool: true,
         resultData: true,
-        inputContext: true
-      }
+        inputContext: true,
+      },
     });
   }
 
@@ -45,14 +51,14 @@ export class HistoryService {
     return (this.prisma as any).analysis.findMany({
       orderBy: { createdAt: 'desc' },
       take: 50,
-      include: { venture: { include: { user: { select: { email: true } } } } }
+      include: { venture: { include: { user: { select: { email: true } } } } },
     });
   }
 
   async deleteAnalysis(analysisId: string, user: User) {
     const analysis = await (this.prisma as any).analysis.findUnique({
       where: { id: analysisId },
-      include: { venture: true }
+      include: { venture: true },
     });
 
     if (!analysis) {
@@ -63,17 +69,19 @@ export class HistoryService {
     const isAdmin = user.role === 'ADMIN';
 
     if (!isOwner && !isAdmin) {
-      throw new ForbiddenException('You do not have permission to delete this analysis');
+      throw new ForbiddenException(
+        'You do not have permission to delete this analysis'
+      );
     }
 
     return (this.prisma as any).analysis.delete({
-      where: { id: analysisId }
+      where: { id: analysisId },
     });
   }
 
   async createManualVersion(dto: any, userId: string) {
     const venture = await (this.prisma as any).venture.findUnique({
-      where: { id: dto.ventureId }
+      where: { id: dto.ventureId },
     });
 
     if (!venture) {
@@ -81,7 +89,9 @@ export class HistoryService {
     }
 
     if (venture.userId !== userId) {
-      throw new ForbiddenException('Venture ID mismatch or unauthorized access.');
+      throw new ForbiddenException(
+        'Venture ID mismatch or unauthorized access.'
+      );
     }
 
     return (this.prisma as any).analysis.create({
@@ -91,9 +101,10 @@ export class HistoryService {
         module: dto.module,
         tool: dto.tool,
         inputContext: dto.description, // FIX: Mapped correctly from DTO 'description' to DB 'inputContext'
-        resultData: typeof dto.data === 'string' ? dto.data : JSON.stringify(dto.data), // Prisma expects a String
-        parentId: dto.parentId
-      }
+        resultData:
+          typeof dto.data === 'string' ? dto.data : JSON.stringify(dto.data), // Prisma expects a String
+        parentId: dto.parentId,
+      },
     });
   }
 }

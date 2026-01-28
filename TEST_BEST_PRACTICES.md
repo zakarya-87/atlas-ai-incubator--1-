@@ -1,17 +1,21 @@
 # ATLAS AI Incubator - Test Best Practices
 
 ## Overview
+
 This document outlines the testing best practices for the ATLAS AI Incubator project, designed to ensure high-quality, maintainable, and reliable code through effective testing strategies.
 
 ## Testing Philosophy
 
 ### 1. Testing Pyramid Implementation
+
 Follow the testing pyramid approach with the following distribution:
+
 - **Unit Tests (60%)**: Fast, isolated tests for individual functions, components, and services
 - **Integration Tests (30%)**: Tests for interactions between components and external systems
 - **E2E Tests (10%)**: Critical user journey tests simulating real user interactions
 
 ### 2. Test Quality Standards
+
 - Tests should be fast, reliable, and deterministic
 - Each test should focus on a single concern
 - Tests should be readable and maintainable
@@ -20,6 +24,7 @@ Follow the testing pyramid approach with the following distribution:
 ## Frontend Testing Best Practices
 
 ### Component Testing (React + Vitest + React Testing Library)
+
 ```typescript
 // ✅ DO: Follow this pattern
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -35,7 +40,7 @@ describe('MyComponent', () => {
   it('handles user interactions properly', async () => {
     const mockCallback = vi.fn();
     render(<MyComponent onClick={mockCallback} />);
-    
+
     fireEvent.click(screen.getByRole('button'));
     await waitFor(() => expect(mockCallback).toHaveBeenCalledTimes(1));
   });
@@ -43,11 +48,13 @@ describe('MyComponent', () => {
 ```
 
 ### Accessibility Testing
+
 - All components must pass automated accessibility checks using axe-core
 - Test keyboard navigation and screen reader compatibility
 - Ensure proper ARIA attributes and semantic HTML usage
 
 ### Custom Hook Testing
+
 - Test all possible states and transitions
 - Verify side effects and cleanup functions
 - Mock external dependencies appropriately
@@ -55,6 +62,7 @@ describe('MyComponent', () => {
 ## Backend Testing Best Practices
 
 ### API Endpoint Testing (Supertest + Jest)
+
 ```typescript
 // ✅ DO: Follow this pattern
 import * as request from 'supertest';
@@ -97,6 +105,7 @@ describe('Authentication Endpoints', () => {
 ```
 
 ### Service Testing
+
 - Mock external dependencies and databases
 - Test business logic in isolation
 - Verify proper error handling and validation
@@ -104,6 +113,7 @@ describe('Authentication Endpoints', () => {
 ## Test Organization and Naming
 
 ### File Structure
+
 ```
 src/
 ├── components/
@@ -124,6 +134,7 @@ src/
 ```
 
 ### Test Naming Convention
+
 - Use Given-When-Then or Describe-It pattern
 - Be specific about what is being tested
 - Include expected behavior in test names
@@ -142,6 +153,7 @@ it('test', () => { ... });
 ## Test Data Management
 
 ### Test Fixtures
+
 Create reusable test data fixtures for consistent testing:
 
 ```typescript
@@ -161,6 +173,7 @@ export const mockUser = {
 ```
 
 ### Database Testing
+
 - Use in-memory databases for faster unit tests
 - Create fresh database state for each test or test suite
 - Clean up test data after each test run
@@ -168,11 +181,13 @@ export const mockUser = {
 ## Error Handling and Edge Cases
 
 ### Negative Testing
+
 - Test error scenarios and exception handling
 - Verify proper error messages are displayed
 - Test boundary conditions and invalid inputs
 
 ### Robustness Testing
+
 - Test with malformed data
 - Verify graceful degradation
 - Test network failure scenarios
@@ -180,11 +195,13 @@ export const mockUser = {
 ## Performance and Reliability
 
 ### Test Performance
+
 - Keep tests fast (< 100ms for unit tests)
 - Minimize external dependencies in unit tests
 - Use mocks and stubs appropriately
 
 ### Flaky Test Prevention
+
 - Ensure tests are deterministic
 - Avoid shared state between tests
 - Use proper async/await patterns
@@ -193,11 +210,13 @@ export const mockUser = {
 ## Code Coverage and Quality Metrics
 
 ### Coverage Targets
+
 - Aim for 80%+ statement coverage
 - Aim for 80%+ branch coverage
 - Focus on critical paths and business logic
 
 ### Quality Checks
+
 - Run linting as part of test process
 - Include type checking in test pipeline
 - Validate accessibility in CI
@@ -205,12 +224,14 @@ export const mockUser = {
 ## Continuous Integration Best Practices
 
 ### Test Execution Order
+
 1. Linting and type checking
 2. Unit tests
 3. Integration tests
 4. E2E tests (only on main branch)
 
 ### Parallel Execution
+
 - Run test suites in parallel when possible
 - Isolate tests that share resources
 - Use unique identifiers for test data
@@ -218,11 +239,13 @@ export const mockUser = {
 ## Security Testing
 
 ### Authentication & Authorization
+
 - Test unauthorized access attempts
 - Verify JWT token validation
 - Test role-based access controls
 
 ### Input Validation
+
 - Test for SQL injection vulnerabilities
 - Test for XSS protection
 - Validate all user inputs
@@ -230,11 +253,13 @@ export const mockUser = {
 ## Documentation and Maintenance
 
 ### Test Documentation
+
 - Document complex test scenarios
 - Maintain README files for test environments
 - Keep test strategy documentation updated
 
 ### Test Maintenance
+
 - Regularly review and update tests
 - Remove obsolete or redundant tests
 - Refactor tests when code changes significantly
@@ -242,6 +267,7 @@ export const mockUser = {
 ## Tools and Configuration
 
 ### Recommended Tools
+
 - **Unit/Integration Tests**: Vitest for frontend, Jest for backend
 - **E2E Tests**: Playwright
 - **API Testing**: Supertest
@@ -249,7 +275,9 @@ export const mockUser = {
 - **Coverage**: @vitest/coverage-v8 or Jest coverage
 
 ### Configuration Files
+
 Maintain proper configuration for each testing environment:
+
 - Separate configurations for unit, integration, and E2E tests
 - Environment-specific settings
 - Consistent test runner configurations
@@ -267,6 +295,7 @@ Maintain proper configuration for each testing environment:
 ## Implementation Checklist
 
 Before considering a feature complete, ensure:
+
 - [ ] All critical paths are covered by unit tests
 - [ ] API endpoints have proper integration tests
 - [ ] Key user journeys are covered by E2E tests

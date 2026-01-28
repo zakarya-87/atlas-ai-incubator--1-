@@ -18,11 +18,14 @@ export default function useUndoRedo<T>(initialState: T): UndoRedoState<T> {
 
   const set = useCallback((newState: T | ((prevState: T) => T)) => {
     setState((currentState) => {
-      const calculatedState = typeof newState === 'function' ? (newState as any)(currentState) : newState;
-      
+      const calculatedState =
+        typeof newState === 'function'
+          ? (newState as any)(currentState)
+          : newState;
+
       // Deep comparison could be added here for performance, but strict reference check is usually enough for React
       if (calculatedState === currentState) return currentState;
-      
+
       setPast((prev) => [...prev, currentState]);
       setFuture([]); // Clear future when new action is taken
       return calculatedState;
@@ -34,10 +37,10 @@ export default function useUndoRedo<T>(initialState: T): UndoRedoState<T> {
       if (prevPast.length === 0) return prevPast;
       const newPast = prevPast.slice(0, -1);
       const previousState = prevPast[prevPast.length - 1];
-      
+
       setFuture((prevFuture) => [state, ...prevFuture]);
       setState(previousState);
-      
+
       return newPast;
     });
   }, [state]);
@@ -47,10 +50,10 @@ export default function useUndoRedo<T>(initialState: T): UndoRedoState<T> {
       if (prevFuture.length === 0) return prevFuture;
       const newFuture = prevFuture.slice(1);
       const nextState = prevFuture[0];
-      
+
       setPast((prevPast) => [...prevPast, state]);
       setState(nextState);
-      
+
       return newFuture;
     });
   }, [state]);
@@ -90,6 +93,6 @@ export default function useUndoRedo<T>(initialState: T): UndoRedoState<T> {
     canUndo: past.length > 0,
     canRedo: future.length > 0,
     reset,
-    history: past
+    history: past,
   };
 }

@@ -1,7 +1,18 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 describe('Logger Utility', () => {
-  let consoleSpy: { log: any; info: any; warn: any; error: any; debug: any; group: any; groupEnd: any; table: any; time: any; timeEnd: any };
+  let consoleSpy: {
+    log: any;
+    info: any;
+    warn: any;
+    error: any;
+    debug: any;
+    group: any;
+    groupEnd: any;
+    table: any;
+    time: any;
+    timeEnd: any;
+  };
 
   beforeEach(() => {
     consoleSpy = {
@@ -25,35 +36,35 @@ describe('Logger Utility', () => {
   it('should log messages', async () => {
     const { logger } = await import('./logger');
     logger.log('Test message');
-    
+
     expect(consoleSpy.log).toHaveBeenCalled();
   });
 
   it('should log info messages', async () => {
     const { logger } = await import('./logger');
     logger.info('Info message');
-    
+
     expect(consoleSpy.info).toHaveBeenCalled();
   });
 
   it('should log warning messages', async () => {
     const { logger } = await import('./logger');
     logger.warn('Warning message');
-    
+
     expect(consoleSpy.warn).toHaveBeenCalled();
   });
 
   it('should always log error messages', async () => {
     const { logger } = await import('./logger');
     logger.error('Error message');
-    
+
     expect(consoleSpy.error).toHaveBeenCalled();
   });
 
   it('should log debug messages', async () => {
     const { logger } = await import('./logger');
     logger.debug('Debug message');
-    
+
     expect(consoleSpy.debug).toHaveBeenCalled();
   });
 
@@ -61,7 +72,7 @@ describe('Logger Utility', () => {
     const { logger } = await import('./logger');
     const callback = vi.fn();
     logger.group('Test Group', callback);
-    
+
     expect(consoleSpy.group).toHaveBeenCalledWith('Test Group');
     expect(callback).toHaveBeenCalled();
     expect(consoleSpy.groupEnd).toHaveBeenCalled();
@@ -71,28 +82,28 @@ describe('Logger Utility', () => {
     const { logger } = await import('./logger');
     const data = [{ name: 'Test', value: 1 }];
     logger.table(data);
-    
+
     expect(consoleSpy.table).toHaveBeenCalledWith(data);
   });
 
   it('should support time measurement', async () => {
     const { logger } = await import('./logger');
     logger.time('test-timer');
-    
+
     expect(consoleSpy.time).toHaveBeenCalledWith('test-timer');
   });
 
   it('should support timeEnd measurement', async () => {
     const { logger } = await import('./logger');
     logger.timeEnd('test-timer');
-    
+
     expect(consoleSpy.timeEnd).toHaveBeenCalledWith('test-timer');
   });
 
   it('should include log level in output', async () => {
     const { logger } = await import('./logger');
     logger.log('Test');
-    
+
     const call = consoleSpy.log.mock.calls[0][0];
     expect(call).toContain('[LOG]');
   });

@@ -1,5 +1,6 @@
-
 import { Controller, Post, Body, UseGuards, Param, Get } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
 
 import { VenturesService } from './ventures.service';
 import { GetUser } from '../auth/get-user.decorator';
@@ -19,8 +20,9 @@ class InviteMemberDto {
 @ApiTags('Ventures')
 @ApiBearerAuth()
 @Controller('ventures')
-
+  @UseGuards(JwtAuthGuard)
 export class VenturesController {
+
   constructor(private readonly venturesService: VenturesService) { }
 
   @Post(':id/invite')
@@ -28,17 +30,19 @@ export class VenturesController {
   async inviteMember(
     @Param('id') ventureId: string,
     @Body() dto: InviteMemberDto,
-    @GetUser() user: User,
+    @GetUser() user: User
   ) {
-    return this.venturesService.inviteMember(ventureId, user.id, dto.email, dto.role);
+    return this.venturesService.inviteMember(
+      ventureId,
+      user.id,
+      dto.email,
+      dto.role
+    );
   }
 
   @Get(':id/members')
   @ApiOperation({ summary: 'List all members of a venture' })
-  async listMembers(
-    @Param('id') ventureId: string,
-    @GetUser() user: User,
-  ) {
+  async listMembers(@Param('id') ventureId: string, @GetUser() user: User) {
     return this.venturesService.listMembers(ventureId, user.id);
   }
 }

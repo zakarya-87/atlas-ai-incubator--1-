@@ -8,6 +8,7 @@
 ## 📊 Test Results Summary
 
 ### Before Fixes:
+
 ```
 ❌ Test Suites: 0 passed, 7 failed (7 total)
 ❌ Tests: 0 passed, ~20 failed
@@ -15,6 +16,7 @@
 ```
 
 ### After Phase 2 Fixes:
+
 ```
 ✅ Test Suites: 3 passed, 7 failed (10 total)
 ✅ Tests: 38 passed, 8 failed (46 total)
@@ -22,6 +24,7 @@
 ```
 
 **Improvement:**
+
 - ✅ **+3 test suites now passing** (30% success rate)
 - ✅ **+38 tests now passing** (82.6% pass rate)
 - 🎉 **Major Progress!**
@@ -31,11 +34,13 @@
 ## ✅ Successfully Fixed
 
 ### 1. **auth.service.spec.ts** - PASSING ✅
+
 **Status:** All tests passing  
 **Duration:** 26.234s  
 **Note:** Console error about "Email service down" is expected (testing error handling)
 
 ### 2. **Additional passing suites** (2 more)
+
 Total of 3 test suites now passing with 38 tests
 
 ---
@@ -51,6 +56,7 @@ The error message indicates Jest is still trying to resolve dependencies from th
 3. **Module resolution** - NestJS trying to instantiate real dependencies
 
 ### Specific Error Pattern:
+
 ```
 Nest can't resolve dependencies of the AnalysisService (..., ?, )
 Please make sure that the argument UsersService at index [4] is available
@@ -65,6 +71,7 @@ This suggests **Jest is using cached/compiled code** from `dist/` folder.
 ### Updated `analysis.service.spec.ts`
 
 **Added:**
+
 ```typescript
 import { UsersService } from '../users/users.service';
 
@@ -78,6 +85,7 @@ usersService = {
 ```
 
 **Also added:**
+
 - `ventureMember.findUnique` mock to PrismaService
 - `id: 'analysis-123'` return value for `analysis.create`
 
@@ -86,6 +94,7 @@ usersService = {
 ## 🎯 Next Steps to Fix Remaining Failures
 
 ### Priority 1: Clear Jest Cache
+
 ```bash
 cd backend
 npm run test -- --clearCache
@@ -93,6 +102,7 @@ npm run test
 ```
 
 ### Priority 2: Clean Build
+
 ```bash
 cd backend
 rm -rf dist
@@ -103,6 +113,7 @@ npm run test
 ### Priority 3: If still failing, check other test files
 
 The tests that might still be failing:
+
 1. `analysis.service.spec.ts` - Fixed but may need cache clear
 2. `analysis.factory.spec.ts` - May need similar fixes
 3. `users.service.spec.ts` - May need provider mocks
@@ -112,11 +123,11 @@ The tests that might still be failing:
 
 ## 📈 Progress Metrics
 
-| Metric | Phase 1 | Phase 2 | Change |
-|--------|---------|---------|--------|
-| **Passing Test Suites** | 0/7 (0%) | 3/10 (30%) | +30% ✅ |
-| **Passing Tests** | 0/~20 (0%) | 38/46 (83%) | +83% ✅ |
-| **Backend Status** | 🔴 All Fail | 🟡 Partial Pass | ✅ Major Improvement |
+| Metric                  | Phase 1     | Phase 2         | Change               |
+| ----------------------- | ----------- | --------------- | -------------------- |
+| **Passing Test Suites** | 0/7 (0%)    | 3/10 (30%)      | +30% ✅              |
+| **Passing Tests**       | 0/~20 (0%)  | 38/46 (83%)     | +83% ✅              |
+| **Backend Status**      | 🔴 All Fail | 🟡 Partial Pass | ✅ Major Improvement |
 
 ---
 
@@ -145,6 +156,7 @@ The tests that might still be failing:
 ## 🚀 Recommended Actions
 
 ### Immediate:
+
 ```bash
 cd backend
 npm run test -- --clearCache
@@ -152,13 +164,15 @@ npm run test
 ```
 
 ### If still failing:
+
 1. Delete `dist/` folder
 2. Run `npm run build`
 3. Run `npm run test` again
 
 ### For remaining failures:
+
 - Apply same pattern (add missing provider mocks)
--  Check each failing test file
+- Check each failing test file
 - Add all required dependencies to test setup
 
 ---
@@ -168,6 +182,7 @@ npm run test
 **Phase 2 Status:** 🟡 **PARTIAL SUCCESS**
 
 We made **massive progress** on backend tests:
+
 - ✅ 3/10 test suites passing (30%)
 - ✅ 38/46 tests passing (83%)
 - ✅ Fixed dependency injection issues

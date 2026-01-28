@@ -1,7 +1,7 @@
-
 export interface AgentGenerationResponse {
   text: string;
   data: any;
+  rawResponse?: any;
 }
 
 export interface AiAgent {

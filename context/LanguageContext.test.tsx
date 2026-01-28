@@ -89,7 +89,9 @@ describe('LanguageContext', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const TestOutsideProvider = () => {
-      expect(() => useLanguage()).toThrow('useLanguage must be used within a LanguageProvider');
+      expect(() => useLanguage()).toThrow(
+        'useLanguage must be used within a LanguageProvider'
+      );
       return null;
     };
 
@@ -103,6 +105,8 @@ describe('LanguageContext', () => {
       </LanguageProvider>
     );
 
-    expect(screen.getByTestId('child-element')).toHaveTextContent('Child Content');
+    expect(screen.getByTestId('child-element')).toHaveTextContent(
+      'Child Content'
+    );
   });
 });

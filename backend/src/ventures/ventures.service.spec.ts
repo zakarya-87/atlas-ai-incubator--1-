@@ -1,6 +1,9 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { VenturesService } from './ventures.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
@@ -88,7 +91,7 @@ describe('VenturesService', () => {
         mockVenture.id,
         mockOwner.id,
         mockInvitee.email,
-        role,
+        role
       );
 
       expect(prismaService.venture.findUnique).toHaveBeenCalledWith({
@@ -106,7 +109,7 @@ describe('VenturesService', () => {
       expect(emailService.sendInviteEmail).toHaveBeenCalledWith(
         mockInvitee.email,
         mockOwner.fullName,
-        mockVenture.name,
+        mockVenture.name
       );
       expect(result.role).toBe(role);
     });
@@ -115,10 +118,20 @@ describe('VenturesService', () => {
       prismaService.venture.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.inviteMember('nonexistent-venture', mockOwner.id, mockInvitee.email, 'editor'),
+        service.inviteMember(
+          'nonexistent-venture',
+          mockOwner.id,
+          mockInvitee.email,
+          'editor'
+        )
       ).rejects.toThrow(NotFoundException);
       await expect(
-        service.inviteMember('nonexistent-venture', mockOwner.id, mockInvitee.email, 'editor'),
+        service.inviteMember(
+          'nonexistent-venture',
+          mockOwner.id,
+          mockInvitee.email,
+          'editor'
+        )
       ).rejects.toThrow('Venture not found');
     });
 
@@ -126,10 +139,20 @@ describe('VenturesService', () => {
       prismaService.venture.findUnique.mockResolvedValue(mockVenture);
 
       await expect(
-        service.inviteMember(mockVenture.id, 'different-user-id', mockInvitee.email, 'editor'),
+        service.inviteMember(
+          mockVenture.id,
+          'different-user-id',
+          mockInvitee.email,
+          'editor'
+        )
       ).rejects.toThrow(ForbiddenException);
       await expect(
-        service.inviteMember(mockVenture.id, 'different-user-id', mockInvitee.email, 'editor'),
+        service.inviteMember(
+          mockVenture.id,
+          'different-user-id',
+          mockInvitee.email,
+          'editor'
+        )
       ).rejects.toThrow('Only the owner can invite members');
     });
 
@@ -138,11 +161,23 @@ describe('VenturesService', () => {
       usersService.findOne.mockResolvedValue(null);
 
       await expect(
-        service.inviteMember(mockVenture.id, mockOwner.id, 'nonexistent@example.com', 'editor'),
+        service.inviteMember(
+          mockVenture.id,
+          mockOwner.id,
+          'nonexistent@example.com',
+          'editor'
+        )
       ).rejects.toThrow(NotFoundException);
       await expect(
-        service.inviteMember(mockVenture.id, mockOwner.id, 'nonexistent@example.com', 'editor'),
-      ).rejects.toThrow('User with this email not found. They must register first.');
+        service.inviteMember(
+          mockVenture.id,
+          mockOwner.id,
+          'nonexistent@example.com',
+          'editor'
+        )
+      ).rejects.toThrow(
+        'User with this email not found. They must register first.'
+      );
     });
 
     it('should throw BadRequestException if trying to invite self', async () => {
@@ -150,10 +185,20 @@ describe('VenturesService', () => {
       usersService.findOne.mockResolvedValue(mockOwner);
 
       await expect(
-        service.inviteMember(mockVenture.id, mockOwner.id, mockOwner.email, 'editor'),
+        service.inviteMember(
+          mockVenture.id,
+          mockOwner.id,
+          mockOwner.email,
+          'editor'
+        )
       ).rejects.toThrow(BadRequestException);
       await expect(
-        service.inviteMember(mockVenture.id, mockOwner.id, mockOwner.email, 'editor'),
+        service.inviteMember(
+          mockVenture.id,
+          mockOwner.id,
+          mockOwner.email,
+          'editor'
+        )
       ).rejects.toThrow('You cannot invite yourself');
     });
 
@@ -177,7 +222,7 @@ describe('VenturesService', () => {
         mockVenture.id,
         mockOwner.id,
         mockInvitee.email,
-        'editor',
+        'editor'
       );
 
       expect(prismaService.ventureMember.update).toHaveBeenCalledWith({
@@ -197,12 +242,17 @@ describe('VenturesService', () => {
       prismaService.ventureMember.findUnique.mockResolvedValue(null);
       prismaService.ventureMember.create.mockResolvedValue({});
 
-      await service.inviteMember(mockVenture.id, mockOwner.id, mockInvitee.email, 'editor');
+      await service.inviteMember(
+        mockVenture.id,
+        mockOwner.id,
+        mockInvitee.email,
+        'editor'
+      );
 
       expect(emailService.sendInviteEmail).toHaveBeenCalledWith(
         mockInvitee.email,
         ownerWithoutName.email,
-        mockVenture.name,
+        mockVenture.name
       );
     });
 
@@ -211,11 +261,18 @@ describe('VenturesService', () => {
       usersService.findOne.mockResolvedValue(mockInvitee);
       prismaService.ventureMember.findUnique.mockResolvedValue(null);
       prismaService.ventureMember.create.mockResolvedValue({ id: 'member-id' });
-      emailService.sendInviteEmail.mockRejectedValue(new Error('Email service down'));
+      emailService.sendInviteEmail.mockRejectedValue(
+        new Error('Email service down')
+      );
 
       // Should not throw even if email fails (fire and forget)
       await expect(
-        service.inviteMember(mockVenture.id, mockOwner.id, mockInvitee.email, 'editor'),
+        service.inviteMember(
+          mockVenture.id,
+          mockOwner.id,
+          mockInvitee.email,
+          'editor'
+        )
       ).resolves.toBeDefined();
     });
   });
@@ -273,12 +330,12 @@ describe('VenturesService', () => {
       prismaService.venture.findUnique.mockResolvedValue(mockVenture);
       prismaService.ventureMember.findUnique.mockResolvedValue(null);
 
-      await expect(service.listMembers(mockVenture.id, 'unauthorized-user')).rejects.toThrow(
-        ForbiddenException,
-      );
-      await expect(service.listMembers(mockVenture.id, 'unauthorized-user')).rejects.toThrow(
-        'Access denied',
-      );
+      await expect(
+        service.listMembers(mockVenture.id, 'unauthorized-user')
+      ).rejects.toThrow(ForbiddenException);
+      await expect(
+        service.listMembers(mockVenture.id, 'unauthorized-user')
+      ).rejects.toThrow('Access denied');
     });
   });
 
@@ -306,7 +363,12 @@ describe('VenturesService', () => {
 
       expect(result).toBe(true);
       expect(prismaService.ventureMember.findUnique).toHaveBeenCalledWith({
-        where: { ventureId_userId: { ventureId: mockVenture.id, userId: mockInvitee.id } },
+        where: {
+          ventureId_userId: {
+            ventureId: mockVenture.id,
+            userId: mockInvitee.id,
+          },
+        },
       });
     });
 
@@ -314,7 +376,10 @@ describe('VenturesService', () => {
       prismaService.venture.findUnique.mockResolvedValue(mockVenture);
       prismaService.ventureMember.findUnique.mockResolvedValue(null);
 
-      const result = await service.checkAccess(mockVenture.id, 'unauthorized-user');
+      const result = await service.checkAccess(
+        mockVenture.id,
+        'unauthorized-user'
+      );
 
       expect(result).toBe(false);
     });
@@ -322,7 +387,10 @@ describe('VenturesService', () => {
     it('should return false if venture does not exist', async () => {
       prismaService.venture.findUnique.mockResolvedValue(null);
 
-      const result = await service.checkAccess('nonexistent-venture', mockOwner.id);
+      const result = await service.checkAccess(
+        'nonexistent-venture',
+        mockOwner.id
+      );
 
       expect(result).toBe(false);
     });

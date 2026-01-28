@@ -32,7 +32,13 @@ class TestAgent extends BaseAgent {
     systemInstruction?: string,
     images?: string[]
   ) {
-    return this.executeGeminiCall('gemini-2.5-pro', prompt, schema, systemInstruction, images);
+    return this.executeGeminiCall(
+      'gemini-2.5-pro',
+      prompt,
+      schema,
+      systemInstruction,
+      images
+    );
   }
 }
 
@@ -44,7 +50,7 @@ describe('BaseAgent', () => {
     // Mock ConfigService
     configService = {
       get: jest.fn((key: string) => {
-        if (key === 'API_KEY') return 'test-api-key';
+        if (key === 'GEMINI_API_KEY') return 'test-api-key';
         return undefined;
       }),
     };
@@ -85,7 +91,13 @@ describe('BaseAgent', () => {
       const context = 'Brand analysis';
       const images = ['data:image/png;base64,iVBORw0KGgo...'];
 
-      const result = await agent.generate(prompt, context, undefined, undefined, images);
+      const result = await agent.generate(
+        prompt,
+        context,
+        undefined,
+        undefined,
+        images
+      );
 
       expect(result).toBeDefined();
       expect(result.data).toEqual({ result: 'success', data: 'test' });
@@ -103,9 +115,9 @@ describe('BaseAgent', () => {
         type: SchemaType.OBJECT,
         properties: {
           title: { type: SchemaType.STRING },
-          items: { 
-            type: SchemaType.ARRAY, 
-            items: { type: SchemaType.STRING } 
+          items: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING },
           },
         },
         required: ['title', 'items'],
@@ -128,7 +140,7 @@ describe('BaseAgent', () => {
       const systemInstruction = 'You are a strategic analyst';
 
       const result = await agent.generate(
-        'test', 
+        'test',
         'context',
         undefined,
         systemInstruction
@@ -144,7 +156,13 @@ describe('BaseAgent', () => {
         'data:image/png;base64,def456',
       ];
 
-      const result = await agent.generate('analyze', 'images', undefined, undefined, images);
+      const result = await agent.generate(
+        'analyze',
+        'images',
+        undefined,
+        undefined,
+        images
+      );
 
       expect(result).toBeDefined();
       expect(result.data).toEqual({ result: 'success', data: 'test' });
@@ -175,7 +193,7 @@ describe('BaseAgent', () => {
       const client = (agent as any).getClient();
 
       expect(client).toBeDefined();
-      expect(configService.get).toHaveBeenCalledWith('API_KEY');
+      expect(configService.get).toHaveBeenCalledWith('GEMINI_API_KEY');
     });
 
     it('should throw error when API key is missing', () => {
@@ -189,4 +207,3 @@ describe('BaseAgent', () => {
     });
   });
 });
-

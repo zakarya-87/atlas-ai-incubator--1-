@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { AnalysisService } from './analysis.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -94,9 +93,17 @@ describe('AnalysisService', () => {
       const result = await service.generateAnalysis(mockDto, mockUser.id);
 
       // Verify Flow
-      expect(prismaService.venture.findUnique).toHaveBeenCalledWith({ where: { id: mockDto.ventureId } });
-      expect(historyService.getRecentAnalysesForContext).toHaveBeenCalledWith(mockDto.ventureId, mockDto.tool);
-      expect(agentFactory.getAgent).toHaveBeenCalledWith(mockDto.module, mockDto.tool);
+      expect(prismaService.venture.findUnique).toHaveBeenCalledWith({
+        where: { id: mockDto.ventureId },
+      });
+      expect(historyService.getRecentAnalysesForContext).toHaveBeenCalledWith(
+        mockDto.ventureId,
+        mockDto.tool
+      );
+      expect(agentFactory.getAgent).toHaveBeenCalledWith(
+        mockDto.module,
+        mockDto.tool
+      );
       expect(mockAgent.generate).toHaveBeenCalled();
       expect(prismaService.analysis.create).toHaveBeenCalled();
       expect(eventsGateway.emitLog).toHaveBeenCalled();
@@ -113,26 +120,30 @@ describe('AnalysisService', () => {
         data: {
           id: mockDto.ventureId,
           name: 'My Venture',
-          userId: mockUser.id
-        }
+          userId: mockUser.id,
+        },
       });
     });
 
     it('should throw ForbiddenException if user does not own venture', async () => {
       prismaService.venture.findUnique.mockResolvedValue({
         id: 'venture-123',
-        userId: 'other-user-id' // Different owner
+        userId: 'other-user-id', // Different owner
       });
 
-      await expect(service.generateAnalysis(mockDto, mockUser.id))
-        .rejects
-        .toThrow(ForbiddenException);
+      await expect(
+        service.generateAnalysis(mockDto, mockUser.id)
+      ).rejects.toThrow(ForbiddenException);
     });
 
     it('should inject context into the agent prompt', async () => {
       prismaService.venture.findUnique.mockResolvedValue(mockVenture);
       historyService.getRecentAnalysesForContext.mockResolvedValue([
-        { tool: 'pestel', createdAt: new Date(), resultData: { data: 'old-data' } }
+        {
+          tool: 'pestel',
+          createdAt: new Date(),
+          resultData: { data: 'old-data' },
+        },
       ]);
 
       await service.generateAnalysis(mockDto, mockUser.id);

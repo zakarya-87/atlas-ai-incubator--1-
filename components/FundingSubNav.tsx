@@ -7,7 +7,10 @@ interface FundingSubNavProps {
   onToolChange: (tool: FundingTool) => void;
 }
 
-const FundingSubNav: React.FC<FundingSubNavProps> = ({ activeTool, onToolChange }) => {
+const FundingSubNav: React.FC<FundingSubNavProps> = ({
+  activeTool,
+  onToolChange,
+}) => {
   const { t } = useLanguage();
 
   const navItems: { key: FundingTool; label: string }[] = [

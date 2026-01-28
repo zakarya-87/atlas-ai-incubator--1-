@@ -1,5 +1,10 @@
-
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  MessageBody,
+  ConnectedSocket,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
@@ -16,7 +21,10 @@ export class EventsGateway {
   server: Server;
 
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(@MessageBody() room: string, @ConnectedSocket() client: Socket) {
+  handleJoinRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket
+  ) {
     client.join(room);
   }
 

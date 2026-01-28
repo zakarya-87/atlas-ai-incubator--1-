@@ -41,7 +41,9 @@ describe('ErrorBoundary Component (TC009)', () => {
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     expect(screen.getByText('Test error occurred')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Reload Application' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reload Application' })
+    ).toBeInTheDocument();
   });
 
   it('should prevent app crash when child component throws error', () => {
@@ -104,7 +106,9 @@ describe('ErrorBoundary Component (TC009)', () => {
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    expect(screen.getByText(/An unexpected error occurred/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/An unexpected error occurred/)
+    ).toBeInTheDocument();
   });
 
   it('should handle non-Error objects thrown', () => {
@@ -124,7 +128,7 @@ describe('ErrorBoundary Component (TC009)', () => {
   it('should allow error recovery with reload button', () => {
     const reloadMock = vi.fn();
     const originalLocation = window.location;
-    
+
     // Replace window.location with a mock object
     Object.defineProperty(window, 'location', {
       value: { ...originalLocation, reload: reloadMock },
@@ -138,7 +142,9 @@ describe('ErrorBoundary Component (TC009)', () => {
       </ErrorBoundary>
     );
 
-    const reloadButton = screen.getByRole('button', { name: 'Reload Application' });
+    const reloadButton = screen.getByRole('button', {
+      name: 'Reload Application',
+    });
     fireEvent.click(reloadButton);
 
     expect(reloadMock).toHaveBeenCalled();
@@ -158,8 +164,15 @@ describe('ErrorBoundary Component (TC009)', () => {
       </ErrorBoundary>
     );
 
-    const errorContainer = screen.getByText('Something went wrong').closest('div');
-    expect(errorContainer).toHaveClass('flex', 'flex-col', 'items-center', 'justify-center');
+    const errorContainer = screen
+      .getByText('Something went wrong')
+      .closest('div');
+    expect(errorContainer).toHaveClass(
+      'flex',
+      'flex-col',
+      'items-center',
+      'justify-center'
+    );
     expect(errorContainer).toHaveClass('p-8', 'text-center');
     expect(errorContainer).toHaveClass('bg-brand-secondary/30', 'rounded-xl');
     expect(errorContainer).toHaveClass('border', 'border-red-500/30');

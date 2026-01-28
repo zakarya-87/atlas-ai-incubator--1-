@@ -77,13 +77,11 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
     it('should login with valid credentials', async () => {
       // Register first
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'login@example.com',
-          password: 'password123',
-          name: 'Login User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'login@example.com',
+        password: 'password123',
+        name: 'Login User',
+      });
 
       // Then login
       return request(app.getHttpServer())
@@ -111,13 +109,11 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
     it('should validate JWT tokens', async () => {
       // Register and login to get token
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'jwt@example.com',
-          password: 'password123',
-          name: 'JWT User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'jwt@example.com',
+        password: 'password123',
+        name: 'JWT User',
+      });
 
       const loginResponse = await request(app.getHttpServer())
         .post('/auth/login')
@@ -141,13 +137,11 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
     beforeEach(async () => {
       // Create user and get token
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'venture@example.com',
-          password: 'password123',
-          name: 'Venture User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'venture@example.com',
+        password: 'password123',
+        name: 'Venture User',
+      });
 
       const loginResponse = await request(app.getHttpServer())
         .post('/auth/login')
@@ -259,13 +253,11 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
     beforeEach(async () => {
       // Create user, venture, and get token
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'analysis@example.com',
-          password: 'password123',
-          name: 'Analysis User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'analysis@example.com',
+        password: 'password123',
+        name: 'Analysis User',
+      });
 
       const loginResponse = await request(app.getHttpServer())
         .post('/auth/login')
@@ -338,7 +330,9 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body).toHaveProperty('status');
-          expect(['pending', 'processing', 'completed', 'failed']).toContain(res.body.status);
+          expect(['pending', 'processing', 'completed', 'failed']).toContain(
+            res.body.status
+          );
         });
     });
 
@@ -420,7 +414,9 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         .get(`/history/${ventureId}`)
         .set('Authorization', `Bearer ${authToken}`);
 
-      const deletedRecord = updatedHistory.body.find((r: any) => r.id === analysisToDelete.id);
+      const deletedRecord = updatedHistory.body.find(
+        (r: any) => r.id === analysisToDelete.id
+      );
       expect(deletedRecord).toBeUndefined();
     });
   });
@@ -506,13 +502,11 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
     beforeEach(async () => {
       // Create user and get token
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'subscription@example.com',
-          password: 'password123',
-          name: 'Subscription User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'subscription@example.com',
+        password: 'password123',
+        name: 'Subscription User',
+      });
 
       const loginResponse = await request(app.getHttpServer())
         .post('/auth/login')
@@ -587,13 +581,11 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
     beforeEach(async () => {
       // Create user, venture, analysis
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'reports@example.com',
-          password: 'password123',
-          name: 'Reports User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'reports@example.com',
+        password: 'password123',
+        name: 'Reports User',
+      });
 
       const loginResponse = await request(app.getHttpServer())
         .post('/auth/login')
@@ -661,13 +653,11 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
     beforeEach(async () => {
       // Create user and venture
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'integration@example.com',
-          password: 'password123',
-          name: 'Integration User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'integration@example.com',
+        password: 'password123',
+        name: 'Integration User',
+      });
 
       const loginResponse = await request(app.getHttpServer())
         .post('/auth/login')
@@ -739,9 +729,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
     });
 
     it('should handle unauthorized access to protected routes', () => {
-      return request(app.getHttpServer())
-        .get('/users/profile')
-        .expect(401);
+      return request(app.getHttpServer()).get('/users/profile').expect(401);
     });
 
     it('should handle invalid JWT tokens', () => {
@@ -762,7 +750,9 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
   describe('Database integration', () => {
     it('should handle database connection errors gracefully', async () => {
       // Mock database disconnection
-      jest.spyOn(prisma, '$connect').mockRejectedValue(new Error('Connection failed'));
+      jest
+        .spyOn(prisma, '$connect')
+        .mockRejectedValue(new Error('Connection failed'));
 
       // This would require specific error handling in the services
       // For now, verify the app can start without database
@@ -771,13 +761,11 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
     it('should handle database transaction rollbacks', async () => {
       // Create user
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'transaction@example.com',
-          password: 'password123',
-          name: 'Transaction User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'transaction@example.com',
+        password: 'password123',
+        name: 'Transaction User',
+      });
 
       // Attempt operation that might fail and rollback
       // This would depend on specific business logic that requires transactions
@@ -796,11 +784,9 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
     it('should handle rate limiting for API endpoints', async () => {
       // This would require rate limiting middleware
       // For now, verify endpoints respond normally under normal load
-      const requests = Array(10).fill(null).map(() =>
-        request(app.getHttpServer())
-          .get('/health')
-          .expect(200)
-      );
+      const requests = Array(10)
+        .fill(null)
+        .map(() => request(app.getHttpServer()).get('/health').expect(200));
 
       await Promise.all(requests);
     });

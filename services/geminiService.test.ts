@@ -2,7 +2,7 @@ import { expect, vi, describe, it, beforeEach } from 'vitest';
 import {
   generateSwotAnalysis,
   fetchVentureHistory,
-  deleteAnalysisRecord
+  deleteAnalysisRecord,
 } from './geminiService';
 import { STORAGE_KEYS } from '../utils/constants';
 
@@ -12,16 +12,15 @@ global.fetch = mockFetch;
 
 // Mock API_CONFIG to reduce retry delays for tests
 vi.mock('../utils/constants', async (importOriginal) => {
-  const actual = await importOriginal() as any;
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     API_CONFIG: {
       ...actual.API_CONFIG,
       RETRY_DELAY: 1, // 1ms delay instead of 2000ms
-    }
+    },
   };
 });
-
 
 describe('geminiService', () => {
   vi.setConfig({ testTimeout: 10000 }); // Increase timeout for potentially long-running tests
@@ -56,8 +55,6 @@ describe('geminiService', () => {
     getItemSpy.mockRestore();
   });
 
-
-
   describe('generateSwotAnalysis', () => {
     it('should call the backend and handle completion', async () => {
       // Mock job submission
@@ -70,10 +67,17 @@ describe('geminiService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => ({ status: 'completed', result: { id: 'analysis-123' } }),
+        json: async () => ({
+          status: 'completed',
+          result: { id: 'analysis-123' },
+        }),
       });
 
-      const result = await generateSwotAnalysis('test business', 'en', 'venture-123');
+      const result = await generateSwotAnalysis(
+        'test business',
+        'en',
+        'venture-123'
+      );
 
       expect(result).toBeDefined();
       expect(mockFetch).toHaveBeenCalledWith(
@@ -84,7 +88,6 @@ describe('geminiService', () => {
         expect.stringContaining('/jobs/job-123'),
         expect.any(Object)
       );
-
     });
 
     it('should handle 401 Authentication error during generation', async () => {
@@ -94,8 +97,9 @@ describe('geminiService', () => {
         statusText: 'Unauthorized',
       });
 
-      await expect(generateSwotAnalysis('test', 'en', 'v1'))
-        .rejects.toThrow(/Authentication Required/i);
+      await expect(generateSwotAnalysis('test', 'en', 'v1')).rejects.toThrow(
+        /Authentication Required/i
+      );
     });
 
     it('should handle 429 Rate limit error', async () => {
@@ -105,8 +109,9 @@ describe('geminiService', () => {
         statusText: 'Too Many Requests',
       });
 
-      await expect(generateSwotAnalysis('test', 'en', 'v1'))
-        .rejects.toThrow('errorRateLimit');
+      await expect(generateSwotAnalysis('test', 'en', 'v1')).rejects.toThrow(
+        'errorRateLimit'
+      );
     });
 
     it('should handle 500 Server error', async () => {
@@ -116,10 +121,10 @@ describe('geminiService', () => {
         statusText: 'Internal Server Error',
       });
 
-      await expect(generateSwotAnalysis('test', 'en', 'v1'))
-        .rejects.toThrow('errorApiServerError');
+      await expect(generateSwotAnalysis('test', 'en', 'v1')).rejects.toThrow(
+        'errorApiServerError'
+      );
     });
-
   });
 
   describe('fetchVentureHistory', () => {
@@ -131,14 +136,16 @@ describe('geminiService', () => {
     });
 
     it('should return parsed history data on success', async () => {
-      const mockData = [{
-        id: '1',
-        module: 'strategy',
-        tool: 'swot',
-        createdAt: new Date().toISOString(),
-        inputContext: 'test input',
-        resultData: JSON.stringify({ strengths: [] })
-      }];
+      const mockData = [
+        {
+          id: '1',
+          module: 'strategy',
+          tool: 'swot',
+          createdAt: new Date().toISOString(),
+          inputContext: 'test input',
+          resultData: JSON.stringify({ strengths: [] }),
+        },
+      ];
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -158,7 +165,9 @@ describe('geminiService', () => {
   describe('deleteAnalysisRecord', () => {
     it('should throw error when no token', async () => {
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-      await expect(deleteAnalysisRecord('123')).rejects.toThrow(/Authentication required/i);
+      await expect(deleteAnalysisRecord('123')).rejects.toThrow(
+        /Authentication required/i
+      );
     });
 
     it('should delete record successfully', async () => {
@@ -172,13 +181,10 @@ describe('geminiService', () => {
         expect.objectContaining({
           method: 'DELETE',
           headers: expect.objectContaining({
-            'Authorization': 'Bearer test-token'
-          })
+            Authorization: 'Bearer test-token',
+          }),
         })
       );
     });
   });
-
 });
-
-

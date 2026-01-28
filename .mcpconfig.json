@@ -3,6 +3,16 @@
     "workspace-developer": {
       "httpUrl": "https://workspace-developer.goog/mcp",
       "trust": true
+    },
+    "devtool": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@standardbeagle/agnt"
+      ],
+      "env": {
+        "AGNT_PROJECT_PATH": "c:/Users/zboud/ATLAS AI Incubator"
+      }
     }
   }
 }

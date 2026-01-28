@@ -10,11 +10,11 @@ import { BrowserRouter } from 'react-router-dom';
 
 // Mock child components
 vi.mock('./Header', () => ({
-  default: () => <div data-testid="header">Header Component</div>
+  default: () => <div data-testid="header">Header Component</div>,
 }));
 
 vi.mock('./SidebarNav', () => ({
-  default: () => <div data-testid="sidebar">Sidebar Component</div>
+  default: () => <div data-testid="sidebar">Sidebar Component</div>,
 }));
 
 describe('Layout Component', () => {
@@ -29,7 +29,7 @@ describe('Layout Component', () => {
     viewingHistoryRecord: false,
     onReturnToWorkspace: vi.fn(),
     isFocusMode: false,
-    onToggleFocusMode: vi.fn()
+    onToggleFocusMode: vi.fn(),
   };
 
   const renderLayout = (props = {}) => {
@@ -75,7 +75,10 @@ describe('Layout Component', () => {
   });
 
   it('should show historical record banner when viewingHistoryRecord is true', () => {
-    renderLayout({ viewingHistoryRecord: true, timestamp: new Date().toISOString() });
+    renderLayout({
+      viewingHistoryRecord: true,
+      timestamp: new Date().toISOString(),
+    });
     expect(screen.getByText(/Viewing historical version/i)).toBeInTheDocument();
   });
 

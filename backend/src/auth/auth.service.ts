@@ -1,4 +1,3 @@
-
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -11,16 +10,23 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private emailService: EmailService,
+    private emailService: EmailService
   ) {}
 
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    await this.usersService.createUser(authCredentialsDto.email, authCredentialsDto.password);
+    await this.usersService.createUser(
+      authCredentialsDto.email,
+      authCredentialsDto.password
+    );
     // Fire and forget email
-    this.emailService.sendWelcomeEmail(authCredentialsDto.email).catch(console.error);
+    this.emailService
+      .sendWelcomeEmail(authCredentialsDto.email)
+      .catch(console.error);
   }
 
-  async signIn(authCredentialsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
+  async signIn(
+    authCredentialsDto: AuthCredentialsDto
+  ): Promise<{ accessToken: string }> {
     const { email, password } = authCredentialsDto;
     const user = await this.usersService.findOne(email);
 

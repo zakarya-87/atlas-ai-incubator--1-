@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { AnalysisController } from './analysis.controller';
 import { AnalysisService } from './analysis.service';
@@ -46,7 +45,9 @@ describe('AnalysisController', () => {
 
     prismaService = {
       venture: {
-        findUnique: jest.fn().mockResolvedValue({ id: 'venture-123', userId: 'user-123' }),
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: 'venture-123', userId: 'user-123' }),
       },
       analysis: {
         findMany: jest.fn().mockResolvedValue([mockAnalysisResponse]),
@@ -62,7 +63,9 @@ describe('AnalysisController', () => {
       ],
     }).compile();
 
+    process.env.REDIS_HOST = 'localhost'; // Ensure Redis mode for tests
     controller = module.get<AnalysisController>(AnalysisController);
+
   });
 
   afterEach(() => {
@@ -82,7 +85,11 @@ describe('AnalysisController', () => {
       const result = await controller.generate(dto, mockUser);
 
       expect(result).toHaveProperty('jobId');
-      expect(jobsService.queueAnalysis).toHaveBeenCalledWith(result.jobId, dto, mockUser.id);
+      expect(jobsService.queueAnalysis).toHaveBeenCalledWith(
+        result.jobId,
+        dto,
+        mockUser.id
+      );
     });
   });
 
@@ -91,7 +98,9 @@ describe('AnalysisController', () => {
       const ventureId = 'venture-123';
       const result = await controller.getVentureAnalyses(ventureId, mockUser);
 
-      expect(prismaService.venture.findUnique).toHaveBeenCalledWith({ where: { id: ventureId } });
+      expect(prismaService.venture.findUnique).toHaveBeenCalledWith({
+        where: { id: ventureId },
+      });
       expect(prismaService.analysis.findMany).toHaveBeenCalledWith({
         where: { ventureId },
         orderBy: { createdAt: 'desc' },
@@ -103,7 +112,9 @@ describe('AnalysisController', () => {
       prismaService.venture.findUnique.mockResolvedValue(null);
       const ventureId = 'not-found-venture';
 
-      await expect(controller.getVentureAnalyses(ventureId, mockUser)).rejects.toThrow('Unauthorized or venture not found');
+      await expect(
+        controller.getVentureAnalyses(ventureId, mockUser)
+      ).rejects.toThrow('Unauthorized or venture not found');
     });
   });
 });

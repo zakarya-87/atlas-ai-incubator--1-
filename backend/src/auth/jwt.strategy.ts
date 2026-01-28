@@ -1,4 +1,3 @@
-
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -11,30 +10,33 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private usersService: UsersService) {
     super({
       jwtFromRequest: (req: Request) => {
-        // First try to extract from cookie
         let token = req?.cookies?.accessToken;
-
-        // Fallback to Authorization header for backward compatibility
         if (!token) {
           token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
         }
-
         return token;
       },
-      secretOrKey: process.env.JWT_SECRET || 'secretKey', // Use environment variable
+      secretOrKey: process.env.JWT_SECRET,
     });
+
   }
 
-  async validate(payload: { email: string }): Promise<any> {
-    // Temporarily disabled for testing. Always returns an admin user.
-    return {
-      id: 'cl-admin-user-id',
-      email: 'admin@atlas.com',
-      role: 'ADMIN',
-      credits: 999,
-      subscriptionStatus: 'active',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  async validate(payload: { id: string; email: string }): Promise<User> {
+    const { id } = payload;
+
+    try {
+      const user = await this.usersService.findById(id);
+
+      if (!user) {
+        console.warn(`[JwtStrategy] User not found for ID: ${id}`);
+        throw new UnauthorizedException('User not found');
+      }
+
+      return user;
+    } catch (error) {
+      console.error(`[JwtStrategy] Validation error for user ID ${id}:`, error);
+      throw error;
+    }
   }
+
 }

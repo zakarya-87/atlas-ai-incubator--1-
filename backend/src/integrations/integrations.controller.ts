@@ -1,4 +1,3 @@
-
 import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
 
 import { IntegrationsService } from './integrations.service';
@@ -20,14 +19,13 @@ class ToggleIntegrationDto {
 }
 
 @Controller('integrations')
-
 export class IntegrationsController {
-  constructor(private readonly integrationsService: IntegrationsService) { }
+  constructor(private readonly integrationsService: IntegrationsService) {}
 
   @Get()
   async getIntegrations(
     @Query('ventureId') ventureId: string,
-    @GetUser() user: User,
+    @GetUser() user: User
   ) {
     return this.integrationsService.getIntegrations(ventureId, user.id);
   }
@@ -35,8 +33,13 @@ export class IntegrationsController {
   @Post('toggle')
   async toggleIntegration(
     @Body() dto: ToggleIntegrationDto,
-    @GetUser() user: User,
+    @GetUser() user: User
   ) {
-    return this.integrationsService.toggleIntegration(dto.ventureId, user.id, dto.provider, dto.connect);
+    return this.integrationsService.toggleIntegration(
+      dto.ventureId,
+      user.id,
+      dto.provider,
+      dto.connect
+    );
   }
 }

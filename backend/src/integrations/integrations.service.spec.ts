@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { ForbiddenException } from '@nestjs/common';
 import { IntegrationsService } from './integrations.service';
@@ -80,8 +79,9 @@ describe('IntegrationsService', () => {
     it('should throw ForbiddenException for unauthorized user', async () => {
       prismaService.venture.findUnique.mockResolvedValue(mockVenture);
 
-      await expect(service.getIntegrations('venture-123', 'other-user'))
-        .rejects.toThrow(ForbiddenException);
+      await expect(
+        service.getIntegrations('venture-123', 'other-user')
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 

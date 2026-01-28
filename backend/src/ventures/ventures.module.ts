@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { VenturesController } from './ventures.controller';
 import { VenturesService } from './ventures.service';

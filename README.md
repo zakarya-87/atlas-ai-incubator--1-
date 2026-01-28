@@ -1,4 +1,3 @@
-
 # ATLAS AI Incubator
 
 **An Agentic, AI-Powered SaaS Platform for Venture Building.**
@@ -15,14 +14,14 @@ ATLAS is a comprehensive platform designed to guide entrepreneurs from raw idea 
 
 ## 🌟 Key Features
 
-*   **Agentic "Boardroom"**: A team of specialized AI agents (CFO, Strategist, Researcher) that collaborate to solve your business problems in real-time.
-*   **Venture Context (Memory)**: The AI remembers previous outputs. Your Financial Forecast automatically adapts to the weaknesses identified in your SWOT analysis.
-*   **Real-Time Market Research**: Integrated with Google Search Grounding to provide up-to-date competitor pricing and market trends.
-*   **Multi-Modal Capabilities**: 
-    *   **Vision**: Upload competitor screenshots for analysis.
-    *   **Image Gen**: Generate brand identity and logo concepts.
-*   **Full SaaS Lifecycle**: Authentication, Team Collaboration (Multi-tenancy), Stripe Subscription Billing, and Usage Quotas.
-*   **Professional Reporting**: Server-side generation of high-resolution PDF reports using Puppeteer.
+- **Agentic "Boardroom"**: A team of specialized AI agents (CFO, Strategist, Researcher) that collaborate to solve your business problems in real-time.
+- **Venture Context (Memory)**: The AI remembers previous outputs. Your Financial Forecast automatically adapts to the weaknesses identified in your SWOT analysis.
+- **Real-Time Market Research**: Integrated with Google Search Grounding to provide up-to-date competitor pricing and market trends.
+- **Multi-Modal Capabilities**:
+  - **Vision**: Upload competitor screenshots for analysis.
+  - **Image Gen**: Generate brand identity and logo concepts.
+- **Full SaaS Lifecycle**: Authentication, Team Collaboration (Multi-tenancy), Stripe Subscription Billing, and Usage Quotas.
+- **Professional Reporting**: Server-side generation of high-resolution PDF reports using Puppeteer.
 
 ---
 
@@ -30,41 +29,44 @@ ATLAS is a comprehensive platform designed to guide entrepreneurs from raw idea 
 
 ATLAS follows a **Modular Monolith** architecture, designed for easy transition to Microservices.
 
-*   **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Framer Motion.
-*   **Backend**: NestJS (Node.js), Passport.js (JWT), Socket.io (WebSockets).
-*   **Database**: PostgreSQL (via Prisma ORM).
-*   **AI Layer**: Google Gemini 1.5 Pro & Flash, Imagen 3.
-*   **Infrastructure**: Docker, Nginx.
+- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Framer Motion.
+- **Backend**: NestJS (Node.js), Passport.js (JWT), Socket.io (WebSockets).
+- **Database**: PostgreSQL (via Prisma ORM).
+- **AI Layer**: Google Gemini 1.5 Pro & Flash, Imagen 3.
+- **Infrastructure**: Docker, Nginx.
 
 ---
+
 ## 📂 Project Structure
 
 The repository is organized as a monorepo with a clear separation of concerns:
 
-| Path                  | Description                                                                                              |
-| --------------------- | -------------------------------------------------------------------------------------------------------- |
-| `backend/`            | The core NestJS backend application. Contains all modules, services, and controllers for the API.        |
-| `backend/src/`        | Source code for the backend.                                                                             |
-| `backend/src/analysis/` | Contains the logic for the AI agentic workflows.                                                         |
-| `backend/src/prisma/`   | Prisma schema, migrations, and database client configuration.                                            |
-| `components/`         | Shared React components used across the frontend application.                                            |
-| `context/`            | React Context providers for managing global state (e.g., Authentication, Language).                      |
-| `e2e/`                | End-to-end tests written with Playwright to simulate user workflows.                                     |
-| `hooks/`              | Custom React hooks for reusable logic (e.g., `useWebSocket`, `useUndoRedo`).                             |
-| `locales/`            | Internationalization (i18n) translation files for multi-language support.                                |
-| `services/`           | Frontend service layer for making API requests to the backend.                                           |
-| `testsprite_tests/`   | A directory for automated tests.                                                                          |
-| `utils/`              | Utility functions shared across the frontend.                                                             |
+| Path                    | Description                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `backend/`              | The core NestJS backend application. Contains all modules, services, and controllers for the API. |
+| `backend/src/`          | Source code for the backend.                                                                      |
+| `backend/src/analysis/` | Contains the logic for the AI agentic workflows.                                                  |
+| `backend/src/prisma/`   | Prisma schema, migrations, and database client configuration.                                     |
+| `components/`           | Shared React components used across the frontend application.                                     |
+| `context/`              | React Context providers for managing global state (e.g., Authentication, Language).               |
+| `e2e/`                  | End-to-end tests written with Playwright to simulate user workflows.                              |
+| `hooks/`                | Custom React hooks for reusable logic (e.g., `useWebSocket`, `useUndoRedo`).                      |
+| `locales/`              | Internationalization (i18n) translation files for multi-language support.                         |
+| `services/`             | Frontend service layer for making API requests to the backend.                                    |
+| `testsprite_tests/`     | A directory for automated tests.                                                                  |
+| `utils/`                | Utility functions shared across the frontend.                                                     |
 
 ---
 
 ## 🚀 Quick Start (Development)
 
 ### Prerequisites
-*   Node.js v18+
-*   Docker & Docker Compose
+
+- Node.js v18+ (for manual setup)
+- Docker & Docker Compose (recommended for local development)
 
 ### 1. Clone & Install
+
 ```bash
 # Install Root dependencies (for E2E tests)
 npm install
@@ -78,8 +80,39 @@ cd ..
 npm install
 ```
 
-### 2. Configuration
+### 2. Docker Setup (Recommended)
+
+For local development with Docker:
+
+```bash
+# Start all services
+docker-compose -f docker-compose.dev.yml up --build
+
+# Access the application:
+# Frontend: http://localhost:5173
+# Backend: http://localhost:3000
+# Database: localhost:5432
+```
+
+For production deployment:
+
+```bash
+# Set environment variables
+export API_KEY=your_api_key
+export JWT_SECRET=your_jwt_secret
+
+# Deploy with production compose
+docker-compose -f docker-compose.prod.yml up --build -d
+```
+
+### 3. Manual Setup (Alternative)
+
+If you prefer running services manually without Docker:
+
+### 3. Configuration
+
 Create a `.env` file in `backend/`:
+
 ```env
 # Database (Matches docker-compose.yml)
 DATABASE_URL="postgresql://atlas_user:atlas_password@localhost:5432/atlas_db"
@@ -102,12 +135,15 @@ SMTP_PASS="pass"
 ```
 
 ### 3. Start Infrastructure
+
 Spin up the local PostgreSQL database.
+
 ```bash
 docker-compose up -d
 ```
 
 ### 4. Initialize Database
+
 ```bash
 cd backend
 npx prisma generate
@@ -115,7 +151,9 @@ npx prisma db push
 ```
 
 ### 5. Run Application
+
 In the root directory, start both Frontend and Backend concurrently:
+
 ```bash
 # Terminal 1: Backend
 cd backend
@@ -124,6 +162,7 @@ npm run start:dev
 # Terminal 2: Frontend
 npm run dev
 ```
+
 Access the app at `http://localhost:5173`.
 Access Swagger API Docs at `http://localhost:3000/api/docs`.
 
@@ -133,9 +172,9 @@ Access Swagger API Docs at `http://localhost:3000/api/docs`.
 
 We adhere to strict engineering discipline with a full testing pyramid.
 
-*   **Unit Tests**: `npm run test:unit` (Vitest & Jest)
-*   **Integration Tests**: `cd backend && npm run test:e2e` (Supertest)
-*   **End-to-End Tests**: `npm run test:e2e` (Playwright)
+- **Unit Tests**: `npm run test:unit` (Vitest & Jest)
+- **Integration Tests**: `cd backend && npm run test:e2e` (Supertest)
+- **End-to-End Tests**: `npm run test:e2e` (Playwright)
 
 ---
 

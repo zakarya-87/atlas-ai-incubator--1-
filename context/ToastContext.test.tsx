@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, act, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  act,
+  fireEvent,
+  waitFor,
+} from '@testing-library/react';
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { ToastProvider, useToast } from './ToastContext';
@@ -9,10 +15,18 @@ describe('ToastContext', () => {
     const { showToast } = useToast();
     return (
       <div>
-        <button onClick={() => showToast('Success message', 'success')}>Show Success</button>
-        <button onClick={() => showToast('Error message', 'error')}>Show Error</button>
-        <button onClick={() => showToast('Warning message', 'warning')}>Show Warning</button>
-        <button onClick={() => showToast('Info message', 'info')}>Show Info</button>
+        <button onClick={() => showToast('Success message', 'success')}>
+          Show Success
+        </button>
+        <button onClick={() => showToast('Error message', 'error')}>
+          Show Error
+        </button>
+        <button onClick={() => showToast('Warning message', 'warning')}>
+          Show Warning
+        </button>
+        <button onClick={() => showToast('Info message', 'info')}>
+          Show Info
+        </button>
       </div>
     );
   };
@@ -84,7 +98,9 @@ describe('ToastContext', () => {
 
   it('should throw error when useToast is used outside provider', () => {
     const TestOutsideProvider = () => {
-      expect(() => useToast()).toThrow('useToast must be used within a ToastProvider');
+      expect(() => useToast()).toThrow(
+        'useToast must be used within a ToastProvider'
+      );
       return null;
     };
 
@@ -98,7 +114,9 @@ describe('ToastContext', () => {
       </ToastProvider>
     );
 
-    expect(screen.getByTestId('child-element')).toHaveTextContent('Child Content');
+    expect(screen.getByTestId('child-element')).toHaveTextContent(
+      'Child Content'
+    );
   });
 
   it('should allow multiple toasts to be displayed', () => {

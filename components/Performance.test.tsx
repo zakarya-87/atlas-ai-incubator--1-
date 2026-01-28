@@ -95,10 +95,12 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
     it('should render ExportControls with acceptable performance', () => {
       const analysisData = {
         id: 'test',
-        strengths: [{ point: 'Test strength', explanation: 'Test explanation' }],
+        strengths: [
+          { point: 'Test strength', explanation: 'Test explanation' },
+        ],
         weaknesses: [],
         opportunities: [],
-        threats: []
+        threats: [],
       };
 
       const startTime = performance.now();
@@ -151,25 +153,24 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
     });
 
     it('should handle complex analysis data structures', () => {
-
       const complexData = {
         id: 'complex-test',
         strengths: Array.from({ length: 50 }, (_, i) => ({
           point: `Strength ${i + 1}`,
-          explanation: `Detailed explanation for strength ${i + 1} with comprehensive analysis`
+          explanation: `Detailed explanation for strength ${i + 1} with comprehensive analysis`,
         })),
         weaknesses: Array.from({ length: 30 }, (_, i) => ({
           point: `Weakness ${i + 1}`,
-          explanation: `Detailed explanation for weakness ${i + 1}`
+          explanation: `Detailed explanation for weakness ${i + 1}`,
         })),
         opportunities: Array.from({ length: 40 }, (_, i) => ({
           point: `Opportunity ${i + 1}`,
-          explanation: `Detailed explanation for opportunity ${i + 1}`
+          explanation: `Detailed explanation for opportunity ${i + 1}`,
         })),
         threats: Array.from({ length: 25 }, (_, i) => ({
           point: `Threat ${i + 1}`,
-          explanation: `Detailed explanation for threat ${i + 1}`
-        }))
+          explanation: `Detailed explanation for threat ${i + 1}`,
+        })),
       };
 
       const startTime = performance.now();
@@ -292,14 +293,14 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
         renderTimes.push(endTime - startTime);
       }
 
-      const averageRenderTime = renderTimes.reduce((a, b) => a + b, 0) / renderTimes.length;
+      const averageRenderTime =
+        renderTimes.reduce((a, b) => a + b, 0) / renderTimes.length;
       const maxRenderTime = Math.max(...renderTimes);
 
       // Average re-render time should be low (< 30ms)
       expect(averageRenderTime).toBeLessThan(30);
       // Max re-render time should be reasonable (< 50ms)
       expect(maxRenderTime).toBeLessThan(50);
-
     });
 
     it('should maintain performance with state updates', () => {
@@ -321,17 +322,21 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
       const updateTimes: number[] = [];
 
       // Simulate rapid typing
-      const text = 'This is a performance test for rapid text input and state updates.';
+      const text =
+        'This is a performance test for rapid text input and state updates.';
       for (let i = 0; i < text.length; i++) {
         const startTime = performance.now();
 
-        fireEvent.change(textarea, { target: { value: text.substring(0, i + 1) } });
+        fireEvent.change(textarea, {
+          target: { value: text.substring(0, i + 1) },
+        });
 
         const endTime = performance.now();
         updateTimes.push(endTime - startTime);
       }
 
-      const averageUpdateTime = updateTimes.reduce((a, b) => a + b, 0) / updateTimes.length;
+      const averageUpdateTime =
+        updateTimes.reduce((a, b) => a + b, 0) / updateTimes.length;
 
       // Text input updates should be fast (< 20ms average)
       expect(averageUpdateTime).toBeLessThan(20);
@@ -365,7 +370,13 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
     });
 
     it('should handle export menu animations smoothly', () => {
-      const analysisData = { id: 'test', strengths: [], weaknesses: [], opportunities: [], threats: [] };
+      const analysisData = {
+        id: 'test',
+        strengths: [],
+        weaknesses: [],
+        opportunities: [],
+        threats: [],
+      };
 
       render(
         <LanguageProvider>
@@ -434,7 +445,7 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
         loadingTransitionTime: '< 50ms',
         reRenderTime: '< 30ms',
         textInputUpdateTime: '< 20ms',
-        largeDatasetHandling: '< 300ms'
+        largeDatasetHandling: '< 300ms',
       };
 
       // Verify all metrics are within acceptable ranges
@@ -445,8 +456,7 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
       expect(performanceMetrics.textInputUpdateTime).toContain('< 20ms');
       expect(performanceMetrics.largeDatasetHandling).toContain('< 300ms');
 
-      Object.entries(performanceMetrics).forEach(([metric, requirement]) => {
-      });
+      Object.entries(performanceMetrics).forEach(([metric, requirement]) => {});
     });
 
     it('should maintain performance consistency across test runs', () => {
@@ -466,14 +476,18 @@ describe('Performance Benchmark of Dashboard Loading (TC019)', () => {
         renderTimes.push(endTime - startTime);
       }
 
-      const averageTime = renderTimes.reduce((a, b) => a + b, 0) / renderTimes.length;
-      const variance = renderTimes.reduce((acc, time) => acc + Math.pow(time - averageTime, 2), 0) / renderTimes.length;
+      const averageTime =
+        renderTimes.reduce((a, b) => a + b, 0) / renderTimes.length;
+      const variance =
+        renderTimes.reduce(
+          (acc, time) => acc + Math.pow(time - averageTime, 2),
+          0
+        ) / renderTimes.length;
       const standardDeviation = Math.sqrt(variance);
 
       // Performance should be consistent (standard deviation < 5ms)
       expect(standardDeviation).toBeLessThan(5);
       expect(averageTime).toBeLessThan(10);
-
     });
   });
 });

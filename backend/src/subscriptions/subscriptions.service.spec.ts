@@ -1,6 +1,8 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
-import { InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  BadRequestException,
+} from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
@@ -27,12 +29,16 @@ describe('SubscriptionsService', () => {
       },
       checkout: {
         sessions: {
-          create: jest.fn().mockResolvedValue({ url: 'https://checkout.stripe.com/test' }),
+          create: jest
+            .fn()
+            .mockResolvedValue({ url: 'https://checkout.stripe.com/test' }),
         },
       },
       billingPortal: {
         sessions: {
-          create: jest.fn().mockResolvedValue({ url: 'https://billing.stripe.com/test' }),
+          create: jest
+            .fn()
+            .mockResolvedValue({ url: 'https://billing.stripe.com/test' }),
         },
       },
       webhooks: {
@@ -46,9 +52,9 @@ describe('SubscriptionsService', () => {
     configService = {
       get: jest.fn((key: string) => {
         const config: Record<string, string> = {
-          'STRIPE_SECRET_KEY': 'sk_test_123',
-          'STRIPE_WEBHOOK_SECRET': 'whsec_123',
-          'FRONTEND_URL': 'http://localhost:5173',
+          STRIPE_SECRET_KEY: 'sk_test_123',
+          STRIPE_WEBHOOK_SECRET: 'whsec_123',
+          FRONTEND_URL: 'http://localhost:5173',
         };
         return config[key];
       }),
@@ -80,14 +86,17 @@ describe('SubscriptionsService', () => {
       const configWithKey = {
         get: jest.fn((key: string) => {
           const config: Record<string, string> = {
-            'STRIPE_SECRET_KEY': 'sk_test_123',
-            'STRIPE_WEBHOOK_SECRET': 'whsec_123',
+            STRIPE_SECRET_KEY: 'sk_test_123',
+            STRIPE_WEBHOOK_SECRET: 'whsec_123',
           };
           return config[key];
         }),
       };
 
-      const testService = new SubscriptionsService(configWithKey as any, {} as any);
+      const testService = new SubscriptionsService(
+        configWithKey as any,
+        {} as any
+      );
       expect((testService as any).stripe).toBeDefined();
     });
 
@@ -97,7 +106,10 @@ describe('SubscriptionsService', () => {
       };
 
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-      const testService = new SubscriptionsService(configWithoutKey as any, {} as any);
+      const testService = new SubscriptionsService(
+        configWithoutKey as any,
+        {} as any
+      );
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('STRIPE_SECRET_KEY not set')
       );
@@ -120,16 +132,18 @@ describe('SubscriptionsService', () => {
     it('should throw error if user not found', async () => {
       prismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.createCheckoutSession('non-existent', 'pro'))
-        .rejects.toThrow(BadRequestException);
+      await expect(
+        service.createCheckoutSession('non-existent', 'pro')
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw error if Stripe not configured', async () => {
       (service as any).stripe = undefined;
       prismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(service.createCheckoutSession('user-123', 'pro'))
-        .rejects.toThrow(InternalServerErrorException);
+      await expect(
+        service.createCheckoutSession('user-123', 'pro')
+      ).rejects.toThrow(InternalServerErrorException);
     });
   });
 
@@ -144,10 +158,14 @@ describe('SubscriptionsService', () => {
     });
 
     it('should throw error if user has no billing account', async () => {
-      prismaService.user.findUnique.mockResolvedValue({ ...mockUser, stripeCustomerId: null });
+      prismaService.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        stripeCustomerId: null,
+      });
 
-      await expect(service.createPortalSession('user-123'))
-        .rejects.toThrow(BadRequestException);
+      await expect(service.createPortalSession('user-123')).rejects.toThrow(
+        BadRequestException
+      );
     });
   });
 
@@ -182,7 +200,7 @@ describe('SubscriptionsService', () => {
     });
 
     it.skip('should process checkout completed event - skipped due to complex mocking', async () => {
-      // This test is skipped because mocking the Stripe webhook constructEvent 
+      // This test is skipped because mocking the Stripe webhook constructEvent
       // requires complex setup that interferes with other tests.
       // The service correctly calls this.stripe.webhooks.constructEvent
       // and handles the webhook events when properly configured.
@@ -198,8 +216,9 @@ describe('SubscriptionsService', () => {
       (service as any).stripe = undefined;
       const payload = JSON.stringify({ type: 'checkout.session.completed' });
 
-      await expect(service.handleWebhook('sig_123', payload))
-        .rejects.toThrow(InternalServerErrorException);
+      await expect(service.handleWebhook('sig_123', payload)).rejects.toThrow(
+        InternalServerErrorException
+      );
     });
 
     it('should throw error for invalid signature', async () => {
@@ -209,8 +228,9 @@ describe('SubscriptionsService', () => {
       (service as any).stripe = mockStripe;
       const payload = JSON.stringify({ type: 'checkout.session.completed' });
 
-      await expect(service.handleWebhook('invalid_sig', payload))
-        .rejects.toThrow(BadRequestException);
+      await expect(
+        service.handleWebhook('invalid_sig', payload)
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });

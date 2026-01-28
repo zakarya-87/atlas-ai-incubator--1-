@@ -2,19 +2,19 @@
 // This is only used in tests
 
 export enum SchemaType {
-    OBJECT = 'object',
-    STRING = 'string',
-    NUMBER = 'number',
-    BOOLEAN = 'boolean',
-    ARRAY = 'array',
+  OBJECT = 'object',
+  STRING = 'string',
+  NUMBER = 'number',
+  BOOLEAN = 'boolean',
+  ARRAY = 'array',
 }
 
 export const GoogleGenerativeAI = class {
-    constructor(apiKey: string) { }
+  constructor(apiKey: string) {}
 
-    getGenerativeModel() {
-        return {
-            generateContent: () => Promise.resolve({ text: '{}' }),
-        };
-    }
+  getGenerativeModel() {
+    return {
+      generateContent: () => Promise.resolve({ text: '{}' }),
+    };
+  }
 };

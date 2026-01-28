@@ -1,4 +1,3 @@
-
 import { Injectable } from '@nestjs/common';
 import { DefaultAgent } from './agents/default.agent';
 import { ResearchAgent } from './agents/research.agent';
@@ -10,32 +9,32 @@ export class AnalysisAgentFactory {
   constructor(
     private readonly defaultAgent: DefaultAgent,
     private readonly researchAgent: ResearchAgent,
-    private readonly designAgent: DesignAgent,
+    private readonly designAgent: DesignAgent
   ) {}
 
   getAgent(module: string, tool: string): AiAgent {
     // Visual Tools
     if (tool === 'brandIdentity') {
-        return this.designAgent;
+      return this.designAgent;
     }
 
     // Dispatch ResearchAgent for tools that require live data
     if (module === 'marketAnalysis') {
-        return this.researchAgent;
+      return this.researchAgent;
     }
-    
+
     const researchHeavyTools = [
-        'competitorAnalysis',
-        'marketResearch',
-        'problemValidation', // Needs market size data
-        'investorDatabase',  // Needs real investor info
-        'expansionStrategy'  // Needs market trend info
+      'competitorAnalysis',
+      'marketResearch',
+      'problemValidation', // Needs market size data
+      'investorDatabase', // Needs real investor info
+      'expansionStrategy', // Needs market trend info
     ];
 
     if (researchHeavyTools.includes(tool)) {
-        return this.researchAgent;
+      return this.researchAgent;
     }
-    
+
     // Default for internal strategic logic (SWOT, Roadmap, etc.)
     return this.defaultAgent;
   }

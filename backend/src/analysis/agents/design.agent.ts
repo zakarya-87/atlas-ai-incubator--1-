@@ -1,13 +1,16 @@
-
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BaseAgent } from './base.agent';
 import { AgentGenerationResponse } from '../interfaces/ai-agent.interface';
+import { AIProviderFactory } from '../providers/ai-provider.factory';
 
 @Injectable()
 export class DesignAgent extends BaseAgent {
-  constructor(configService: ConfigService) {
-    super(configService);
+  constructor(
+    configService: ConfigService,
+    protected readonly providerFactory: AIProviderFactory
+  ) {
+    super(configService, providerFactory);
   }
 
   async generate(
@@ -36,28 +39,38 @@ export class DesignAgent extends BaseAgent {
       `;
 
       const response = await this.executeGeminiCall(
-        'gemini-2.5-pro',
+        'gemini-2.0-flash-lite',
         brandPrompt,
         schema,
-        "You are a creative director and brand strategist specializing in startup branding."
+        'You are a creative director and brand strategist specializing in startup branding.'
       );
 
       // Ensure the response has all required fields
       const data = {
-        logoImage: response.data?.logoImage || "",
-        imagePrompt: response.data?.imagePrompt || "A modern, minimalist logo concept",
-        rationale: response.data?.rationale || "Brand identity designed to convey professionalism and innovation",
-        palette: response.data?.palette || ["#6366F1", "#818CF8", "#A5B4FC", "#1E293B", "#F8FAFC"]
+        logoImage: response.data?.logoImage || '',
+        imagePrompt:
+          response.data?.imagePrompt || 'A modern, minimalist logo concept',
+        rationale:
+          response.data?.rationale ||
+          'Brand identity designed to convey professionalism and innovation',
+        palette: response.data?.palette || [
+          '#6366F1',
+          '#818CF8',
+          '#A5B4FC',
+          '#1E293B',
+          '#F8FAFC',
+        ],
       };
 
       return {
-        text: "Brand identity concept generated successfully. Note: Logo image generation requires Vertex AI setup.",
-        data: data
+        text: 'Brand identity concept generated successfully. Note: Logo image generation requires Vertex AI setup.',
+        data: data,
       };
-
     } catch (error: any) {
-      console.error("Design Agent Error:", error);
-      throw new InternalServerErrorException(`Failed to generate brand identity: ${error.message}`);
+      console.error('Design Agent Error:', error);
+      throw new InternalServerErrorException(
+        `Failed to generate brand identity: ${error.message}`
+      );
     }
   }
 }

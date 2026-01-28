@@ -1,6 +1,16 @@
-
 // Centralized ModuleType definition
-export type ModuleType = 'dashboard' | 'fundamentals' | 'strategy' | 'marketAnalysis' | 'finance' | 'growth' | 'funding' | 'integrations' | 'architecture' | 'audit' | 'productivity';
+export type ModuleType =
+  | 'dashboard'
+  | 'fundamentals'
+  | 'strategy'
+  | 'marketAnalysis'
+  | 'finance'
+  | 'growth'
+  | 'funding'
+  | 'integrations'
+  | 'architecture'
+  | 'audit'
+  | 'productivity';
 
 export interface AnalysisPoint {
   point: string;
@@ -9,24 +19,32 @@ export interface AnalysisPoint {
 }
 
 export interface Source {
-    title: string;
-    url: string;
+  title: string;
+  url: string;
 }
 
 // Authentication Types
 export interface AuthCredentials {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 // Agent Types
-export type AgentType = 'Lead Strategist' | 'Market Researcher' | 'Product Owner' | 'CFO' | 'Growth Hacker' | 'Venture Capitalist' | 'Systems Architect' | 'Creative Director';
+export type AgentType =
+  | 'Lead Strategist'
+  | 'Market Researcher'
+  | 'Product Owner'
+  | 'CFO'
+  | 'Growth Hacker'
+  | 'Venture Capitalist'
+  | 'Systems Architect'
+  | 'Creative Director';
 
 export interface AgentLog {
-    id: string;
-    agent: AgentType;
-    messageKey: string; // Translation key
-    timestamp: number;
+  id: string;
+  agent: AgentType;
+  messageKey: string; // Translation key
+  timestamp: number;
 }
 
 export interface SwotData {
@@ -217,10 +235,10 @@ export interface ValidationTrackerData {
 
 // Types for Brand Identity
 export interface BrandIdentityData {
-    logoImage: string; // Base64
-    imagePrompt: string;
-    rationale: string;
-    palette: string[]; // Array of Hex codes
+  logoImage: string; // Base64
+  imagePrompt: string;
+  rationale: string;
+  palette: string[]; // Array of Hex codes
 }
 
 // Types for Budget Generator
@@ -231,14 +249,18 @@ export interface BudgetItem {
 }
 
 export interface BudgetCategory {
-  categoryName: 'Revenue Streams' | 'Cost of Goods Sold (COGS)' | 'Operating Expenses (OPEX)' | 'Capital Expenditures (CAPEX)';
+  categoryName:
+    | 'Revenue Streams'
+    | 'Cost of Goods Sold (COGS)'
+    | 'Operating Expenses (OPEX)'
+    | 'Capital Expenditures (CAPEX)';
   items: BudgetItem[];
 }
 
 export interface ScenarioSummary {
-    totalRevenue: number;
-    totalExpenses: number;
-    netProfitOrLoss: number;
+  totalRevenue: number;
+  totalExpenses: number;
+  netProfitOrLoss: number;
 }
 
 export interface BudgetScenario {
@@ -277,73 +299,90 @@ export interface CashFlowMonth {
 }
 
 export interface CashFlowForecastData {
-    monthlyForecasts: CashFlowMonth[];
-    runwayMonths: number;
-    averageBurnRate: number;
-    insights: AnalysisPoint[];
+  monthlyForecasts: CashFlowMonth[];
+  runwayMonths: number;
+  averageBurnRate: number;
+  insights: AnalysisPoint[];
 }
 
 // Types for KPI Dashboard
 export interface Kpi {
-    name: string;
-    value: string;
-    benchmark: string;
-    insight: string;
+  name: string;
+  value: string;
+  benchmark: string;
+  insight: string;
 }
 
 export interface KpiDashboardData {
-    executiveSummary: string;
-    kpis: Kpi[];
+  executiveSummary: string;
+  kpis: Kpi[];
 }
 
 // Types for Milestones & Smart Alerts
 export interface Milestone {
-    point: string;
-    explanation: string;
-    quarter: number; // e.g., 1, 2, 3, 4 for the next 12 months
+  point: string;
+  explanation: string;
+  quarter: number; // e.g., 1, 2, 3, 4 for the next 12 months
 }
 
 export interface SmartAlert {
-    alert: string;
-    recommendation: string;
-    severity: 'High' | 'Medium' | 'Low';
+  alert: string;
+  recommendation: string;
+  severity: 'High' | 'Medium' | 'Low';
 }
 
 export interface MilestonesData {
-    milestones: Milestone[];
-    smartAlerts: SmartAlert[];
+  milestones: Milestone[];
+  smartAlerts: SmartAlert[];
 }
 
 export interface RecommendedStrategy {
-    strategyName: 'Market Penetration' | 'Market Development' | 'Product Development' | 'Diversification';
-    justification: string;
+  strategyName:
+    | 'Market Penetration'
+    | 'Market Development'
+    | 'Product Development'
+    | 'Diversification';
+  justification: string;
 }
 
 export interface ExpansionStrategyData {
-    recommendedStrategy: RecommendedStrategy;
-    marketExpansionSuggestions: AnalysisPoint[];
-    predictiveModelingInsights: AnalysisPoint[];
-    partnershipRecommendations: AnalysisPoint[];
+  recommendedStrategy: RecommendedStrategy;
+  marketExpansionSuggestions: AnalysisPoint[];
+  predictiveModelingInsights: AnalysisPoint[];
+  partnershipRecommendations: AnalysisPoint[];
 }
 
 // Types for Pitch Deck Generator
 export interface PitchDeckSlide {
-    title: string;
-    content: AnalysisPoint[];
-    visualSuggestion?: {
-        type: 'bar_chart' | 'line_graph' | 'pie_chart' | 'map' | 'table' | 'infographic' | 'none';
-        description: string;
-    };
+  title: string;
+  content: AnalysisPoint[];
+  visualSuggestion?: {
+    type:
+      | 'bar_chart'
+      | 'line_graph'
+      | 'pie_chart'
+      | 'map'
+      | 'table'
+      | 'infographic'
+      | 'none';
+    description: string;
+  };
 }
 
 export interface PitchDeckData {
-    slides: PitchDeckSlide[];
+  slides: PitchDeckSlide[];
 }
 
 // Types for Investor Database Access
 export interface InvestorProfile {
   name: string;
-  type: 'Angel Investor' | 'Venture Capital (Early Stage)' | 'Venture Capital (Late Stage)' | 'Accelerator / Incubator' | 'Corporate Venture Arm' | 'Grant Program';
+  type:
+    | 'Angel Investor'
+    | 'Venture Capital (Early Stage)'
+    | 'Venture Capital (Late Stage)'
+    | 'Accelerator / Incubator'
+    | 'Corporate Venture Arm'
+    | 'Grant Program';
   location: string;
   investmentStage: string;
   ticketSize: string;
@@ -368,7 +407,11 @@ export interface FundraisingTask {
 }
 
 export interface FundraisingPhase {
-  phaseName: 'Preparation' | 'Investor Outreach' | 'Meetings & Due Diligence' | 'Closing';
+  phaseName:
+    | 'Preparation'
+    | 'Investor Outreach'
+    | 'Meetings & Due Diligence'
+    | 'Closing';
   tasks: FundraisingTask[];
 }
 
@@ -406,33 +449,87 @@ export interface ExperimentData {
   columns: ExperimentColumn[];
 }
 
-
 // Type for any possible analysis data. Added _sources support and optional ID from database.
-export type AnyAnalysisData = (SwotData | PestelData | MarketAnalysisData | MarketResearchData | RoadmapData | LeanCanvasData | OkrWorkflowData | IdeaValidationData | ProblemValidationData | CompetitorAnalysisData | CustomerValidationData | RiskFeasibilityData | ValidationTrackerData | BudgetGeneratorData | FinancialForecastData | CashFlowForecastData | KpiDashboardData | MilestonesData | ExpansionStrategyData | PitchDeckData | InvestorMatchingData | FundraisingRoadmapData | ExperimentData | BrandIdentityData) & { _sources?: Source[]; id?: string };
+export type AnyAnalysisData = (
+  | SwotData
+  | PestelData
+  | MarketAnalysisData
+  | MarketResearchData
+  | RoadmapData
+  | LeanCanvasData
+  | OkrWorkflowData
+  | IdeaValidationData
+  | ProblemValidationData
+  | CompetitorAnalysisData
+  | CustomerValidationData
+  | RiskFeasibilityData
+  | ValidationTrackerData
+  | BudgetGeneratorData
+  | FinancialForecastData
+  | CashFlowForecastData
+  | KpiDashboardData
+  | MilestonesData
+  | ExpansionStrategyData
+  | PitchDeckData
+  | InvestorMatchingData
+  | FundraisingRoadmapData
+  | ExperimentData
+  | BrandIdentityData
+) & { _sources?: Source[]; id?: string };
 
 // Type for Generation History
 export interface GenerationRecord {
-    id: string;
-    timestamp: string;
-    module: ModuleType;
-    tool: AnyTool;
-    toolNameKey: string;
-    inputDescription: string;
-    data: AnyAnalysisData;
+  id: string;
+  timestamp: string;
+  module: ModuleType;
+  tool: AnyTool;
+  toolNameKey: string;
+  inputDescription: string;
+  data: AnyAnalysisData;
 }
 
-
 // Centralized Tool Types
-export type StrategyTool = 'swot' | 'pestel' | 'roadmap' | 'leanCanvas' | 'okrWorkflow';
+export type StrategyTool =
+  | 'swot'
+  | 'pestel'
+  | 'roadmap'
+  | 'leanCanvas'
+  | 'okrWorkflow';
 export type MarketAnalysisTool = 'overview' | 'research';
-export type FundamentalsTool = 'ideaValidation' | 'problemValidation' | 'competitorAnalysis' | 'customerValidation' | 'riskFeasibility' | 'validationTracker' | 'experimentBuilder' | 'brandIdentity';
-export type FinanceTool = 'budgetGenerator' | 'financialForecast' | 'cashFlowForecast' | 'kpiDashboards';
+export type FundamentalsTool =
+  | 'ideaValidation'
+  | 'problemValidation'
+  | 'competitorAnalysis'
+  | 'customerValidation'
+  | 'riskFeasibility'
+  | 'validationTracker'
+  | 'experimentBuilder'
+  | 'brandIdentity';
+export type FinanceTool =
+  | 'budgetGenerator'
+  | 'financialForecast'
+  | 'cashFlowForecast'
+  | 'kpiDashboards';
 export type GrowthTool = 'milestones' | 'expansionStrategy';
-export type FundingTool = 'pitchDeckGenerator' | 'investorDatabase' | 'fundraisingRoadmap';
+export type FundingTool =
+  | 'pitchDeckGenerator'
+  | 'investorDatabase'
+  | 'fundraisingRoadmap';
 export type ArchitectureTool = 'systemDesign';
 export type AuditTool = 'trail';
 export type IntegrationsTool = 'connectors';
 export type ProductivityTool = 'taskManager';
 export type DashboardTool = 'overview';
 
-export type AnyTool = StrategyTool | MarketAnalysisTool | FundamentalsTool | FinanceTool | GrowthTool | FundingTool | ArchitectureTool | AuditTool | IntegrationsTool | ProductivityTool | DashboardTool;
+export type AnyTool =
+  | StrategyTool
+  | MarketAnalysisTool
+  | FundamentalsTool
+  | FinanceTool
+  | GrowthTool
+  | FundingTool
+  | ArchitectureTool
+  | AuditTool
+  | IntegrationsTool
+  | ProductivityTool
+  | DashboardTool;

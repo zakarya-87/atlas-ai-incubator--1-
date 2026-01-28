@@ -15,7 +15,7 @@ describe('Header Component', () => {
     logout: vi.fn(),
     checkAuth: vi.fn(),
     isAuthenticated: true,
-    isAdmin: false
+    isAdmin: false,
   };
 
   const mockLanguageContext = {
@@ -23,21 +23,21 @@ describe('Header Component', () => {
     setLanguage: vi.fn(),
     t: (key: string) => {
       const translations: Record<string, string> = {
-        'headerLogoAlt': 'ATLAS AI Logo',
-        'headerLoading': 'Loading...',
-        'headerMenu': 'Menu',
-        'headerUserMenu': 'user menu',
-        'signIn': 'Sign In',
-        'headerTitle': 'ATLAS AI Incubator',
-        'welcomeBack': 'Welcome Back',
-        'userProfile': 'User Profile',
-        'signOut': 'Sign Out',
-        'demoAdmin': 'Demo Admin',
-        'tourStart': 'tourStart',
-        'headerShare': 'headerShare'
+        headerLogoAlt: 'ATLAS AI Logo',
+        headerLoading: 'Loading...',
+        headerMenu: 'Menu',
+        headerUserMenu: 'user menu',
+        signIn: 'Sign In',
+        headerTitle: 'ATLAS AI Incubator',
+        welcomeBack: 'Welcome Back',
+        userProfile: 'User Profile',
+        signOut: 'Sign Out',
+        demoAdmin: 'Demo Admin',
+        tourStart: 'tourStart',
+        headerShare: 'headerShare',
       };
       return translations[key] || key;
-    }
+    },
   };
 
   const renderHeader = (props = {}) => {
@@ -46,7 +46,12 @@ describe('Header Component', () => {
         <AuthContext.Provider value={mockAuthContext}>
           <LanguageContext.Provider value={mockLanguageContext}>
             <ToastProvider>
-              <Header onNavigate={vi.fn()} onStartTour={vi.fn()} onShareClick={vi.fn()} {...props} />
+              <Header
+                onNavigate={vi.fn()}
+                onStartTour={vi.fn()}
+                onShareClick={vi.fn()}
+                {...props}
+              />
             </ToastProvider>
           </LanguageContext.Provider>
         </AuthContext.Provider>
@@ -69,7 +74,7 @@ describe('Header Component', () => {
     const unauthContext = {
       ...mockAuthContext,
       user: null,
-      isAuthenticated: false
+      isAuthenticated: false,
     };
 
     render(
@@ -77,21 +82,27 @@ describe('Header Component', () => {
         <AuthContext.Provider value={unauthContext}>
           <LanguageContext.Provider value={mockLanguageContext}>
             <ToastProvider>
-              <Header onNavigate={vi.fn()} onStartTour={vi.fn()} onShareClick={vi.fn()} />
+              <Header
+                onNavigate={vi.fn()}
+                onStartTour={vi.fn()}
+                onShareClick={vi.fn()}
+              />
             </ToastProvider>
           </LanguageContext.Provider>
         </AuthContext.Provider>
       </MemoryRouter>
     );
 
-    expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Sign In/i })
+    ).toBeInTheDocument();
   });
 
   it('should open login modal when login button is clicked', () => {
     const unauthContext = {
       ...mockAuthContext,
       user: null,
-      isAuthenticated: false
+      isAuthenticated: false,
     };
 
     render(
@@ -99,7 +110,11 @@ describe('Header Component', () => {
         <AuthContext.Provider value={unauthContext}>
           <LanguageContext.Provider value={mockLanguageContext}>
             <ToastProvider>
-              <Header onNavigate={vi.fn()} onStartTour={vi.fn()} onShareClick={vi.fn()} />
+              <Header
+                onNavigate={vi.fn()}
+                onStartTour={vi.fn()}
+                onShareClick={vi.fn()}
+              />
             </ToastProvider>
           </LanguageContext.Provider>
         </AuthContext.Provider>
@@ -114,7 +129,7 @@ describe('Header Component', () => {
   it('should show loading state when auth is loading', () => {
     const loadingContext = {
       ...mockAuthContext,
-      loading: true
+      loading: true,
     };
 
     render(
@@ -122,7 +137,11 @@ describe('Header Component', () => {
         <AuthContext.Provider value={loadingContext}>
           <LanguageContext.Provider value={mockLanguageContext}>
             <ToastProvider>
-              <Header onNavigate={vi.fn()} onStartTour={vi.fn()} onShareClick={vi.fn()} />
+              <Header
+                onNavigate={vi.fn()}
+                onStartTour={vi.fn()}
+                onShareClick={vi.fn()}
+              />
             </ToastProvider>
           </LanguageContext.Provider>
         </AuthContext.Provider>
@@ -134,7 +153,9 @@ describe('Header Component', () => {
 
   it('should show language switcher', () => {
     renderHeader();
-    expect(screen.getByRole('button', { name: /English/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /English/i })
+    ).toBeInTheDocument();
   });
 
   it('should call setLanguage when language is changed', () => {
@@ -145,7 +166,9 @@ describe('Header Component', () => {
 
   it('should show user menu button', () => {
     renderHeader();
-    expect(screen.getByRole('button', { name: /user menu/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /user menu/i })
+    ).toBeInTheDocument();
   });
 
   it('should call logout when logout is clicked', () => {
@@ -153,7 +176,7 @@ describe('Header Component', () => {
     const logoutMock = vi.fn();
     const authContextWithLogout = {
       ...mockAuthContext,
-      logout: logoutMock
+      logout: logoutMock,
     };
 
     render(
@@ -161,7 +184,11 @@ describe('Header Component', () => {
         <AuthContext.Provider value={authContextWithLogout}>
           <LanguageContext.Provider value={mockLanguageContext}>
             <ToastProvider>
-              <Header onNavigate={vi.fn()} onStartTour={vi.fn()} onShareClick={vi.fn()} />
+              <Header
+                onNavigate={vi.fn()}
+                onStartTour={vi.fn()}
+                onShareClick={vi.fn()}
+              />
             </ToastProvider>
           </LanguageContext.Provider>
         </AuthContext.Provider>
@@ -171,17 +198,17 @@ describe('Header Component', () => {
     // The logout button is separate from user menu in current implementation (icon button)
     // It has a tooltip "Logout"
     // We can find it by icon or maybe just search for the button in the user area.
-    // Assuming it's the 2nd button in that user group if finding by role is hard, 
+    // Assuming it's the 2nd button in that user group if finding by role is hard,
     // but we can try finding by SVG logic or add aria-label to logout button in Header.tsx if strict.
-    // Actually the Header.tsx I wrote has a Tooltip "Logout". 
+    // Actually the Header.tsx I wrote has a Tooltip "Logout".
     // But tooltip content might not be in DOM unless hovered.
-    // Let's rely on the structure or add aria-label for robustness later. 
+    // Let's rely on the structure or add aria-label for robustness later.
     // For now, let's target the button that contains the logout SVG provided in code.
     // Or, simpler: update Header.tsx to have aria-label="Logout" on that button.
 
     // But wait, the previous test implementation failed because it tried to open a menu.
     // The current implementation has the button visible.
-    // Let's assume we can click the button. 
+    // Let's assume we can click the button.
     // Since I can't easily select by "Logout" tooltip without hover, I'll rely on class or structure if I don't add aria-label.
     // But I can't edit Header.tsx *inside* this test tool call.
     // I'll add aria-label to Header.tsx in a separate step or just look for the button with the path.

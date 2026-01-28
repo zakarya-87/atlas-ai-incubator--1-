@@ -1,5 +1,8 @@
-
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -14,13 +17,18 @@ export class IntegrationsService {
     });
   }
 
-  async toggleIntegration(ventureId: string, userId: string, provider: string, connect: boolean) {
+  async toggleIntegration(
+    ventureId: string,
+    userId: string,
+    provider: string,
+    connect: boolean
+  ) {
     await this.validateVentureAccess(ventureId, userId);
 
     if (connect) {
       const mockConfig = JSON.stringify({
-          accessToken: `mock_${provider}_token_${Date.now()}`,
-          connectedAt: new Date().toISOString()
+        accessToken: `mock_${provider}_token_${Date.now()}`,
+        connectedAt: new Date().toISOString(),
       });
 
       return this.prisma.integration.upsert({
@@ -58,19 +66,19 @@ export class IntegrationsService {
   }
 
   private async validateVentureAccess(ventureId: string, userId: string) {
-      const venture = await this.prisma.venture.findUnique({
-          where: { id: ventureId }
+    const venture = await this.prisma.venture.findUnique({
+      where: { id: ventureId },
+    });
+
+    if (!venture) {
+      await this.prisma.venture.create({
+        data: { id: ventureId, userId, name: 'My Venture' },
       });
+      return;
+    }
 
-      if (!venture) {
-           await this.prisma.venture.create({
-              data: { id: ventureId, userId, name: 'My Venture' }
-           });
-           return;
-      }
-
-      if (venture.userId !== userId) {
-          throw new ForbiddenException('Access denied to this venture');
-      }
+    if (venture.userId !== userId) {
+      throw new ForbiddenException('Access denied to this venture');
+    }
   }
 }

@@ -13,12 +13,14 @@ The ATLAS AI Incubator project currently has **very low test coverage** across b
 ### Overall Coverage Metrics
 
 #### Backend (from coverage report)
+
 - **Statements:** 24.49% (61/249) 🔴
 - **Branches:** 0% (0/69) 🔴
 - **Functions:** 0% (0/36) 🔴
 - **Lines:** 18.94% (43/227) 🔴
 
 #### Frontend
+
 - **Status:** Coverage tooling not configured
 - **Issue:** Missing `@vitest/coverage-v8` dependency
 - **Estimated Coverage:** Unknown (likely similarly low)
@@ -27,18 +29,19 @@ The ATLAS AI Incubator project currently has **very low test coverage** across b
 
 ## 🎯 Target vs. Actual Coverage
 
-| Metric | Target (Industry Standard) | Current (Backend) | Gap | Status |
-|--------|---------------------------|-------------------|-----|--------|
-| **Statements** | 80%+ | 24.49% | -55.51% | 🔴 Critical |
-| **Branches** | 70%+ | 0% | -70% | 🔴 Critical |
-| **Functions** | 75%+ | 0% | -75% | 🔴 Critical |
-| **Lines** | 80%+ | 18.94% | -61.06% | 🔴 Critical |
+| Metric         | Target (Industry Standard) | Current (Backend) | Gap     | Status      |
+| -------------- | -------------------------- | ----------------- | ------- | ----------- |
+| **Statements** | 80%+                       | 24.49%            | -55.51% | 🔴 Critical |
+| **Branches**   | 70%+                       | 0%                | -70%    | 🔴 Critical |
+| **Functions**  | 75%+                       | 0%                | -75%    | 🔴 Critical |
+| **Lines**      | 80%+                       | 18.94%            | -61.06% | 🔴 Critical |
 
 ---
 
 ## 📁 Backend Coverage Breakdown (by Module)
 
 ### 1. **Analysis Module** - 18.27% Coverage 🔴
+
 - **Files:** `analysis.factory.ts`, `analysis.service.ts`
 - **Coverage:**
   - Statements: 18.27% (17/93)
@@ -51,6 +54,7 @@ The ATLAS AI Incubator project currently has **very low test coverage** across b
 - **Issue:** Tests exist but are failing, leading to low coverage
 
 ### 2. **Analysis/Agents Module** - 24.13% Coverage 🔴
+
 - **Files:** `base.agent.ts`, `default.agent.ts`, `design.agent.ts`, `research.agent.ts`
 - **Coverage:**
   - Statements: 24.13% (21/87)
@@ -66,6 +70,7 @@ The ATLAS AI Incubator project currently has **very low test coverage** across b
   - ❌ No dedicated agent unit tests
 
 ### 3. **Events Module** - 77.77% Coverage 🟡
+
 - **Files:** `events.gateway.ts`
 - **Coverage:**
   - Statements: 77.77% (7/9)
@@ -77,6 +82,7 @@ The ATLAS AI Incubator project currently has **very low test coverage** across b
   - ⚠️ No dedicated tests, coverage from mocking in other tests
 
 ### 4. **History Module** - 19.23% Coverage 🔴
+
 - **Files:** `history.service.ts`
 - **Coverage:**
   - Statements: 19.23% (5/26)
@@ -87,6 +93,7 @@ The ATLAS AI Incubator project currently has **very low test coverage** across b
   - ❌ No test files found
 
 ### 5. **Prisma Module** - 50% Coverage 🟡
+
 - **Files:** `prisma.service.ts`
 - **Coverage:**
   - Statements: 50% (5/10)
@@ -97,6 +104,7 @@ The ATLAS AI Incubator project currently has **very low test coverage** across b
   - ⚠️ Mocked in other tests, no dedicated unit tests
 
 ### 6. **Users Module** - 25% Coverage 🔴
+
 - **Files:** `users.service.ts`
 - **Coverage:**
   - Statements: 25% (6/24)
@@ -111,6 +119,7 @@ The ATLAS AI Incubator project currently has **very low test coverage** across b
 ## 🚨 Critical Gaps - Modules WITHOUT Tests
 
 ### Backend Services (0% Coverage)
+
 1. **Auth Module**
    - ❌ `auth.service.ts` - No tests (listed as `.spec.ts` but failing)
    - ❌ `auth.controller.ts` - No tests
@@ -147,7 +156,9 @@ The ATLAS AI Incubator project currently has **very low test coverage** across b
    - ❌ `jobs.controller.ts` - No tests
 
 ### Frontend Components (Coverage Unknown)
+
 Based on file search, **85+ component files** with minimal or no tests:
+
 - ❌ Most React components (AgentOrchestrator, Dashboard, etc.)
 - ❌ Context providers (AuthContext, etc.)
 - ❌ Complex displays (SwotDisplay, FinancialForecastDisplay, etc.)
@@ -160,6 +171,7 @@ Based on file search, **85+ component files** with minimal or no tests:
 ## 🔍 Test Files Inventory
 
 ### Backend Test Files (Existing)
+
 ```
 backend/
 ├── test/
@@ -177,6 +189,7 @@ backend/
 ```
 
 ### Frontend Test Files (Existing)
+
 ```
 root/
 ├── e2e/
@@ -194,12 +207,14 @@ root/
 All backend unit tests are **currently failing** with the same error pattern:
 
 ### Root Cause
+
 ```
 Error: Nest cannot create the AnalysisModule instance.
 The module at index [6] of the AnalysisModule "imports" array is undefined.
 ```
 
 ### Affected Tests
+
 1. `analysis.service.spec.ts` - 8 tests failing
 2. `analysis.factory.spec.ts` - Likely failing
 3. `auth.service.spec.ts` - Likely failing
@@ -207,6 +222,7 @@ The module at index [6] of the AnalysisModule "imports" array is undefined.
 5. `ventures.service.spec.ts` - Likely failing
 
 ### Issue
+
 - **Module dependency issue:** The test module setup is not correctly mocking all dependencies
 - **Impact:** Even though tests are written, they're not executing, resulting in 0% function coverage
 
@@ -215,16 +231,19 @@ The module at index [6] of the AnalysisModule "imports" array is undefined.
 ## 📈 Coverage by Category
 
 ### Well-Tested (>50% Coverage) ✅
+
 1. **Events Gateway** - 77.77%
 2. **Prisma Service** - 50%
 3. **Default Agent** - 66.66%
 
 ### Partially Tested (20-50% Coverage) 🟡
+
 1. **Analysis Agents** - 24.13%
 2. **Analysis Service/Factory** - 18.27%
 3. **Users Service** - 25%
 
 ### Almost No Coverage (<20%) 🔴
+
 1. **History Service** - 19.23%
 2. **Auth Service** - 0%
 3. **Ventures Service** - 0%
@@ -236,6 +255,7 @@ The module at index [6] of the AnalysisModule "imports" array is undefined.
 ## 🎯 Critical User Flows - Coverage Assessment
 
 ### 1. **User Authentication** 🔴 CRITICAL
+
 - **Flow:** Sign Up → Login → JWT Token → Protected Routes
 - **Coverage:**
   - `auth.service.ts`: ❌ 0%
@@ -244,6 +264,7 @@ The module at index [6] of the AnalysisModule "imports" array is undefined.
 - **Risk:** **HIGH** - Authentication bugs could lock users out
 
 ### 2. **Analysis Generation** 🟡 PARTIAL
+
 - **Flow:** Submit Business → Queue Job → Generate AI Analysis → Display Results
 - **Coverage:**
   - `analysis.service.ts`: ⚠️ 18.27% (tests failing)
@@ -253,6 +274,7 @@ The module at index [6] of the AnalysisModule "imports" array is undefined.
 - **Risk:** **MEDIUM** - Core functionality partially tested
 
 ### 3. **Venture Management** 🔴 CRITICAL
+
 - **Flow:** Create Venture → Update Details → View History
 - **Coverage:**
   - `ventures.service.ts`: ❌ 0%
@@ -261,6 +283,7 @@ The module at index [6] of the AnalysisModule "imports" array is undefined.
 - **Risk:** **HIGH** - Data integrity not verified
 
 ### 4. **Frontend User Journey** 🟡 PARTIAL
+
 - **Flow:** Login → Navigate Modules → Generate SWOT → Export
 - **Coverage:**
   - E2E test: ✅ Present (`core-flow.spec.ts`)
@@ -273,19 +296,24 @@ The module at index [6] of the AnalysisModule "imports" array is undefined.
 ## 🔨 Issues Preventing Coverage
 
 ### 1. **Frontend Coverage Tooling Missing**
+
 ```
 Error: Cannot find dependency '@vitest/coverage-v8'
 ```
+
 **Fix:**
+
 ```bash
 npm install -D @vitest/coverage-v8
 ```
 
 ### 2. **Backend Tests Failing**
+
 - **Issue:** NestJS module dependency resolution failing
 - **Fix Needed:** Review test module setup, ensure all imports are mocked
 
 ### 3. **Test Files Listed but Not Working**
+
 - `auth.service.spec.ts`
 - `users.service.spec.ts`
 - `ventures.service.spec.ts`
@@ -298,25 +326,25 @@ npm install -D @vitest/coverage-v8
 
 ### Backend - Low Coverage Files
 
-| File | Statements | Branches | Functions | Lines | Priority |
-|------|-----------|----------|-----------|-------|----------|
-| `base.agent.ts` | 9.67% | 0% | 0% | 10% | HIGH |
-| `history.service.ts` | 19.23% | 0% | 0% | 12.5% | HIGH |
-| `users.service.ts` | 25% | 0% | 0% | 18.18% | HIGH |
-| `analysis.service.ts` | 13.33% | 0% | 0% | 11.42% | CRITICAL |
-| `research.agent.ts` | 23.07% | 0% | 0% | 16.66% | HIGH |
-| `design.agent.ts` | 28.57% | 0% | 0% | 21.05% | MEDIUM |
+| File                  | Statements | Branches | Functions | Lines  | Priority |
+| --------------------- | ---------- | -------- | --------- | ------ | -------- |
+| `base.agent.ts`       | 9.67%      | 0%       | 0%        | 10%    | HIGH     |
+| `history.service.ts`  | 19.23%     | 0%       | 0%        | 12.5%  | HIGH     |
+| `users.service.ts`    | 25%        | 0%       | 0%        | 18.18% | HIGH     |
+| `analysis.service.ts` | 13.33%     | 0%       | 0%        | 11.42% | CRITICAL |
+| `research.agent.ts`   | 23.07%     | 0%       | 0%        | 16.66% | HIGH     |
+| `design.agent.ts`     | 28.57%     | 0%       | 0%        | 21.05% | MEDIUM   |
 
 ### Frontend - Untested Components (Sample)
 
-| Component | Type | Complexity | Test Status | Priority |
-|-----------|------|------------|-------------|----------|
-| `AgentOrchestrator.tsx` | Complex Logic | High | ❌ None | CRITICAL |
-| `AuthModal.tsx` | Auth Logic | High | ❌ None | HIGH |
-| `Dashboard.tsx` | Main View | High | ❌ None | HIGH |
-| `ErrorBoundary.tsx` | Error Handling | Medium | ❌ None | HIGH |
-| `SwotDisplay.tsx` | Data Display | Medium | ❌ None | MEDIUM |
-| `ExportControls.tsx` | Feature | Medium | ❌ None | MEDIUM |
+| Component               | Type           | Complexity | Test Status | Priority |
+| ----------------------- | -------------- | ---------- | ----------- | -------- |
+| `AgentOrchestrator.tsx` | Complex Logic  | High       | ❌ None     | CRITICAL |
+| `AuthModal.tsx`         | Auth Logic     | High       | ❌ None     | HIGH     |
+| `Dashboard.tsx`         | Main View      | High       | ❌ None     | HIGH     |
+| `ErrorBoundary.tsx`     | Error Handling | Medium     | ❌ None     | HIGH     |
+| `SwotDisplay.tsx`       | Data Display   | Medium     | ❌ None     | MEDIUM   |
+| `ExportControls.tsx`    | Feature        | Medium     | ❌ None     | MEDIUM   |
 
 ---
 
@@ -325,10 +353,11 @@ npm install -D @vitest/coverage-v8
 ### Immediate Actions (This Week) 🚨
 
 1. **Fix Coverage Tooling**
+
    ```bash
    # Frontend
    npm install -D @vitest/coverage-v8
-   
+
    # Backend
    npm run test:cov  # Should already work
    ```
@@ -408,24 +437,28 @@ npm install -D @vitest/coverage-v8
 ## 📋 Coverage Improvement Roadmap
 
 ### Phase 1: Foundation (Week 1-2) - Target: 40% Overall
+
 - ✅ Fix tooling issues
 - ✅ Get existing tests passing
 - ✅ Test authentication flow
 - ✅ Test core analysis service
 
 ### Phase 2: Expansion (Week 3-4) - Target: 60% Overall
+
 - ✅ Test all controllers
 - ✅ Test all services
 - ✅ Add top 10 component tests
 - ✅ Add integration tests
 
 ### Phase 3: Optimization (Week 5-8) - Target: 75% Overall
+
 - ✅ Test edge cases
 - ✅ Test error scenarios
 - ✅ Add E2E tests for all flows
 - ✅ Visual regression tests
 
 ### Phase 4: Production Ready (Week 9-12) - Target: 80%+ Overall
+
 - ✅ Achieve 80%+ coverage
 - ✅ CI/CD enforcement
 - ✅ Coverage monitoring
@@ -436,6 +469,7 @@ npm install -D @vitest/coverage-v8
 ## 🔍 Coverage Metrics to Track
 
 ### Weekly KPIs
+
 - [ ] Statement coverage %
 - [ ] Branch coverage %
 - [ ] Function coverage %
@@ -445,6 +479,7 @@ npm install -D @vitest/coverage-v8
 - [ ] Test execution time
 
 ### Quality Gates (CI/CD)
+
 ```json
 {
   "statements": 80,
@@ -459,6 +494,7 @@ npm install -D @vitest/coverage-v8
 ## 💡 Best Practices for Writing Tests
 
 ### 1. **Unit Tests**
+
 ```typescript
 // Good: Test one thing, mock dependencies
 it('should create venture if not exists', async () => {
@@ -469,6 +505,7 @@ it('should create venture if not exists', async () => {
 ```
 
 ### 2. **Integration Tests**
+
 ```typescript
 // Good: Test HTTP endpoint with real validation
 it('POST /analysis should return 400 on invalid DTO', () => {
@@ -480,6 +517,7 @@ it('POST /analysis should return 400 on invalid DTO', () => {
 ```
 
 ### 3. **E2E Tests**
+
 ```typescript
 // Good: Test complete user flow
 test('Generate SWOT flow', async ({ page }) => {
@@ -495,6 +533,7 @@ test('Generate SWOT flow', async ({ page }) => {
 ## 🎯 Success Criteria
 
 ### Minimum Coverage for Production
+
 - ✅ **Overall:** 80% statement coverage
 - ✅ **Critical Paths:** 90%+ coverage (auth, analysis generation)
 - ✅ **Services:** 85%+ coverage
@@ -503,6 +542,7 @@ test('Generate SWOT flow', async ({ page }) => {
 - ✅ **E2E:** All critical flows tested
 
 ### Quality Metrics
+
 - ✅ 0 failing tests in CI/CD
 - ✅ Test execution time < 5 minutes
 - ✅ No flaky tests (>95% pass rate)
@@ -513,6 +553,7 @@ test('Generate SWOT flow', async ({ page }) => {
 ## 📚 Resources
 
 ### Running Coverage Reports
+
 ```bash
 # Frontend
 npm run test:unit -- --coverage
@@ -526,6 +567,7 @@ cd backend && npm run test:cov
 ```
 
 ### Coverage Report Locations
+
 - **Backend HTML:** `backend/coverage/lcov-report/index.html`
 - **Backend JSON:** `backend/coverage/coverage-final.json`
 - **Backend LCOV:** `backend/coverage/lcov.info`
@@ -551,4 +593,4 @@ The ATLAS AI Incubator has a well-designed test architecture but **critically lo
 ---
 
 **Generated by Antigravity AI Assistant**  
-*Last Updated: 2025-11-21T22:38*
+_Last Updated: 2025-11-21T22:38_

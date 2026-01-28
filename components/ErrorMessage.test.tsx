@@ -37,7 +37,9 @@ describe('ErrorMessage Component', () => {
   it('should show retry button for retryable errors', () => {
     const onRetry = vi.fn();
     render(<ErrorMessage {...defaultProps} onRetry={onRetry} />);
-    expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /try again/i })
+    ).toBeInTheDocument();
   });
 
   it('should call onRetry when clicked', () => {
@@ -48,8 +50,12 @@ describe('ErrorMessage Component', () => {
   });
 
   it('should disable button when retrying', () => {
-    render(<ErrorMessage {...defaultProps} isRetrying={true} onRetry={() => {}} />);
-    expect(screen.getByRole('button', { name: /generating.../i })).toBeDisabled();
+    render(
+      <ErrorMessage {...defaultProps} isRetrying={true} onRetry={() => {}} />
+    );
+    expect(
+      screen.getByRole('button', { name: /generating.../i })
+    ).toBeDisabled();
   });
 
   it('should not show retry for empty description error', () => {

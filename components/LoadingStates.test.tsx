@@ -18,7 +18,12 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
 
       const spinner = document.querySelector('.animate-spin');
       expect(spinner).toBeInTheDocument();
-      expect(spinner).toHaveClass('w-12', 'h-12', 'border-4', 'border-brand-teal');
+      expect(spinner).toHaveClass(
+        'w-12',
+        'h-12',
+        'border-4',
+        'border-brand-teal'
+      );
     });
 
     it('should display loading text', () => {
@@ -32,7 +37,13 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
       render(<LoadingSpinner />);
 
       const container = screen.getByText('loadingTitle').closest('div');
-      expect(container).toHaveClass('flex', 'flex-col', 'items-center', 'justify-center', 'text-center');
+      expect(container).toHaveClass(
+        'flex',
+        'flex-col',
+        'items-center',
+        'justify-center',
+        'text-center'
+      );
       expect(container).toHaveClass('text-brand-light');
     });
 
@@ -104,7 +115,9 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
       render(<AnalysisSkeleton tool="overview" />);
 
       // Should have 3 column layout
-      const gridContainer = document.querySelector('.grid-cols-1.md\\:grid-cols-3');
+      const gridContainer = document.querySelector(
+        '.grid-cols-1.md\\:grid-cols-3'
+      );
       expect(gridContainer).toBeInTheDocument();
     });
 
@@ -119,7 +132,11 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
       render(<AnalysisSkeleton tool="swot" />);
 
       const firstSkeleton = document.querySelector('.animate-pulse');
-      expect(firstSkeleton).toHaveClass('bg-brand-secondary/20', 'rounded-lg', 'p-4');
+      expect(firstSkeleton).toHaveClass(
+        'bg-brand-secondary/20',
+        'rounded-lg',
+        'p-4'
+      );
       expect(firstSkeleton).toHaveClass('border', 'border-white/5');
     });
 
@@ -129,7 +146,7 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
       const textLines = document.querySelectorAll('.bg-brand-light\\/5');
       expect(textLines.length).toBeGreaterThan(0);
 
-      textLines.forEach(line => {
+      textLines.forEach((line) => {
         expect(line).toHaveClass('h-3', 'rounded', 'mb-2');
       });
     });
@@ -140,7 +157,7 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
       const headers = document.querySelectorAll('.bg-brand-light\\/10');
       expect(headers.length).toBeGreaterThan(0);
 
-      headers.forEach(header => {
+      headers.forEach((header) => {
         expect(header).toHaveClass('h-5', 'rounded', 'mb-4');
       });
     });
@@ -149,7 +166,11 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
       render(<AnalysisSkeleton tool="overview" />);
 
       const gridContainer = document.querySelector('.grid');
-      expect(gridContainer).toHaveClass('grid-cols-1', 'md:grid-cols-3', 'gap-4');
+      expect(gridContainer).toHaveClass(
+        'grid-cols-1',
+        'md:grid-cols-3',
+        'gap-4'
+      );
     });
 
     it('should render table skeleton with proper row structure', () => {
@@ -180,16 +201,31 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
 
     it('should handle all supported tool types without errors', () => {
       const supportedTools: any[] = [
-        'swot', 'pestel', 'leanCanvas', 'competitorAnalysis',
-        'budgetGenerator', 'financialForecast', 'cashFlowForecast',
-        'kpiDashboards', 'validationTracker', 'pitchDeckGenerator',
-        'investorDatabase', 'overview', 'problemValidation',
-        'research', 'expansionStrategy', 'roadmap', 'milestones',
-        'fundraisingRoadmap', 'okrWorkflow', 'ideaValidation',
-        'customerValidation', 'riskFeasibility'
+        'swot',
+        'pestel',
+        'leanCanvas',
+        'competitorAnalysis',
+        'budgetGenerator',
+        'financialForecast',
+        'cashFlowForecast',
+        'kpiDashboards',
+        'validationTracker',
+        'pitchDeckGenerator',
+        'investorDatabase',
+        'overview',
+        'problemValidation',
+        'research',
+        'expansionStrategy',
+        'roadmap',
+        'milestones',
+        'fundraisingRoadmap',
+        'okrWorkflow',
+        'ideaValidation',
+        'customerValidation',
+        'riskFeasibility',
       ];
 
-      supportedTools.forEach(tool => {
+      supportedTools.forEach((tool) => {
         expect(() => render(<AnalysisSkeleton tool={tool} />)).not.toThrow();
       });
     });
@@ -203,7 +239,7 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
       expect(skeletonBlocks.length).toBeGreaterThan(0);
 
       // All skeleton blocks should be visible
-      skeletonBlocks.forEach(block => {
+      skeletonBlocks.forEach((block) => {
         expect(block).toBeVisible();
       });
     });
@@ -216,7 +252,9 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
       expect(animatedElements.length).toBeGreaterThan(0);
 
       // Check for proper color contrast (light backgrounds)
-      const backgroundElements = document.querySelectorAll('.bg-brand-secondary\\/20');
+      const backgroundElements = document.querySelectorAll(
+        '.bg-brand-secondary\\/20'
+      );
       expect(backgroundElements.length).toBeGreaterThan(0);
     });
   });
@@ -240,7 +278,11 @@ describe('Loading States with Spinners and Skeletons (TC014)', () => {
       expect(skeletonContainer).toBeInTheDocument();
 
       // Should have proper spacing and layout
-      expect(skeletonContainer).toHaveClass('grid-cols-1', 'md:grid-cols-2', 'gap-4');
+      expect(skeletonContainer).toHaveClass(
+        'grid-cols-1',
+        'md:grid-cols-2',
+        'gap-4'
+      );
     });
 
     it('should maintain layout consistency between skeleton and loaded states', () => {

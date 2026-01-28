@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { ReportsService } from './reports.service';
@@ -56,7 +55,10 @@ describe('ReportsService', () => {
 
   describe('generatePDFReport', () => {
     it('should generate PDF from analysis data', async () => {
-      const result = await service.generatePDFReport('analysis-123', 'user-123');
+      const result = await service.generatePDFReport(
+        'analysis-123',
+        'user-123'
+      );
       expect(result).toBeDefined();
       expect(result.toString()).toBe('mock-pdf-content');
     });
@@ -64,8 +66,9 @@ describe('ReportsService', () => {
     it('should throw NotFoundException if analysis not found', async () => {
       prismaService.analysis.findUnique.mockResolvedValue(null);
 
-      await expect(service.generatePDFReport('non-existent', 'user-123'))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.generatePDFReport('non-existent', 'user-123')
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException if user does not own the analysis', async () => {
@@ -74,14 +77,18 @@ describe('ReportsService', () => {
         venture: { userId: 'other-user' },
       });
 
-      await expect(service.generatePDFReport('analysis-123', 'user-123'))
-        .rejects.toThrow(ForbiddenException);
+      await expect(
+        service.generatePDFReport('analysis-123', 'user-123')
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
   describe('generateHTMLReport', () => {
     it('should include properly formatted SWOT sections', async () => {
-      const result = await service.generateHTMLReport('analysis-123', 'user-123');
+      const result = await service.generateHTMLReport(
+        'analysis-123',
+        'user-123'
+      );
       expect(result).toContain('<h2>STRENGTHS</h2>');
       expect(result).toContain('<h2>WEAKNESSES</h2>');
     });
@@ -89,8 +96,9 @@ describe('ReportsService', () => {
     it('should throw NotFoundException if analysis not found', async () => {
       prismaService.analysis.findUnique.mockResolvedValue(null);
 
-      await expect(service.generateHTMLReport('non-existent', 'user-123'))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.generateHTMLReport('non-existent', 'user-123')
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException if unauthorized', async () => {
@@ -99,8 +107,9 @@ describe('ReportsService', () => {
         venture: { userId: 'other-user' },
       });
 
-      await expect(service.generateHTMLReport('analysis-123', 'user-123'))
-        .rejects.toThrow(ForbiddenException);
+      await expect(
+        service.generateHTMLReport('analysis-123', 'user-123')
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -117,8 +126,9 @@ describe('ReportsService', () => {
     it('should throw NotFoundException if analysis not found', async () => {
       prismaService.analysis.findUnique.mockResolvedValue(null);
 
-      await expect(service.exportAsJSON('non-existent', 'user-123'))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.exportAsJSON('non-existent', 'user-123')
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ForbiddenException if unauthorized', async () => {
@@ -127,8 +137,9 @@ describe('ReportsService', () => {
         venture: { userId: 'other-user' },
       });
 
-      await expect(service.exportAsJSON('analysis-123', 'user-123'))
-        .rejects.toThrow(ForbiddenException);
+      await expect(
+        service.exportAsJSON('analysis-123', 'user-123')
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -140,7 +151,11 @@ describe('ReportsService', () => {
         style: { fontFamily: 'Arial', primaryColor: '#000' },
       };
 
-      const result = await service.generateCustomReport('analysis-123', template, 'user-123');
+      const result = await service.generateCustomReport(
+        'analysis-123',
+        template,
+        'user-123'
+      );
 
       expect(result).toContain('<h1>Custom Report</h1>');
       expect(result).toContain('<h2>STRENGTHS</h2>');
@@ -151,7 +166,11 @@ describe('ReportsService', () => {
       prismaService.analysis.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.generateCustomReport('non-existent', { title: 'Test' }, 'user-123')
+        service.generateCustomReport(
+          'non-existent',
+          { title: 'Test' },
+          'user-123'
+        )
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -162,7 +181,11 @@ describe('ReportsService', () => {
       });
 
       await expect(
-        service.generateCustomReport('analysis-123', { title: 'Test' }, 'user-123')
+        service.generateCustomReport(
+          'analysis-123',
+          { title: 'Test' },
+          'user-123'
+        )
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -172,7 +195,10 @@ describe('ReportsService', () => {
       prismaService.analysis.findUnique
         .mockResolvedValueOnce(mockAnalysis)
         .mockRejectedValueOnce(new Error('Not found'));
-      const results = await service.batchGeneratePDFs(['analysis-1', 'analysis-2'], 'user-123');
+      const results = await service.batchGeneratePDFs(
+        ['analysis-1', 'analysis-2'],
+        'user-123'
+      );
       expect(results).toEqual([
         { id: 'analysis-1', success: true },
         { id: 'analysis-2', success: false, error: 'Not found' },
@@ -188,7 +214,7 @@ describe('ReportsService', () => {
       );
 
       expect(results).toHaveLength(3);
-      expect(results.every(r => r.success)).toBe(true);
+      expect(results.every((r) => r.success)).toBe(true);
     });
   });
 });

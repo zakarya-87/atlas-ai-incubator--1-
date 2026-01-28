@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Header from './Header';
@@ -28,16 +27,64 @@ interface LayoutProps {
 }
 
 const tourSteps: TourStep[] = [
-  { titleKey: 'tourWelcomeTitle', contentKey: 'tourWelcomeContent', placement: 'center' },
-  { target: '#sidebar-nav', titleKey: 'tourSidebarTitle', contentKey: 'tourSidebarContent', placement: 'right' },
-  { target: '#sub-nav', titleKey: 'tourSubNavTitle', contentKey: 'tourSubNavContent', placement: 'bottom' },
-  { target: '#business-description-input', titleKey: 'tourInputTitle', contentKey: 'tourInputContent', placement: 'bottom' },
-  { target: '#generate-button', titleKey: 'tourGenerateTitle', contentKey: 'tourGenerateContent', placement: 'left' },
-  { target: '#export-content-area', titleKey: 'tourOutputTitle', contentKey: 'tourOutputContent', placement: 'top' },
-  { target: '#export-controls', titleKey: 'tourExportTitle', contentKey: 'tourExportContent', placement: 'left' },
-  { target: '#search-bar', titleKey: 'tourSearchTitle', contentKey: 'tourSearchContent', placement: 'bottom' },
-  { target: '#language-switcher', titleKey: 'tourLanguageTitle', contentKey: 'tourLanguageContent', placement: 'bottom' },
-  { titleKey: 'tourEndTitle', contentKey: 'tourEndContent', placement: 'center' },
+  {
+    titleKey: 'tourWelcomeTitle',
+    contentKey: 'tourWelcomeContent',
+    placement: 'center',
+  },
+  {
+    target: '#sidebar-nav',
+    titleKey: 'tourSidebarTitle',
+    contentKey: 'tourSidebarContent',
+    placement: 'right',
+  },
+  {
+    target: '#sub-nav',
+    titleKey: 'tourSubNavTitle',
+    contentKey: 'tourSubNavContent',
+    placement: 'bottom',
+  },
+  {
+    target: '#business-description-input',
+    titleKey: 'tourInputTitle',
+    contentKey: 'tourInputContent',
+    placement: 'bottom',
+  },
+  {
+    target: '#generate-button',
+    titleKey: 'tourGenerateTitle',
+    contentKey: 'tourGenerateContent',
+    placement: 'left',
+  },
+  {
+    target: '#export-content-area',
+    titleKey: 'tourOutputTitle',
+    contentKey: 'tourOutputContent',
+    placement: 'top',
+  },
+  {
+    target: '#export-controls',
+    titleKey: 'tourExportTitle',
+    contentKey: 'tourExportContent',
+    placement: 'left',
+  },
+  {
+    target: '#search-bar',
+    titleKey: 'tourSearchTitle',
+    contentKey: 'tourSearchContent',
+    placement: 'bottom',
+  },
+  {
+    target: '#language-switcher',
+    titleKey: 'tourLanguageTitle',
+    contentKey: 'tourLanguageContent',
+    placement: 'bottom',
+  },
+  {
+    titleKey: 'tourEndTitle',
+    contentKey: 'tourEndContent',
+    placement: 'center',
+  },
 ];
 
 const Layout: React.FC<LayoutProps> = ({
@@ -54,19 +101,26 @@ const Layout: React.FC<LayoutProps> = ({
   onReturnToWorkspace,
   timestamp,
   isFocusMode,
-  onToggleFocusMode
+  onToggleFocusMode,
 }) => {
   const { t } = useLanguage();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleStartTour = useCallback(() => setIsTourOpen(true), [setIsTourOpen]);
+  const handleStartTour = useCallback(
+    () => setIsTourOpen(true),
+    [setIsTourOpen]
+  );
   const handleShareClick = useCallback(() => setIsShareModalOpen(true), []);
-  const toggleSidebar = useCallback(() => setIsSidebarOpen(prev => !prev), []);
+  const toggleSidebar = useCallback(
+    () => setIsSidebarOpen((prev) => !prev),
+    []
+  );
 
   return (
-    <div className={`min-h-screen bg-brand-primary transition-all duration-300 ${isTourOpen ? 'overflow-hidden' : ''}`}>
-
+    <div
+      className={`min-h-screen bg-brand-primary transition-all duration-300 ${isTourOpen ? 'overflow-hidden' : ''}`}
+    >
       {/* Focus Mode Exit Button */}
       <AnimatePresence>
         {isFocusMode && (
@@ -77,8 +131,19 @@ const Layout: React.FC<LayoutProps> = ({
             onClick={onToggleFocusMode}
             className="fixed top-4 right-4 z-[60] px-4 py-2 bg-brand-secondary/90 backdrop-blur-md border border-brand-accent/50 rounded-full text-brand-text hover:text-white text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-brand-accent/50 transition-all"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
             Exit Focus
           </motion.button>
@@ -125,19 +190,23 @@ const Layout: React.FC<LayoutProps> = ({
                   x: 0,
                   opacity: 1,
                   width: 'auto',
-                  transition: { duration: 0.3 }
+                  transition: { duration: 0.3 },
                 }}
                 exit={{ x: -280, opacity: 0 }}
                 className={`fixed md:relative z-40 h-[calc(100vh-4rem)] ${isSidebarOpen ? 'block' : 'hidden md:block'}`}
               >
-                <SidebarNav activeModule={activeModule} onModuleChange={onModuleChange} />
+                <SidebarNav
+                  activeModule={activeModule}
+                  onModuleChange={onModuleChange}
+                />
               </motion.div>
             </>
           )}
         </AnimatePresence>
 
-        <main className={`flex-1 transition-all duration-300 ${!isFocusMode ? 'md:ml-20 rtl:md:ml-0 rtl:md:mr-20 pb-20 md:pb-0' : 'p-4 md:p-8'}`}>
-
+        <main
+          className={`flex-1 transition-all duration-300 ${!isFocusMode ? 'md:ml-20 rtl:md:ml-0 rtl:md:mr-20 pb-20 md:pb-0' : 'p-4 md:p-8'}`}
+        >
           {!isFocusMode && <Hero activeModule={activeModule} />}
 
           <AnimatePresence>
@@ -148,7 +217,14 @@ const Layout: React.FC<LayoutProps> = ({
                 exit={{ y: -50, opacity: 0 }}
                 className="sticky top-16 z-30 bg-yellow-500/10 text-yellow-300 p-2 text-center text-sm font-semibold border-b border-yellow-500/30"
               >
-                Viewing historical version from {timestamp ? new Date(timestamp).toLocaleString() : 'Unknown'} | <button onClick={onReturnToWorkspace} className="underline hover:text-white">Return to Workspace</button>
+                Viewing historical version from{' '}
+                {timestamp ? new Date(timestamp).toLocaleString() : 'Unknown'} |{' '}
+                <button
+                  onClick={onReturnToWorkspace}
+                  className="underline hover:text-white"
+                >
+                  Return to Workspace
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -167,17 +243,33 @@ const Layout: React.FC<LayoutProps> = ({
             )}
           </AnimatePresence>
 
-          <div className={`container mx-auto px-4 sm:px-6 lg:px-8 ${isFocusMode ? 'max-w-5xl' : ''}`}>
+          <div
+            className={`container mx-auto px-4 sm:px-6 lg:px-8 ${isFocusMode ? 'max-w-5xl' : ''}`}
+          >
             {children}
           </div>
         </main>
       </div>
 
       <AnimatePresence>
-        {isTourOpen && <OnboardingTour steps={tourSteps} onFinish={() => { setIsTourOpen(false); localStorage.setItem('atlas-ai-tour-complete', 'true'); }} />}
+        {isTourOpen && (
+          <OnboardingTour
+            steps={tourSteps}
+            onFinish={() => {
+              setIsTourOpen(false);
+              localStorage.setItem('atlas-ai-tour-complete', 'true');
+            }}
+          />
+        )}
       </AnimatePresence>
-      <ShareModal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} />
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+      />
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </div>
   );
 };

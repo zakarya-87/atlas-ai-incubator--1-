@@ -9,7 +9,7 @@ export class HealthController {
     return {
       status: 'ok',
       timestamp: new Date().toISOString(),
-      message: 'ATLAS AI Backend is running'
+      message: 'ATLAS AI Backend is running',
     };
   }
 }

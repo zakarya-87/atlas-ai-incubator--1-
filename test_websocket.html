@@ -1,50 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
+  <head>
     <title>WebSocket Test</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <h1>WebSocket Connection Test</h1>
     <p id="status">Connecting to WebSocket...</p>
     <p id="logs"></p>
 
     <script>
-        const socket = io('http://localhost:3000', {
-            transports: ['websocket', 'polling'],
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000,
-        });
+      const socket = io('http://localhost:3000', {
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+      });
 
-        socket.on('connect', () => {
-            document.getElementById('status').textContent = '✅ WebSocket connected successfully!';
-            document.getElementById('status').style.color = 'green';
-            console.log('WebSocket connected:', socket.id);
-        });
+      socket.on('connect', () => {
+        document.getElementById('status').textContent =
+          '✅ WebSocket connected successfully!';
+        document.getElementById('status').style.color = 'green';
+        console.log('WebSocket connected:', socket.id);
+      });
 
-        socket.on('connect_error', (error) => {
-            document.getElementById('status').textContent = '❌ WebSocket connection failed: ' + error.message;
-            document.getElementById('status').style.color = 'red';
-            console.error('WebSocket connection error:', error);
-        });
+      socket.on('connect_error', (error) => {
+        document.getElementById('status').textContent =
+          '❌ WebSocket connection failed: ' + error.message;
+        document.getElementById('status').style.color = 'red';
+        console.error('WebSocket connection error:', error);
+      });
 
-        socket.on('disconnect', (reason) => {
-            document.getElementById('status').textContent = '⚠️ WebSocket disconnected: ' + reason;
-            document.getElementById('status').style.color = 'orange';
-            console.log('WebSocket disconnected:', reason);
-        });
+      socket.on('disconnect', (reason) => {
+        document.getElementById('status').textContent =
+          '⚠️ WebSocket disconnected: ' + reason;
+        document.getElementById('status').style.color = 'orange';
+        console.log('WebSocket disconnected:', reason);
+      });
 
-        socket.on('agentLog', (log) => {
-            const logsDiv = document.getElementById('logs');
-            logsDiv.innerHTML += '<p>Received log: ' + JSON.stringify(log) + '</p>';
-            console.log('Received agent log:', log);
-        });
+      socket.on('agentLog', (log) => {
+        const logsDiv = document.getElementById('logs');
+        logsDiv.innerHTML += '<p>Received log: ' + JSON.stringify(log) + '</p>';
+        console.log('Received agent log:', log);
+      });
 
-        // Test joining a room
-        setTimeout(() => {
-            socket.emit('joinRoom', 'test-room');
-            document.getElementById('logs').innerHTML += '<p>Joined room: test-room</p>';
-        }, 2000);
+      // Test joining a room
+      setTimeout(() => {
+        socket.emit('joinRoom', 'test-room');
+        document.getElementById('logs').innerHTML +=
+          '<p>Joined room: test-room</p>';
+      }, 2000);
     </script>
-</body>
+  </body>
 </html>

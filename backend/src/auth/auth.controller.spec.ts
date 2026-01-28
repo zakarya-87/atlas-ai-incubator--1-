@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -61,7 +60,7 @@ describe('AuthController', () => {
       const result = await controller.signIn(dto, mockResponse);
 
       expect(authService.signIn).toHaveBeenCalledWith(dto);
-      expect(result).toEqual({ success: true });
+      expect(result).toEqual({ success: true, access_token: 'mock-token' });
       expect(mockResponse.cookie).toHaveBeenCalledWith(
         'accessToken',
         'mock-token',
@@ -99,7 +98,9 @@ describe('AuthController', () => {
         password: 'wrongpassword',
       };
 
-      await expect(controller.signIn(dto, mockResponse)).rejects.toThrow('Invalid credentials');
+      await expect(controller.signIn(dto, mockResponse)).rejects.toThrow(
+        'Invalid credentials'
+      );
     });
   });
 

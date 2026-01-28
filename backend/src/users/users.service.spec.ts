@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -105,7 +104,9 @@ describe('UsersService', () => {
       const hashedPassword = 'hashed_mock_password';
 
       (bcrypt.genSalt as ReturnType<typeof jest.fn>).mockResolvedValue(salt);
-      (bcrypt.hash as ReturnType<typeof jest.fn>).mockResolvedValue(hashedPassword);
+      (bcrypt.hash as ReturnType<typeof jest.fn>).mockResolvedValue(
+        hashedPassword
+      );
       prismaService.user.create.mockResolvedValue({
         id: 'new-user-id',
         email,
@@ -137,7 +138,7 @@ describe('UsersService', () => {
           data: expect.objectContaining({
             credits: 5,
           }),
-        }),
+        })
       );
     });
   });
@@ -168,7 +169,9 @@ describe('UsersService', () => {
       const hashedPassword = 'new_hashed_password';
 
       (bcrypt.genSalt as ReturnType<typeof jest.fn>).mockResolvedValue(salt);
-      (bcrypt.hash as ReturnType<typeof jest.fn>).mockResolvedValue(hashedPassword);
+      (bcrypt.hash as ReturnType<typeof jest.fn>).mockResolvedValue(
+        hashedPassword
+      );
       prismaService.user.update.mockResolvedValue({
         ...mockUser,
         password: hashedPassword,
@@ -189,7 +192,9 @@ describe('UsersService', () => {
       const updateDto = { fullName: 'Jane Doe', password: 'newPass456' };
 
       (bcrypt.genSalt as ReturnType<typeof jest.fn>).mockResolvedValue('salt');
-      (bcrypt.hash as ReturnType<typeof jest.fn>).mockResolvedValue('hashed_new_pass');
+      (bcrypt.hash as ReturnType<typeof jest.fn>).mockResolvedValue(
+        'hashed_new_pass'
+      );
       prismaService.user.update.mockResolvedValue({});
 
       await service.updateUser(userId, updateDto);
@@ -235,10 +240,10 @@ describe('UsersService', () => {
       prismaService.user.findUnique.mockResolvedValue(userWithNoCredits);
 
       await expect(service.checkAndDeductCredits('user-123')).rejects.toThrow(
-        ForbiddenException,
+        ForbiddenException
       );
       await expect(service.checkAndDeductCredits('user-123')).rejects.toThrow(
-        'Insufficient credits. Please upgrade to Pro to continue generating insights.',
+        'Insufficient credits. Please upgrade to Pro to continue generating insights.'
       );
       expect(prismaService.user.update).not.toHaveBeenCalled();
     });
@@ -248,7 +253,7 @@ describe('UsersService', () => {
       prismaService.user.findUnique.mockResolvedValue(userWithNegativeCredits);
 
       await expect(service.checkAndDeductCredits('user-123')).rejects.toThrow(
-        ForbiddenException,
+        ForbiddenException
       );
     });
 

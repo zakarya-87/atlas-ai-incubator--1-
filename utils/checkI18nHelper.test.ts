@@ -7,7 +7,9 @@ describe('readLocales helper (i18n)', () => {
 
   it.todo('should list only .ts locale files and ignore non-TS files');
   it.todo('should derive locale keys from filenames');
-  it.todo('should strip the "export default" prefix and collect remaining content');
+  it.todo(
+    'should strip the "export default" prefix and collect remaining content'
+  );
   it.todo('should handle whitespace around export statement');
   it.todo('should store raw content unchanged if missing export default');
   it.todo('should produce object keyed by locale code with string values');
