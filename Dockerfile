@@ -1,0 +1,47 @@
+# Build stage
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy source and build
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+# Install curl for health checks
+RUN apk add --no-cache curl
+
+# Create non-root user for security
+RUN addgroup -g 101 -S nginx-user && \
+    adduser -S -u 101 -G nginx-user nginx-user
+
+# Copy build artifacts to nginx public directory
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy custom nginx config if exists, else use default
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Set proper ownership
+RUN chown -R nginx-user:nginx-user /usr/share/nginx/html && \
+    chown -R nginx-user:nginx-user /var/cache/nginx && \
+    chown -R nginx-user:nginx-user /var/log/nginx && \
+    chown -R nginx-user:nginx-user /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx-user:nginx-user /var/run/nginx.pid
+
+# Switch to non-root user
+USER nginx-user
+
+EXPOSE 80
+
+# Health check for nginx
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]
