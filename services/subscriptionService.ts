@@ -1,7 +1,9 @@
+import { STORAGE_KEYS } from '../utils/constants';
+
 const BACKEND_URL =
   (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000';
 
-const getAuthToken = () => localStorage.getItem('atlas_auth_token') || '';
+const getAuthToken = () => localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN) || '';
 
 export const createCheckoutSession = async (
   planId: string
@@ -13,6 +15,7 @@ export const createCheckoutSession = async (
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
+    credentials: 'include',
     body: JSON.stringify({ planId }),
   });
 
@@ -27,6 +30,7 @@ export const createPortalSession = async (): Promise<{ url: string }> => {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    credentials: 'include',
   });
 
   if (!response.ok) throw new Error('Failed to create portal session');
@@ -40,6 +44,7 @@ export const getSubscriptionStatus = async (): Promise<{
   const token = getAuthToken();
   const response = await fetch(`${BACKEND_URL}/subscriptions/status`, {
     headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
 
   if (!response.ok) return { status: 'free', plan: 'basic' };

@@ -40,6 +40,7 @@ export async function submitAnalysisJob(payload: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
+    credentials: 'include',
     body: JSON.stringify(payload),
   });
 
@@ -62,6 +63,7 @@ export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
     headers: {
       Authorization: `Bearer ${token}`,
     },
+    credentials: 'include',
   });
 
   if (!response.ok) {
