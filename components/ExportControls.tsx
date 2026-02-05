@@ -374,6 +374,7 @@ const ExportControls: React.FC<ExportControlsProps> = ({
           whileTap={{ scale: 0.95 }}
           className="flex items-center justify-center w-14 h-14 bg-brand-teal rounded-full shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-primary focus:ring-brand-teal"
           aria-label="Export"
+          tabIndex={0}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

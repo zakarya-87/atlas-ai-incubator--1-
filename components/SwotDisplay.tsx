@@ -35,8 +35,8 @@ const SwotQuadrant: React.FC<SwotQuadrantProps> = ({
 
   const handleStartEdit = (index: number) => {
     setEditingIndex(index);
-    setEditedPoint(points[index].point);
-    setEditedExplanation(points[index].explanation);
+    setEditedPoint(points?.[index]?.point || '');
+    setEditedExplanation(points?.[index]?.explanation || '');
   };
 
   const handleCancelEdit = () => {
@@ -44,10 +44,10 @@ const SwotQuadrant: React.FC<SwotQuadrantProps> = ({
   };
 
   const handleToggleComplete = (index: number) => {
-    if (editingIndex !== null) return; // Don't allow toggling while editing
+    if (editingIndex !== null || !points) return; // Don't allow toggling while editing or if points is undefined
 
-    const updatedPoints = [...points];
-    const currentPoint = { ...updatedPoints[index] };
+    const updatedPoints = [...(points || [])];
+    const currentPoint = { ...(updatedPoints[index] || {}) };
     currentPoint.completed = !currentPoint.completed;
     updatedPoints[index] = currentPoint;
 
@@ -60,9 +60,9 @@ const SwotQuadrant: React.FC<SwotQuadrantProps> = ({
   };
 
   const handleSaveEdit = () => {
-    if (editingIndex === null) return;
+    if (editingIndex === null || !points) return;
 
-    const updatedPoints = [...points];
+    const updatedPoints = [...(points || [])];
     updatedPoints[editingIndex] = {
       ...updatedPoints[editingIndex],
       point: editedPoint.trim(),
@@ -90,7 +90,7 @@ const SwotQuadrant: React.FC<SwotQuadrantProps> = ({
         <h3 className={`text-xl font-bold ${textColorClass}`}>{title}</h3>
       </div>
       <ul className="space-y-3 text-brand-text/90 flex-grow">
-        {points.map((item, index) => (
+        {(points || []).map((item, index) => (
           <li
             key={index}
             className="text-sm leading-relaxed group relative p-2 -m-2 rounded-md hover:bg-white/5 transition-colors grid"
@@ -308,6 +308,24 @@ const containerVariants = {
 
 const SwotDisplay: React.FC<SwotDisplayProps> = ({ data, onUpdate }) => {
   const { t } = useLanguage();
+
+  // Handle undefined, null, non-object, or array data gracefully
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('strengths' in data)) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No analysis data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       variants={containerVariants}
@@ -318,7 +336,7 @@ const SwotDisplay: React.FC<SwotDisplayProps> = ({ data, onUpdate }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <SwotQuadrant
           title={t('swotStrengths')}
-          points={data.strengths}
+          points={data.strengths || []}
           icon={icons.strengths}
           bgColorClass="bg-green-500/5"
           textColorClass="text-green-400"
@@ -328,7 +346,7 @@ const SwotDisplay: React.FC<SwotDisplayProps> = ({ data, onUpdate }) => {
         />
         <SwotQuadrant
           title={t('swotWeaknesses')}
-          points={data.weaknesses}
+          points={data.weaknesses || []}
           icon={icons.weaknesses}
           bgColorClass="bg-yellow-500/5"
           textColorClass="text-yellow-400"
@@ -338,7 +356,7 @@ const SwotDisplay: React.FC<SwotDisplayProps> = ({ data, onUpdate }) => {
         />
         <SwotQuadrant
           title={t('swotOpportunities')}
-          points={data.opportunities}
+          points={data.opportunities || []}
           icon={icons.opportunities}
           bgColorClass="bg-blue-500/5"
           textColorClass="text-blue-400"
@@ -348,7 +366,7 @@ const SwotDisplay: React.FC<SwotDisplayProps> = ({ data, onUpdate }) => {
         />
         <SwotQuadrant
           title={t('swotThreats')}
-          points={data.threats}
+          points={data.threats || []}
           icon={icons.threats}
           bgColorClass="bg-red-500/5"
           textColorClass="text-red-400"

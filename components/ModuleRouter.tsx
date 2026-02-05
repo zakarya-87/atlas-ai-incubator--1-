@@ -116,6 +116,7 @@ interface ModuleRouterProps {
   onViewHistory: (record: GenerationRecord) => void;
   onDeleteHistory: (id: string) => void;
   onNavigate: (module: ModuleType, tool: AnyTool) => void;
+  onAnalysisResult?: (result: { jobId: string; result: AnyAnalysisData }) => void;
 }
 
 // Wrapper for Lazy Loaded Content defined outside to avoid recreation and fix type inference
@@ -151,6 +152,7 @@ const ModuleRouter = (props: ModuleRouterProps) => {
     onViewHistory,
     onDeleteHistory,
     onNavigate,
+    onAnalysisResult,
   } = props;
 
   // --- 1. Sub Navigation Rendering ---
@@ -214,7 +216,11 @@ const ModuleRouter = (props: ModuleRouterProps) => {
   const renderContent = () => {
     if (isLoading)
       return (
-        <AgentOrchestrator activeTool={activeTool} ventureId={ventureId} />
+        <AgentOrchestrator
+          activeTool={activeTool}
+          ventureId={ventureId}
+          onAnalysisResult={onAnalysisResult}
+        />
       );
     if (error)
       return (
@@ -280,15 +286,15 @@ const ModuleRouter = (props: ModuleRouterProps) => {
             onSave={(data) =>
               onSaveVersion(
                 viewingHistoryRecord ||
-                  ({
-                    id: 'temp-id',
-                    timestamp: new Date().toISOString(),
-                    module: 'fundamentals',
-                    tool: 'experimentBuilder',
-                    toolNameKey: 'fundamentalsNavExperimentBuilder',
-                    inputDescription: 'Experiment Board',
-                    data: { columns: [] },
-                  } as GenerationRecord),
+                ({
+                  id: 'temp-id',
+                  timestamp: new Date().toISOString(),
+                  module: 'fundamentals',
+                  tool: 'experimentBuilder',
+                  toolNameKey: 'fundamentalsNavExperimentBuilder',
+                  inputDescription: 'Experiment Board',
+                  data: { columns: [] },
+                } as GenerationRecord),
                 data,
                 `Saved board from ${new Date().toLocaleTimeString()}`
               )

@@ -6,6 +6,14 @@ import { AuthContext } from '../context/AuthContext';
 import { LanguageContext } from '../context/LanguageContext';
 import { ToastProvider } from '../context/ToastContext';
 
+// Mock authService to prevent console errors
+vi.mock('../services/authService', () => ({
+  fetchUserProfile: vi.fn().mockResolvedValue({
+    credits: 5,
+    subscriptionStatus: 'free'
+  })
+}));
+
 describe('Header Component', () => {
   const mockAuthContext = {
     user: { id: '1', name: 'Test User', email: 'test@example.com' },

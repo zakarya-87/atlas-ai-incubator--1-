@@ -154,7 +154,7 @@ const CompetitorAnalysisDisplay: React.FC<{ data: CompetitorAnalysisData }> = ({
               </tr>
             </thead>
             <tbody>
-              {data.competitors.map((c, index) => (
+              {(data?.competitors || []).map((c, index) => (
                 <motion.tr
                   key={index}
                   variants={itemVariants}

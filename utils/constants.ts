@@ -26,7 +26,7 @@ export const STORAGE_KEYS = {
 export const API_CONFIG = {
   BACKEND_URL:
     (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000',
-  REQUEST_TIMEOUT: 120000, // 2 minutes - Gemini Pro can take longer for complex analyses
+  REQUEST_TIMEOUT: 300000, // 5 minutes - Increased for complex AI analyses
   RETRY_ATTEMPTS: 2,
   RETRY_DELAY: 2000, // 2 seconds
 } as const;
@@ -39,7 +39,7 @@ export const WS_CONFIG = {
   RECONNECT_ATTEMPTS: 5,
   RECONNECT_DELAY: 2000, // 2 seconds
   HEARTBEAT_INTERVAL: 30000, // 30 seconds
-  CONNECTION_TIMEOUT: 10000, // 10 seconds
+  CONNECTION_TIMEOUT: 60000, // 60 seconds - Increased for long-running AI analyses
 } as const;
 
 // ==========================================

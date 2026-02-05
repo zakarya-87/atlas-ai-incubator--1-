@@ -38,6 +38,9 @@ describe('AnalysisService', () => {
     jest.clearAllMocks();
     // Mock implementations
     prismaService = {
+      user: {
+        findUnique: jest.fn().mockResolvedValue({ id: 'user-123', role: 'USER' }),
+      },
       venture: {
         findUnique: jest.fn(),
         create: jest.fn(),

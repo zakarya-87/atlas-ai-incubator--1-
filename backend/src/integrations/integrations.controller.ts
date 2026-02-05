@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
 
 import { IntegrationsService } from './integrations.service';
 import { GetUser } from '../auth/get-user.decorator';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { User } from '@prisma/client';
 import { IsBoolean, IsString, IsNotEmpty } from 'class-validator';
 
@@ -19,6 +20,7 @@ class ToggleIntegrationDto {
 }
 
 @Controller('integrations')
+@UseGuards(JwtAuthGuard)
 export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
 

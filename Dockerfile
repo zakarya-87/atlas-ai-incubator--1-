@@ -17,9 +17,9 @@ FROM nginx:alpine
 # Install curl for health checks
 RUN apk add --no-cache curl
 
-# Create non-root user for security
-RUN addgroup -g 101 -S nginx-user && \
-    adduser -S -u 101 -G nginx-user nginx-user
+# Create non-root user for security (using GID/UID 1001 to avoid conflicts with existing nginx user)
+RUN addgroup -g 1001 -S nginx-user && \
+    adduser -S -u 1001 -G nginx-user nginx-user
 
 # Copy build artifacts to nginx public directory
 COPY --from=build /app/dist /usr/share/nginx/html

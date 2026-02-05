@@ -1,0 +1,109 @@
+{
+  "summary": {
+    "test_suite": "TestSprite MCP",
+    "project": "ATLAS AI Incubator",
+    "execution_date": "2026-02-02T14:50:52.942912",
+    "category": "error_handling",
+    "total_tests": 6,
+    "passed": 4,
+    "failed": 2,
+    "timeout": 0,
+    "error": 0,
+    "recovery_success": 4,
+    "success_rate": 66.66666666666666,
+    "coverage_threshold": 80.0,
+    "coverage_met": false,
+    "total_duration": 2.259256362915039,
+    "status": "FAILED"
+  },
+  "category_breakdown": {
+    "error_handling": {
+      "category": "error_handling",
+      "total": 6,
+      "passed": 4,
+      "failed": 2,
+      "timeout": 0,
+      "error": 0,
+      "skipped": 0,
+      "duration": 2.259256362915039,
+      "success_rate": 66.66666666666666
+    }
+  },
+  "test_results": [
+    {
+      "test_id": "EH001_network_failures",
+      "category": "error_handling",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH001_network_failures.py",
+      "status": "PASSED",
+      "duration": 1.071272850036621,
+      "error": null,
+      "output": "activation\n      Mechanism working: True\n  [OK] PASS [RECOVERY] RECOVERY OK Retry: Service recovery detection\n      Mechanism working: True\n\n======================================================================\nEH001 SUMMARY\n======================================================================\nTotal Tests: 21\nPassed: 21 [OK]\nFailed: 0 [FAIL]\nSuccess Rate: 100.0%\n\nRecovery Mechanisms:\n  Successful: 21 [RECOVERY]\n  Failed: 0\n======================================================================\n",
+      "recovery_success": true,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EH002_api_errors",
+      "category": "error_handling",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH002_api_errors.py",
+      "status": "PASSED",
+      "duration": 0.5083487033843994,
+      "error": null,
+      "output": "COVERY] Slow response times\n     Degradation handled: True\n  [OK] [RECOVERY] Circuit breaker open\n     Degradation handled: True\n  [OK] [RECOVERY] Fallback service active\n     Degradation handled: True\n\n======================================================================\nEH002 SUMMARY\n======================================================================\nTotal: 20\nPassed: 20 [OK]\nFailed: 0 [FAIL]\nRecovery OK: 20 [RECOVERY]\n======================================================================\n",
+      "recovery_success": true,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EH003_database_errors",
+      "category": "error_handling",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH003_database_errors.py",
+      "status": "FAILED",
+      "duration": 0.1555039882659912,
+      "error": "\n======================================================================\nEH003: Database Error Handling\n======================================================================\n\n[TEST] Database Connection Failures\n  [OK] [RECOVERY] Connection: Pool exhaustion\n     Recovery: True\n  [OK] [RECOVERY] Connection: Network partition\n     Recovery: True\n  [FAIL] Connection: Auth failure\n     Recovery: False\n  [OK] [RECOVERY] Connection: SSL error\n     Recovery: True\n  [OK] [RECOVERY] Connection: Timeout\n     Recovery: True\n\n[TEST] Constraint Violations\n  [OK] [RECOVERY] Constraint: Unique email\n     Handled: True\n  [OK] [RECOVERY] Constraint: Unique venture name\n     Handled: True\n  [OK] [RECOVERY] Constraint: Foreign key\n     Handled: True\n  [OK] [RECOVERY] Constraint: Not null\n     Handled: True\n  [OK] [RECOVERY] Constraint: Check constraint\n     Handled: True\n\n[TEST] Transaction Failures\n  [OK] [RECOVERY] Transaction: Deadlock\n     Recovery: True\n  [OK] [RECOVERY] Transaction: Lock timeout\n     Recovery: True\n  [OK] Transaction: Rollback failure\n     Recovery: False\n  [OK] [RECOVERY] Transaction: Partial commit\n     Recovery: True\n  [OK] [RECOVERY] Transaction: Serialization failure\n     Recovery: True\n\n[TEST] Query Failures\n  [OK] [RECOVERY] Query: Syntax error\n     Handled: True\n  [OK] [RECOVERY] Query: Table not found\n     Handled: True\n  [OK] [RECOVERY] Query: Column not found\n     Handled: True\n  [OK] [RECOVERY] Query: Data type mismatch\n     Handled: True\n  [OK] [RECOVERY] Query: Query timeout\n     Handled: True\n\n[TEST] Migration Errors\n  [OK] [RECOVERY] Migration: Migration lock\n     Handled: True\n  [OK] [RECOVERY] Migration: Failed migration\n     Handled: True\n  [OK] [RECOVERY] Migration: Schema drift\n     Handled: True\n  [OK] [RECOVERY] Migration: Version conflict\n     Handled: True\n\n======================================================================\nEH003 SUMMARY\n======================================================================\nTotal: 24\nPassed: 23 [OK]\nFailed: 1 [FAIL]\nRecovery OK: 22 [RECOVERY]\n======================================================================\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EH004_ai_service_failures",
+      "category": "error_handling",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH004_ai_service_failures.py",
+      "status": "FAILED",
+      "duration": 0.17758727073669434,
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH004_ai_service_failures.py\", line 185, in test_fallback_mechanisms\n    self.log(\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH004_ai_service_failures.py\", line 26, in log\n    print(f\"  {status}{rec} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u2192' in position 34: character maps to <undefined>\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH004_ai_service_failures.py\", line 263, in <module>\n    main()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH004_ai_service_failures.py\", line 258, in main\n    report = runner.run_all_tests()\n             ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH004_ai_service_failures.py\", line 235, in run_all_tests\n    self.test_fallback_mechanisms()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH004_ai_service_failures.py\", line 194, in test_fallback_mechanisms\n    self.log(f\"Fallback: {desc}\", False, f\"Error: {e}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH004_ai_service_failures.py\", line 26, in log\n    print(f\"  {status}{rec} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u2192' in position 25: character maps to <undefined>\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EH005_authentication_errors",
+      "category": "error_handling",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH005_authentication_errors.py",
+      "status": "PASSED",
+      "duration": 0.1729874610900879,
+      "error": null,
+      "output": " TOTP\n     Handled: True\n  [OK] [RECOVERY] MFA: Backup code used\n     Handled: True\n  [OK] [RECOVERY] MFA: MFA timeout\n     Handled: True\n  [OK] [RECOVERY] MFA: Device not recognized\n     Handled: True\n\n======================================================================\nEH005 SUMMARY\n======================================================================\nTotal: 25\nPassed: 25 [OK]\nFailed: 0 [FAIL]\nRecovery OK: 25 [RECOVERY]\n======================================================================\n",
+      "recovery_success": true,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EH006_validation_errors",
+      "category": "error_handling",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EH006_validation_errors.py",
+      "status": "PASSED",
+      "duration": 0.17355608940124512,
+      "error": null,
+      "output": " Custom: Invalid credit card\n     Validator: credit_card\n  [OK] [RECOVERY] Custom: Future date required\n     Validator: future_date\n  [OK] [RECOVERY] Custom: Profanity filter\n     Validator: clean_text\n\n======================================================================\nEH006 SUMMARY\n======================================================================\nTotal: 25\nPassed: 25 [OK]\nFailed: 0 [FAIL]\nRecovery OK: 25 [RECOVERY]\n======================================================================\n",
+      "recovery_success": true,
+      "coverage_data": null
+    }
+  ],
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "win32",
+    "working_directory": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests",
+    "test_files_found": 6,
+    "mcp_server_available": false,
+    "api_key_configured": false,
+    "ci_mode": false
+  }
+}

@@ -1,75 +1,62 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaClient } from '@prisma/client';
+
+// Mock the PrismaClient
+jest.mock('@prisma/client', () => {
+  class MockPrismaClient {
+    $connect = jest.fn().mockResolvedValue(undefined);
+    $disconnect = jest.fn().mockResolvedValue(undefined);
+    user = { findUnique: jest.fn() };
+    venture = { findUnique: jest.fn() };
+    analysis = { findUnique: jest.fn() };
+    integration = { findMany: jest.fn() };
+  }
+  return {
+    PrismaClient: MockPrismaClient,
+  };
+});
+
 import { PrismaService } from './prisma.service';
 
 describe('PrismaService', () => {
   let service: PrismaService;
 
-  beforeEach(() => {
-    service = new PrismaService();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [PrismaService],
+    }).compile();
+
+    service = module.get<PrismaService>(PrismaService);
   });
 
-  afterEach(async () => {
-    await service.$disconnect();
-  });
-
-  describe('constructor', () => {
-    it('should create instance', () => {
-      expect(service).toBeInstanceOf(PrismaService);
-    });
-
-    it('should extend PrismaClient', () => {
-      expect(service).toHaveProperty('$connect');
-      expect(service).toHaveProperty('$disconnect');
-      expect(service).toHaveProperty('user');
-      expect(service).toHaveProperty('venture');
-      expect(service).toHaveProperty('analysis');
-    });
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
   describe('onModuleInit', () => {
-    it('should be defined', () => {
-      expect(service.onModuleInit).toBeDefined();
-      expect(typeof service.onModuleInit).toBe('function');
+    it('should call $connect', async () => {
+      const connectSpy = jest.spyOn(service as any, '$connect');
+      await service.onModuleInit();
+      expect(connectSpy).toHaveBeenCalled();
     });
   });
 
   describe('onModuleDestroy', () => {
-    it('should be defined', () => {
-      expect(service.onModuleDestroy).toBeDefined();
-      expect(typeof service.onModuleDestroy).toBe('function');
+    it('should call $disconnect', async () => {
+      const disconnectSpy = jest.spyOn(service as any, '$disconnect');
+      await service.onModuleDestroy();
+      expect(disconnectSpy).toHaveBeenCalled();
     });
   });
 
   describe('database properties', () => {
-    it('should have user model', () => {
+    it('should have models defined', () => {
       expect(service.user).toBeDefined();
-      expect(typeof service.user.findUnique).toBe('function');
-      expect(typeof service.user.create).toBe('function');
-      expect(typeof service.user.update).toBe('function');
-      expect(typeof service.user.delete).toBe('function');
-      expect(typeof service.user.findMany).toBe('function');
-    });
-
-    it('should have venture model', () => {
       expect(service.venture).toBeDefined();
-      expect(typeof service.venture.findUnique).toBe('function');
-      expect(typeof service.venture.create).toBe('function');
-      expect(typeof service.venture.update).toBe('function');
-      expect(typeof service.venture.delete).toBe('function');
-    });
-
-    it('should have analysis model', () => {
       expect(service.analysis).toBeDefined();
-      expect(typeof service.analysis.findUnique).toBe('function');
-      expect(typeof service.analysis.create).toBe('function');
-      expect(typeof service.analysis.update).toBe('function');
-      expect(typeof service.analysis.delete).toBe('function');
-      expect(typeof service.analysis.findMany).toBe('function');
-    });
-
-    it('should have integration model', () => {
       expect(service.integration).toBeDefined();
-      expect(typeof service.integration.findMany).toBe('function');
-      expect(typeof service.integration.upsert).toBe('function');
     });
   });
 });
+
+

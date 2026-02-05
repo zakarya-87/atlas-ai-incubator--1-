@@ -150,8 +150,8 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
 }) => {
   const { language, t } = useLanguage();
   const realisticScenario =
-    data.scenarios.find((s) => s.scenarioName === 'Realistic') ||
-    data.scenarios[0];
+    (data?.scenarios || []).find((s) => s.scenarioName === 'Realistic') ||
+    (data?.scenarios || [])[0];
 
   return (
     <motion.div
@@ -190,7 +190,7 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
               {t('budgetGeneratorRecommendations')}
             </h3>
             <div className="space-y-3">
-              {data.recommendations.map((rec, index) => (
+              {(data?.recommendations || []).map((rec, index) => (
                 <div key={index} className="rounded-lg p-4 bg-blue-500/5">
                   <strong className="font-semibold text-blue-300 text-sm display-block">
                     {rec.point}

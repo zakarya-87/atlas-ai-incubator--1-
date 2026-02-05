@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io, Socket } from 'socket.io-client';
 import { useLanguage } from '../context/LanguageContext';
-import type { AnyTool, AgentType, AgentLog } from '../types';
+import type { AnyTool, AgentType, AgentLog, AnyAnalysisData } from '../types';
 import { TranslationKey } from '../locales';
 import AnalysisSkeleton from './AnalysisSkeleton';
 import { STORAGE_KEYS, WS_CONFIG, API_CONFIG } from '../utils/constants';
@@ -11,11 +11,13 @@ import { logger } from '../utils/logger';
 interface AgentOrchestratorProps {
   activeTool: AnyTool;
   ventureId: string;
+  onAnalysisResult?: (result: { jobId: string; result: AnyAnalysisData }) => void;
 }
 
 const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
   activeTool,
   ventureId,
+  onAnalysisResult,
 }) => {
   const { t } = useLanguage();
   const [logs, setLogs] = useState<AgentLog[]>([]);
@@ -155,6 +157,13 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
     socketRef.current.on('agentLog', (log: AgentLog) => {
       setActiveAgent(log.agent);
       setLogs((prev) => [...prev, log]);
+    });
+
+    socketRef.current.on('analysisResult', (data: { jobId: string; result: AnyAnalysisData }) => {
+      logger.info('Analysis result received via WebSocket:', data);
+      if (onAnalysisResult) {
+        onAnalysisResult(data);
+      }
     });
 
     socketRef.current.on('error', (error) => {

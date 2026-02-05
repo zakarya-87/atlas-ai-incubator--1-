@@ -123,6 +123,20 @@ const ProblemValidationDisplay: React.FC<ProblemValidationDisplayProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  // Handle case where data is undefined/null
+  if (!data) {
+    return (
+      <div className="w-full space-y-4">
+        <div className="rounded-lg p-4 bg-brand-secondary/30">
+          <h3 className="text-xl font-bold text-brand-teal mb-3">
+            {t('problemValidationMarketSize')}
+          </h3>
+          <p className="text-gray-400">No data available</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       variants={containerVariants}
@@ -140,19 +154,19 @@ const ProblemValidationDisplay: React.FC<ProblemValidationDisplayProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <MarketSizeCard
             title={t('problemValidationTAM')}
-            data={data.marketSize.tam}
+            data={data?.marketSize?.tam || { value: 'N/A', explanation: 'Data not available' }}
             bgColorClass="bg-blue-500/10"
             textColorClass="text-blue-400"
           />
           <MarketSizeCard
             title={t('problemValidationSAM')}
-            data={data.marketSize.sam}
+            data={data?.marketSize?.sam || { value: 'N/A', explanation: 'Data not available' }}
             bgColorClass="bg-teal-500/10"
             textColorClass="text-teal-400"
           />
           <MarketSizeCard
             title={t('problemValidationSOM')}
-            data={data.marketSize.som}
+            data={data?.marketSize?.som || { value: 'N/A', explanation: 'Data not available' }}
             bgColorClass="bg-green-500/10"
             textColorClass="text-green-400"
           />
@@ -162,14 +176,14 @@ const ProblemValidationDisplay: React.FC<ProblemValidationDisplayProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SectionCard
           title={t('problemValidationCustomerSegments')}
-          points={data.customerSegments}
+          points={data.customerSegments || []}
           icon={icons.segments}
           bgColorClass="bg-purple-500/5"
           textColorClass="text-purple-400"
         />
         <SectionCard
           title={t('problemValidationProblemSignificance')}
-          points={data.problemSignificance}
+          points={data.problemSignificance || []}
           icon={icons.significance}
           bgColorClass="bg-yellow-500/5"
           textColorClass="text-yellow-400"

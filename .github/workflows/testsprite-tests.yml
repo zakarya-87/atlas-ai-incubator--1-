@@ -1,0 +1,327 @@
+name: TestSprite MCP Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run nightly at 2 AM
+    - cron: '0 2 * * *'
+
+env:
+  TESTSPRITE_API_KEY: ${{ secrets.TESTSPRITE_API_KEY }}
+  ATLAS_API_URL: ${{ secrets.ATLAS_API_URL || 'http://localhost:5173' }}
+  COVERAGE_THRESHOLD: 85
+
+jobs:
+  validate-setup:
+    name: Validate Test Environment
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22'
+    
+    - name: Install dependencies
+      run: |
+        cd testsprite_tests
+        pip install requests psutil
+        npm install -g @testsprite/testsprite-mcp@latest || true
+    
+    - name: Validate environment
+      run: |
+        cd testsprite_tests
+        python testsprite_runner.py --validate
+
+  core-tests:
+    name: Core Functionality Tests (TC*)
+    runs-on: ubuntu-latest
+    needs: validate-setup
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd testsprite_tests
+        pip install requests psutil
+    
+    - name: Run core tests
+      run: |
+        cd testsprite_tests
+        python testsprite_runner.py \
+          --category core \
+          --coverage-threshold 85 \
+          --ci-mode \
+          --report-format both
+    
+    - name: Upload core test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: core-test-results
+        path: testsprite_tests/testsprite_report_*.json
+
+  edge-case-tests:
+    name: Edge Case Tests (EC*)
+    runs-on: ubuntu-latest
+    needs: validate-setup
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd testsprite_tests
+        pip install requests psutil
+    
+    - name: Run edge case tests
+      run: |
+        cd testsprite_tests
+        python testsprite_runner.py \
+          --category edge_cases \
+          --coverage-threshold 90 \
+          --ci-mode \
+          --report-format both
+    
+    - name: Upload edge case results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: edge-case-results
+        path: testsprite_tests/testsprite_report_*.json
+
+  error-handling-tests:
+    name: Error Handling Tests (EH*)
+    runs-on: ubuntu-latest
+    needs: validate-setup
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd testsprite_tests
+        pip install requests psutil
+    
+    - name: Run error handling tests
+      run: |
+        cd testsprite_tests
+        python testsprite_runner.py \
+          --category error_handling \
+          --coverage-threshold 95 \
+          --ci-mode \
+          --report-format both
+    
+    - name: Upload error handling results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: error-handling-results
+        path: testsprite_tests/testsprite_report_*.json
+
+  security-tests:
+    name: Security Tests (SC*)
+    runs-on: ubuntu-latest
+    needs: validate-setup
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd testsprite_tests
+        pip install requests psutil
+    
+    - name: Run security tests
+      run: |
+        cd testsprite_tests
+        python testsprite_runner.py \
+          --category security \
+          --coverage-threshold 90 \
+          --ci-mode \
+          --report-format both
+    
+    - name: Upload security results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-results
+        path: testsprite_tests/testsprite_report_*.json
+
+  performance-tests:
+    name: Performance Tests (PF*)
+    runs-on: ubuntu-latest
+    needs: [core-tests, edge-case-tests, error-handling-tests]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd testsprite_tests
+        pip install requests psutil
+    
+    - name: Run performance tests
+      run: |
+        cd testsprite_tests
+        python testsprite_runner.py \
+          --category performance \
+          --ci-mode \
+          --report-format both
+    
+    - name: Upload performance results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-results
+        path: testsprite_tests/testsprite_report_*.json
+
+  regression-tests:
+    name: Regression Tests (RG*)
+    runs-on: ubuntu-latest
+    needs: [security-tests, performance-tests]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        cd testsprite_tests
+        pip install requests psutil
+    
+    - name: Run regression tests
+      run: |
+        cd testsprite_tests
+        python testsprite_runner.py \
+          --category regression \
+          --ci-mode \
+          --report-format both
+    
+    - name: Upload regression results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: regression-results
+        path: testsprite_tests/testsprite_report_*.json
+
+  coverage-report:
+    name: Generate Coverage Report
+    runs-on: ubuntu-latest
+    needs: [core-tests, edge-case-tests, error-handling-tests, security-tests, performance-tests, regression-tests]
+    if: always()
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+    
+    - name: Generate combined report
+      run: |
+        echo "# TestSprite MCP Test Results" > combined_report.md
+        echo "" >> combined_report.md
+        echo "## Test Execution Summary" >> combined_report.md
+        echo "" >> combined_report.md
+        
+        for dir in *-results; do
+          if [ -d "$dir" ]; then
+            echo "### $dir" >> combined_report.md
+            echo "" >> combined_report.md
+            cat $dir/*.md >> combined_report.md || true
+            echo "" >> combined_report.md
+          fi
+        done
+    
+    - name: Upload combined report
+      uses: actions/upload-artifact@v3
+      with:
+        name: combined-test-report
+        path: combined_report.md
+    
+    - name: Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('combined_report.md', 'utf8');
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: report.substring(0, 65000) // GitHub comment limit
+          });
+
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: coverage-report
+    if: failure()
+    
+    steps:
+    - name: Notify on failure
+      uses: slackapi/slack-github-action@v1.24.0
+      with:
+        payload: |
+          {
+            "text": "❌ TestSprite MCP Test Suite Failed",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "Test Suite Failure"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "The TestSprite MCP test suite has failed. Please check the logs."
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

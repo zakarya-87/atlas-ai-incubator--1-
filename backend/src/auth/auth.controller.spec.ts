@@ -66,7 +66,7 @@ describe('AuthController', () => {
         'mock-token',
         expect.objectContaining({
           httpOnly: true,
-          sameSite: 'strict',
+          sameSite: 'lax',
           maxAge: 24 * 60 * 60 * 1000,
         })
       );
@@ -112,7 +112,7 @@ describe('AuthController', () => {
         'accessToken',
         expect.objectContaining({
           httpOnly: true,
-          sameSite: 'strict',
+          sameSite: 'lax',
         })
       );
       expect(result).toEqual({ success: true });

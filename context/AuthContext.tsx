@@ -173,15 +173,69 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     return () => clearInterval(intervalId);
   }, [user, refreshAuth]);
 
-  const signInAsAdminDemo = useCallback(() => {
-    const demoUser = {
-      email: 'admin-demo@local',
-      name: 'Admin (Demo)',
-      role: 'admin',
+  const signInAsAdminDemo = useCallback(async () => {
+    // Use the actual seeded admin credentials from the database
+    const demoCredentials = {
+      email: 'admin@atlas.com',
+      password: 'admin123',
     };
-    setUser(demoUser);
-    localStorage.setItem(DEMO_ADMIN_KEY, JSON.stringify(demoUser));
-    setToken(null);
+    
+    try {
+      console.log('[Demo Admin] Attempting to login with seeded admin...');
+      
+      // Perform actual login to get valid token
+      const response = await fetch(
+        `${(import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/signin`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(demoCredentials),
+          credentials: 'include',
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to login');
+      }
+      
+      const data = await response.json();
+      console.log('[Demo Admin] Login successful, fetching profile...');
+      
+      // Save token if provided
+      if (data.access_token) {
+        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.access_token);
+        setToken(data.access_token);
+      }
+      
+      // Fetch user profile to get full user data including credits
+      const profile = await fetchUserProfile();
+      
+      const demoUser = {
+        email: profile.email,
+        name: profile.fullName || 'Atlas Admin',
+        role: profile.role || 'admin',
+      };
+      
+      setUser(demoUser);
+      localStorage.setItem(DEMO_ADMIN_KEY, JSON.stringify(demoUser));
+      
+      console.log('[Demo Admin] Successfully logged in as:', demoUser.email);
+      console.log('[Demo Admin] Credits:', profile.credits);
+      
+    } catch (error) {
+      console.error('[Demo Admin] Login failed:', error);
+      // Fallback to showing error but still set local user for UI
+      const fallbackUser = {
+        email: demoCredentials.email,
+        name: 'Atlas Admin (Demo)',
+        role: 'admin',
+      };
+      setUser(fallbackUser);
+      localStorage.setItem(DEMO_ADMIN_KEY, JSON.stringify(fallbackUser));
+      setToken('demo-token');
+      throw error;
+    }
   }, []);
 
   const value = {

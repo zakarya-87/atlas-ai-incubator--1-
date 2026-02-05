@@ -3,10 +3,12 @@ import { Job } from 'bullmq';
 import { AnalysisService } from './analysis.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventsGateway } from '../events/events.gateway';
+import { setJob } from './job-store';
 
 export interface AnalysisJobData {
   dto: any;
   userId: string;
+  originalJobId: string;
 }
 
 @Processor('analysis-queue')
@@ -23,7 +25,15 @@ export class AnalysisProcessor extends WorkerHost {
     const { dto, userId } = job.data;
 
     try {
-      // Update job status to processing
+      // Update local job store
+      setJob(job.data.originalJobId, {
+        jobId: job.data.originalJobId,
+        status: 'active',
+        progress: 10,
+        createdAt: Date.now(),
+      });
+
+      // Update job status in DB
       await this.prisma.job.update({
         where: { id: job.id.toString() },
         data: { status: 'processing', startedAt: new Date() },
@@ -42,7 +52,25 @@ export class AnalysisProcessor extends WorkerHost {
       // Call the actual analysis service
       const result = await this.analysisService.generateAnalysis(dto, userId);
 
-      // Update job status to completed
+      // Update local job store to completed
+      setJob(job.data.originalJobId, {
+        jobId: job.data.originalJobId,
+        status: 'completed',
+        progress: 100,
+        result,
+        createdAt: Date.now(),
+        finishedAt: Date.now(),
+      });
+
+      // Emit analysis result event
+      if (dto.ventureId) {
+        this.eventsGateway.emitAnalysisResult(dto.ventureId, {
+          jobId: job.data.originalJobId,
+          result,
+        });
+      }
+
+      // Update job status in DB
       await this.prisma.job.update({
         where: { id: job.id.toString() },
         data: {
@@ -64,7 +92,16 @@ export class AnalysisProcessor extends WorkerHost {
 
       return result;
     } catch (error) {
-      // Update job status to failed
+      // Update local job store to failed
+      setJob(job.data.originalJobId, {
+        jobId: job.data.originalJobId,
+        status: 'failed',
+        error: error.message,
+        createdAt: Date.now(),
+        finishedAt: Date.now(),
+      });
+
+      // Update job status in DB
       await this.prisma.job.update({
         where: { id: job.id.toString() },
         data: {

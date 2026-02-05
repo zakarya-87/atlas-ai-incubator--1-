@@ -35,6 +35,10 @@ export class UsersService {
         email,
         password: hashedPassword,
         credits: 5, // Explicit default
+        role: 'USER', // Default role
+        subscriptionStatus: 'free', // Default status
+        subscriptionPlan: 'free', // Default plan
+        fullName: email.split('@')[0], // Extract name from email as default
       },
     });
   }

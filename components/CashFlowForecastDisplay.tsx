@@ -151,7 +151,7 @@ const CashFlowForecastDisplay: React.FC<{ data: CashFlowForecastData }> = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {data.monthlyForecasts.map((monthData) => (
+                  {(data?.monthlyForecasts || []).map((monthData) => (
                     <tr
                       key={monthData.month}
                       className={`border-b border-brand-accent/50 hover:bg-brand-accent/20 ${monthData.endingBalance < 0 ? 'bg-red-900/30' : ''}`}
@@ -188,7 +188,7 @@ const CashFlowForecastDisplay: React.FC<{ data: CashFlowForecastData }> = ({
               {t('cashFlowForecastInsights')}
             </h3>
             <div className="space-y-3">
-              {data.insights.map((insight, index) => (
+              {(data?.insights || []).map((insight, index) => (
                 <div key={index} className="rounded-lg p-4 bg-yellow-500/5">
                   <strong className="font-semibold text-yellow-300 text-sm display-block">
                     {insight.point}

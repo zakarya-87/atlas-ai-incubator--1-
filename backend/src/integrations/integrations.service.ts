@@ -72,7 +72,14 @@ export class IntegrationsService {
 
     if (!venture) {
       await this.prisma.venture.create({
-        data: { id: ventureId, userId, name: 'My Venture' },
+        data: {
+          id: ventureId,
+          userId,
+          name: `Venture ${ventureId.substring(0, 8)}`,
+          description: 'Auto-created venture',
+          industry: 'Technology',
+          stage: 'idea'
+        },
       });
       return;
     }

@@ -122,6 +122,10 @@ describe('UsersService', () => {
           email,
           password: hashedPassword,
           credits: 5,
+          role: 'USER',
+          subscriptionStatus: 'free',
+          subscriptionPlan: 'free',
+          fullName: 'newuser',
         },
       });
     });

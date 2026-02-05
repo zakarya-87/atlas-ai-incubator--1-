@@ -33,12 +33,12 @@ const CanvasBlock: React.FC<CanvasBlockProps> = ({
       <h3 className={`text-md font-bold ${textColorClass}`}>{title}</h3>
     </div>
     <ul className="space-y-2 text-brand-text/90 flex-grow">
-      {points.map((item, index) => (
+      {(points || []).map((item, index) => (
         <li key={index} className="text-sm leading-relaxed">
           <strong className="font-semibold text-brand-text/95 display-block">
-            {item.point}
+            {item?.point || 'N/A'}
           </strong>
-          <p className="text-xs text-brand-text/80">{item.explanation}</p>
+          <p className="text-xs text-brand-text/80">{item?.explanation || 'N/A'}</p>
         </li>
       ))}
     </ul>

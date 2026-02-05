@@ -1,43 +1,53 @@
 #!/bin/sh
-set -e  # Exit on error
 
-# Logging configuration
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
-}
+# Startup script for ATLAS AI Incubator Backend
+# This script handles database migration and application startup
 
-error_exit() {
-    log "ERROR: $*"
-    exit 1
-}
+echo "========================================"
+echo "ATLAS AI Incubator Backend Startup"
+echo "========================================"
+echo ""
 
 # Wait for PostgreSQL to be ready
-log "Waiting for PostgreSQL at $DATABASE_URL..."
-MAX_RETRIES=30
-RETRY_COUNT=0
-
-until pg_isready -h postgres -p 5432 -U atlas_user 2>/dev/null || [ $RETRY_COUNT -ge $MAX_RETRIES ]
-do
-    RETRY_COUNT=$((RETRY_COUNT + 1))
-    log "PostgreSQL not ready yet (attempt $RETRY_COUNT/$MAX_RETRIES), waiting..."
+echo "Step 1/3: Waiting for PostgreSQL..."
+max_attempts=30
+attempt=0
+while ! pg_isready -h postgres -U atlas_user -d atlas_db > /dev/null 2>&1; do
+    attempt=$((attempt + 1))
+    if [ $attempt -ge $max_attempts ]; then
+        echo "ERROR: PostgreSQL did not become ready after $max_attempts attempts"
+        exit 1
+    fi
+    echo "  Attempt $attempt/$max_attempts: PostgreSQL not ready yet, waiting..."
     sleep 2
 done
+echo "✓ PostgreSQL is ready!"
+echo ""
 
-if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
-    error_exit "Failed to connect to PostgreSQL after $MAX_RETRIES attempts"
+# Generate Prisma Client
+echo "Step 2/3: Generating Prisma Client..."
+if npx prisma generate; then
+    echo "✓ Prisma Client generated successfully"
+else
+    echo "ERROR: Failed to generate Prisma Client"
+    exit 1
 fi
+echo ""
 
-log "Database is ready! Generating Prisma client..."
-if ! npx prisma generate; then
-    error_exit "Failed to generate Prisma client"
+# Run database migrations
+echo "Step 3/3: Running database migrations..."
+if npx prisma migrate deploy; then
+    echo "✓ Database migrations completed"
+else
+    echo "ERROR: Database migration failed"
+    exit 1
 fi
+echo ""
 
-log "Running database migrations..."
-if ! npx prisma migrate deploy; then
-    error_exit "Failed to run database migrations"
-fi
+echo "========================================"
+echo "Startup complete! Starting application..."
+echo "========================================"
+echo ""
 
-log "Starting application in production mode..."
-if ! npm run start:prod; then
-    error_exit "Failed to start application"
-fi
+# Start the application
+exec node dist/main.js

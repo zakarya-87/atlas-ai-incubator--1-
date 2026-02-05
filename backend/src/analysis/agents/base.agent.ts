@@ -104,8 +104,8 @@ export abstract class BaseAgent implements AiAgent {
 
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(
-            () => reject(new Error('Gemini API timeout after 120 seconds')),
-            120000
+            () => reject(new Error('Gemini API timeout after 300 seconds')),
+            300000
           );
         });
 

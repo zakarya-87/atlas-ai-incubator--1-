@@ -1,0 +1,87 @@
+{
+  "summary": {
+    "test_suite": "TestSprite MCP",
+    "project": "ATLAS AI Incubator",
+    "execution_date": "2026-02-02T14:58:08.625150",
+    "category": "security",
+    "total_tests": 4,
+    "passed": 1,
+    "failed": 3,
+    "timeout": 0,
+    "error": 0,
+    "recovery_success": 0,
+    "success_rate": 25.0,
+    "coverage_threshold": 80.0,
+    "coverage_met": false,
+    "total_duration": 4.806379556655884,
+    "status": "FAILED"
+  },
+  "category_breakdown": {
+    "security": {
+      "category": "security",
+      "total": 4,
+      "passed": 1,
+      "failed": 3,
+      "timeout": 0,
+      "error": 0,
+      "skipped": 0,
+      "duration": 4.806379556655884,
+      "success_rate": 25.0
+    }
+  },
+  "test_results": [
+    {
+      "test_id": "SC001_sql_injection",
+      "category": "security",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\SC001_sql_injection.py",
+      "status": "FAILED",
+      "duration": 1.3033931255340576,
+      "error": "\n======================================================================\nSC001: SQL Injection Prevention - Comprehensive Test Suite\n======================================================================\nTarget: http://localhost:5173\nMode: local\n======================================================================\n\n[TEST] Authentication Bypass Attempts\n  [OK] [CRITICAL] Auth: Classic OR injection\n     Blocked\n  [OK] [CRITICAL] Auth: Numeric OR injection\n     Blocked\n  [FAIL] [CRITICAL] Auth: Comment bypass\n     PAYLOAD ACCEPTED: admin'--...\n  [OK] [CRITICAL] Auth: Union select\n     Blocked\n  [OK] [CRITICAL] Auth: Alternative true\n     Blocked\n  [OK] [WARNING] Auth: Boolean AND\n     Blocked\n  [OK] [CRITICAL] Auth: Destructive SQL\n     Blocked\n\n[TEST] UNION-Based Injection\n  [OK]  Union: Basic union\n     Union injection blocked\n  [OK]  Union: Null union\n     Union injection blocked\n  [OK]  Union: Schema extraction\n     Union injection blocked\n  [OK]  Union: Version extraction\n     Union injection blocked\n  [OK]  Union: File access\n     Union injection blocked\n\n[TEST] Time-Based Blind Injection\n  [OK]  Time: MySQL sleep\n     Blocked in 0.0s\n  [OK]  Time: PostgreSQL sleep\n     Blocked in 0.0s\n  [OK]  Time: Subquery sleep\n     Blocked in 0.0s\n  [OK]  Time: MSSQL delay\n     Blocked in 0.0s\n  [OK]  Time: Conditional sleep\n     Blocked in 0.0s\n\n[TEST] Error-Based Extraction\n  [OK] [WARNING] Error: MySQL error\n     Error injection blocked\n  [OK] [WARNING] Error: MSSQL conversion\n     Error injection blocked\n  [OK] [WARNING] Error: PostgreSQL cast\n     Error injection blocked\n  [OK] [WARNING] Error: Divide by zero\n     Error injection blocked\n  [OK] [WARNING] Error: Duplicate entry\n     Error injection blocked\n\n[TEST] Obfuscation Techniques\n  [FAIL] [WARNING] Obfuscation: URL encoding\n     May bypass filters\n  [OK] [WARNING] Obfuscation: Comment obfuscation\n     Obfuscation detected\n  [FAIL] [WARNING] Obfuscation: Space encoding\n     May bypass filters\n  [OK] [WARNING] Obfuscation: MySQL comment\n     Obfuscation detected\n  [OK] [WARNING] Obfuscation: Double dash\n     Obfuscation detected\n  [OK] [WARNING] Obfuscation: Null byte termination\n     Obfuscation detected\n  [FAIL] [WARNING] Obfuscation: Plus concat\n     May bypass filters\n  [FAIL] [WARNING] Obfuscation: Pipe concat\n     May bypass filters\n\n[TEST] NoSQL Injection\n  [FAIL] [WARNING] NoSQL: MongoDB not equal\n     NoSQL payload accepted\n  [FAIL] [WARNING] NoSQL: MongoDB greater than\n     NoSQL payload accepted\n  [FAIL] [WARNING] NoSQL: MongoDB regex\n     NoSQL payload accepted\n  [FAIL] [WARNING] NoSQL: MongoDB where\n     NoSQL payload accepted\n  [FAIL] [WARNING] NoSQL: Query operator\n     NoSQL payload accepted\n\n[TEST] ORM Parameterization\n  [OK]  ORM: Parameterized query\n     Implemented\n  [OK]  ORM: Prepared statements\n     Implemented\n  [OK]  ORM: Query builder escaping\n     Implemented\n  [OK]  ORM: Raw query validation\n     Implemented\n  [OK]  ORM: Input sanitization\n     Implemented\n\n======================================================================\nSC001 SECURITY SUMMARY\n======================================================================\nTotal Tests: 40\nPassed: 30 [OK]\nFailed: 10 [FAIL]\nSuccess Rate: 75.0%\n\n[CRITICAL] HIGH-RISK VULNERABILITIES DETECTED:\n   - Auth: Comment bypass\n======================================================================\n\n[CRITICAL] CRITICAL: SQL injection vulnerabilities found!\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "SC002_xss_protection",
+      "category": "security",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\SC002_xss_protection.py",
+      "status": "FAILED",
+      "duration": 1.408247470855713,
+      "error": "\n======================================================================\nSC002: XSS Prevention - Comprehensive Test Suite\n======================================================================\nTarget: http://localhost:5173\nMode: local\n======================================================================\n\n[TEST] Reflected XSS Attack Vectors\n  [OK] [CRITICAL] Reflected: Basic script tag\n     Sanitized\n  [OK] [CRITICAL] Reflected: Cookie theft\n     Sanitized\n  [OK] [WARNING] Reflected: Image onerror\n     Sanitized\n  [OK] [WARNING] Reflected: Image cookie steal\n     Sanitized\n  [OK] [WARNING] Reflected: Body onload\n     Sanitized\n  [OK] [WARNING] Reflected: SVG onload\n     Sanitized\n  [OK] [WARNING] Reflected: Iframe JavaScript\n     Sanitized\n  [OK] [WARNING] Reflected: Input autofocus\n     Sanitized\n  [OK] [WARNING] Reflected: HTML import\n     Sanitized\n  [OK] [WARNING] Reflected: Meta refresh\n     Sanitized\n  [OK] [WARNING] Reflected: Object tag\n     Sanitized\n  [OK] [WARNING] Reflected: Embed tag\n     Sanitized\n\n[TEST] Stored XSS Attack Vectors\n  [OK] [CRITICAL] Stored: Token exfiltration\n     Content sanitized\n  [OK] [WARNING] Stored: Mouseover event\n     Content sanitized\n  [OK] [WARNING] Stored: JavaScript protocol\n     Content sanitized\n  [OK] [WARNING] Stored: Form action JS\n     Content sanitized\n  [OK] [WARNING] Stored: CSS import\n     Content sanitized\n  [OK] [CRITICAL] Stored: Redirect with cookie\n     Content sanitized\n\n[TEST] DOM-Based XSS Attack Vectors\n  [OK] [WARNING] DOM: Hash injection\n     DOM sanitized\n  [FAIL] [WARNING] DOM: JavaScript protocol\n     DOM vulnerable!\n  [OK] [WARNING] DOM: Broken tag bypass\n     DOM sanitized\n  [OK] [WARNING] DOM: Quote breakout\n     DOM sanitized\n  [OK] [WARNING] DOM: Attribute injection\n     DOM sanitized\n  [OK] [CRITICAL] DOM: Script tag closure\n     DOM sanitized\n\n[TEST] Mutation XSS (mXSS)\n  [OK]  Mutation: Nested HTML\n     Parser safe\n  [OK]  Mutation: SVG script\n     Parser safe\n  [OK]  Mutation: MathML script\n     Parser safe\n  [OK]  Mutation: Table script\n     Parser safe\n\n[TEST] Content Security Policy (CSP)\n  [OK]  CSP: CSP header present\n     Implemented\n  [OK]  CSP: script-src directive\n     Implemented\n  [OK]  CSP: style-src 'self'\n     Implemented\n  [OK]  CSP: default-src 'self'\n     Implemented\n  [OK]  CSP: frame-ancestors 'none'\n     Implemented\n  [OK]  CSP: base-uri 'self'\n     Implemented\n  [OK]  CSP: form-action 'self'\n     Implemented\n\n[TEST] Output Encoding\n  [OK]  Encoding: HTML body\n     Properly encoded\n  [OK]  Encoding: HTML attribute\n     Properly encoded\n  [OK]  Encoding: JavaScript\n     Properly encoded\n  [OK]  Encoding: URL\n     Properly encoded\n  [OK]  Encoding: CSS\n     Properly encoded\n\n[TEST] Event Handler Injection\n  [FAIL] [WARNING] Event: onerror\n     Event handler present!\n  [FAIL] [WARNING] Event: onload\n     Event handler present!\n  [FAIL] [WARNING] Event: onclick\n     Event handler present!\n  [FAIL] [WARNING] Event: onmouseover\n     Event handler present!\n  [FAIL] [WARNING] Event: onfocus\n     Event handler present!\n  [FAIL] [WARNING] Event: onchange\n     Event handler present!\n\n[TEST] JavaScript Protocol Attacks\n  [OK]  JS Protocol: Basic JS protocol\n     Protocol blocked\n  [OK]  JS Protocol: With slashes\n     Protocol blocked\n  [OK]  JS Protocol: With newline\n     Protocol blocked\n  [OK]  JS Protocol: With comment\n     Protocol blocked\n  [OK]  JS Protocol: Mixed case\n     Protocol blocked\n  [OK]  JS Protocol: HTML entity\n     Protocol blocked\n\n======================================================================\nSC002 SECURITY SUMMARY\n======================================================================\nTotal Tests: 52\nPassed: 45 [OK]\nFailed: 7 [FAIL]\nSuccess Rate: 86.5%\n\n[CRITICAL] CRITICAL XSS VULNERABILITIES DETECTED:\n   - DOM: JavaScript protocol\n   - Event: onerror\n   - Event: onload\n\n[WARN]  IMMEDIATE ACTION REQUIRED!\n======================================================================\n\n[CRITICAL] CRITICAL: XSS vulnerabilities found!\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "SC003_auth_bypass",
+      "category": "security",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\SC003_auth_bypass.py",
+      "status": "PASSED",
+      "duration": 0.9110527038574219,
+      "error": null,
+      "output": "ogout\n     Replay blocked\n  [OK]  Replay: Reuse after password change\n     Replay blocked\n  [OK]  Replay: Concurrent usage\n     Replay blocked\n  [OK]  Replay: Token binding\n     Replay blocked\n\n======================================================================\nSC003 SECURITY SUMMARY\n======================================================================\nTotal Tests: 34\nPassed: 34 [OK]\nFailed: 0 [FAIL]\nSuccess Rate: 100.0%\n======================================================================\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "SC004_rate_limiting",
+      "category": "security",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\SC004_rate_limiting.py",
+      "status": "FAILED",
+      "duration": 1.1836862564086914,
+      "error": "\n======================================================================\nSC004: Rate Limiting & DDoS Protection\n======================================================================\nTarget: http://localhost:5173\nMode: local\n======================================================================\n\n[TEST] API Endpoint Rate Limiting\n  [OK]  Rate: POST /auth/login\n     5 requests per 60s\n  [OK]  Rate: POST /auth/register\n     3 requests per 60s\n  [OK]  Rate: POST /api/analysis\n     10 requests per 60s\n  [OK]  Rate: GET /api/ventures\n     30 requests per 60s\n  [OK]  Rate: GET /api/export\n     5 requests per 3600s\n\n[TEST] Brute Force Protection\n  [OK]  Brute: Login attempts\n     Blocked after 5 attempts\n  [OK]  Brute: Password reset\n     Blocked after 3 attempts\n  [OK]  Brute: 2FA attempts\n     Blocked after 3 attempts\n  [OK]  Brute: API key attempts\n     Blocked after 10 attempts\n\n[TEST] Burst Request Protection\n  [OK]  Burst: 10 requests/second\n     Burst protection active\n  [OK]  Burst: 50 requests/second\n     Burst protection active\n  [OK]  Burst: 100 requests/second\n     Burst protection active\n  [OK]  Burst: Token bucket\n     Burst protection active\n  [OK]  Burst: Sliding window\n     Burst protection active\n\n[TEST] DDoS Mitigation\n  [OK]  DDoS: IP blocking after abuse\n     Implemented\n  [OK]  DDoS: Connection limiting\n     Implemented\n  [OK]  DDoS: Request size limiting\n     Implemented\n  [FAIL]  DDoS: Geographic restrictions\n     Not detected\n  [OK]  DDoS: CAPTCHA challenge\n     Implemented\n  [OK]  DDoS: CDN protection\n     Implemented\n  [OK]  DDoS: WAF rules\n     Implemented\n\n[TEST] User Quota Enforcement\n  [OK]  Quota: Daily API calls\n     Limit: 1000\n  [OK]  Quota: Analysis generation\n     Limit: 50\n  [OK]  Quota: Export generation\n     Limit: 10\n  [OK]  Quota: Storage usage\n     Limit: 1073741824\n  [OK]  Quota: Team members\n     Limit: 50\n  [OK]  Quota: Concurrent requests\n     Limit: 10\n\n[TEST] IP Reputation & Blocking\n  [OK]  IP: Tor exit nodes blocked\n     Active\n  [OK]  IP: VPN/proxy detection\n     Active\n  [OK]  IP: Known bot networks\n     Active\n  [OK]  IP: IP reputation scoring\n     Active\n  [FAIL]  IP: Geolocation restrictions\n     Not detected\n\n[TEST] Circuit Breaker Pattern\n  [OK]  Circuit: Open circuit after failures\n     Implemented\n  [OK]  Circuit: Half-open state\n     Implemented\n  [OK]  Circuit: Timeout before opening\n     Implemented\n  [OK]  Circuit: Recovery detection\n     Implemented\n\n======================================================================\nSC004 SECURITY SUMMARY\n======================================================================\nTotal Tests: 36\nPassed: 34 [OK]\nFailed: 2 [FAIL]\nSuccess Rate: 94.4%\n\n[WARN]  RATE LIMITING GAPS DETECTED - Review failed tests\n======================================================================\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    }
+  ],
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "win32",
+    "working_directory": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests",
+    "test_files_found": 4,
+    "mcp_server_available": false,
+    "api_key_configured": false,
+    "ci_mode": false
+  }
+}

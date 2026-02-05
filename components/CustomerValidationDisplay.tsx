@@ -77,7 +77,7 @@ const CustomerValidationDisplay: React.FC<{ data: CustomerValidationData }> = ({
           {t('customerValidationScorecard')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {data.validationScorecard.map((metric, index) => (
+          {(data?.validationScorecard || []).map((metric, index) => (
             <MetricCard key={index} metric={metric} />
           ))}
         </div>
@@ -93,17 +93,17 @@ const CustomerValidationDisplay: React.FC<{ data: CustomerValidationData }> = ({
             <div className="rounded-lg p-6 bg-brand-secondary/30 border-2 border-dashed border-brand-accent/50 space-y-4">
               <div>
                 <h4 className="text-lg font-bold text-brand-text">
-                  {data.landingPageCopy.headline}
+                  {data?.landingPageCopy?.headline || 'Headline not available'}
                 </h4>
                 <p className="text-brand-text/80 mt-1">
-                  {data.landingPageCopy.body}
+                  {data?.landingPageCopy?.body || 'Body content not available'}
                 </p>
               </div>
               <button
                 className="px-5 py-2 bg-brand-teal text-white font-bold rounded-lg shadow-md"
                 disabled
               >
-                {data.landingPageCopy.callToAction}
+                {data?.landingPageCopy?.callToAction || 'Call to Action not available'}
               </button>
             </div>
           </motion.div>
@@ -114,7 +114,7 @@ const CustomerValidationDisplay: React.FC<{ data: CustomerValidationData }> = ({
               {t('customerValidationAds')}
             </h3>
             <div className="space-y-4">
-              {data.adCopy.map((ad, index) => (
+              {(data?.adCopy || []).map((ad, index) => (
                 <AdCard key={index} ad={ad} />
               ))}
             </div>
@@ -128,7 +128,7 @@ const CustomerValidationDisplay: React.FC<{ data: CustomerValidationData }> = ({
           </h3>
           <div className="rounded-lg p-6 bg-brand-secondary/30">
             <ul className="space-y-4">
-              {data.surveyQuestions.map((q, index) => (
+              {(data?.surveyQuestions || []).map((q, index) => (
                 <li key={index} className="flex items-start text-sm">
                   <span className="text-brand-teal font-bold mr-3 rtl:ml-3 rtl:mr-0">
                     {index + 1}.

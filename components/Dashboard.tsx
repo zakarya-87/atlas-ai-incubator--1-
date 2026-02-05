@@ -73,7 +73,7 @@ const Dashboard: React.FC<DashboardProps> = ({ ventureId, onNavigate }) => {
     loadData();
   }, [isAuthenticated, isAdmin, ventureId]);
 
-  const userName = user?.email.split('@')[0] || 'Founder';
+  const userName = user?.email?.split('@')?.[0] || 'Founder';
 
   return (
     <motion.div

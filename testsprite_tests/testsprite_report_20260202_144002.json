@@ -1,0 +1,109 @@
+{
+  "summary": {
+    "test_suite": "TestSprite MCP",
+    "project": "ATLAS AI Incubator",
+    "execution_date": "2026-02-02T14:40:02.338947",
+    "category": "edge_cases",
+    "total_tests": 6,
+    "passed": 0,
+    "failed": 6,
+    "timeout": 0,
+    "error": 0,
+    "recovery_success": 0,
+    "success_rate": 0.0,
+    "coverage_threshold": 80.0,
+    "coverage_met": false,
+    "total_duration": 3.7526278495788574,
+    "status": "FAILED"
+  },
+  "category_breakdown": {
+    "edge_cases": {
+      "category": "edge_cases",
+      "total": 6,
+      "passed": 0,
+      "failed": 6,
+      "timeout": 0,
+      "error": 0,
+      "skipped": 0,
+      "duration": 3.7526278495788574,
+      "success_rate": 0.0
+    }
+  },
+  "test_results": [
+    {
+      "test_id": "EC001_input_validation",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py",
+      "status": "FAILED",
+      "duration": 2.0220322608947754,
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py\", line 109, in test_empty_inputs\n    self.log_result(\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py\", line 58, in log_result\n    print(f\"  {status} {test_name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u2705' in position 2: character maps to <undefined>\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py\", line 411, in run_all_tests\n    test_func()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py\", line 127, in test_empty_inputs\n    self.log_result(\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py\", line 58, in log_result\n    print(f\"  {status} {test_name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u274c' in position 2: character maps to <undefined>\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py\", line 447, in <module>\n    main()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py\", line 440, in main\n    report = runner.run_all_tests()\n             ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py\", line 413, in run_all_tests\n    print(f\"\\u274c CRITICAL ERROR in {test_name}: {e}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u274c' in position 0: character maps to <undefined>\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC002_boundary_conditions",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC002_boundary_conditions.py",
+      "status": "FAILED",
+      "duration": 0.1637861728668213,
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC002_boundary_conditions.py\", line 66, in test_numeric_boundaries\n    self.log(name, passed, f\"Value: {input_val}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC002_boundary_conditions.py\", line 27, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u2705' in position 2: character maps to <undefined>\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC002_boundary_conditions.py\", line 199, in <module>\n    main()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC002_boundary_conditions.py\", line 194, in main\n    report = runner.run_all_tests()\n             ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC002_boundary_conditions.py\", line 170, in run_all_tests\n    self.test_numeric_boundaries()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC002_boundary_conditions.py\", line 70, in test_numeric_boundaries\n    self.log(name, False, f\"Error: {e}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC002_boundary_conditions.py\", line 27, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u274c' in position 2: character maps to <undefined>\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC003_concurrent_access",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC003_concurrent_access.py",
+      "status": "FAILED",
+      "duration": 0.6577255725860596,
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC003_concurrent_access.py\", line 61, in test_simultaneous_edits\n    self.log(\"Concurrent venture updates\", passed, f\"Updates: {len(data_versions)}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC003_concurrent_access.py\", line 30, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u2705' in position 2: character maps to <undefined>\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC003_concurrent_access.py\", line 219, in <module>\n    main()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC003_concurrent_access.py\", line 214, in main\n    report = runner.run_all_tests()\n             ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC003_concurrent_access.py\", line 190, in run_all_tests\n    self.test_simultaneous_edits()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC003_concurrent_access.py\", line 67, in test_simultaneous_edits\n    self.log(\"Concurrent venture updates\", False, f\"Error: {e}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC003_concurrent_access.py\", line 30, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u274c' in position 2: character maps to <undefined>\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC004_data_limits",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC004_data_limits.py",
+      "status": "FAILED",
+      "duration": 0.16807889938354492,
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC004_data_limits.py\", line 52, in test_venture_limits\n    self.log(f\"Venture limit: {desc}\", passed, f\"{current}/{limit}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC004_data_limits.py\", line 25, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u2705' in position 2: character maps to <undefined>\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC004_data_limits.py\", line 204, in <module>\n    main()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC004_data_limits.py\", line 199, in main\n    report = runner.run_all_tests()\n             ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC004_data_limits.py\", line 174, in run_all_tests\n    self.test_venture_limits()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC004_data_limits.py\", line 56, in test_venture_limits\n    self.log(f\"Venture limit: {desc}\", False, f\"Error: {e}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC004_data_limits.py\", line 25, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u274c' in position 2: character maps to <undefined>\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC005_special_characters",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC005_special_characters.py",
+      "status": "FAILED",
+      "duration": 0.16477084159851074,
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC005_special_characters.py\", line 59, in test_xss_vectors\n    self.log(f\"XSS: {desc}\", passed, \"Sanitized\" if passed else \"Not sanitized\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC005_special_characters.py\", line 27, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u2705' in position 2: character maps to <undefined>\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC005_special_characters.py\", line 231, in <module>\n    main()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC005_special_characters.py\", line 226, in main\n    report = runner.run_all_tests()\n             ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC005_special_characters.py\", line 201, in run_all_tests\n    self.test_xss_vectors()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC005_special_characters.py\", line 63, in test_xss_vectors\n    self.log(f\"XSS: {desc}\", False, f\"Error: {e}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC005_special_characters.py\", line 27, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u274c' in position 2: character maps to <undefined>\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC006_timezone_edge_cases",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC006_timezone_edge_cases.py",
+      "status": "FAILED",
+      "duration": 0.5762341022491455,
+      "error": "Traceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC006_timezone_edge_cases.py\", line 54, in test_dst_transitions\n    self.log(f\"DST: {desc}\", passed, f\"ISO: {iso_str}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC006_timezone_edge_cases.py\", line 26, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u2705' in position 2: character maps to <undefined>\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC006_timezone_edge_cases.py\", line 208, in <module>\n    main()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC006_timezone_edge_cases.py\", line 203, in main\n    report = runner.run_all_tests()\n             ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC006_timezone_edge_cases.py\", line 178, in run_all_tests\n    self.test_dst_transitions()\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC006_timezone_edge_cases.py\", line 58, in test_dst_transitions\n    self.log(f\"DST: {desc}\", False, f\"Error: {e}\")\n  File \"C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC006_timezone_edge_cases.py\", line 26, in log\n    print(f\"  {status} {name}\")\n  File \"C:\\Users\\zboud\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\encodings\\cp1252.py\", line 19, in encode\n    return codecs.charmap_encode(input,self.errors,encoding_table)[0]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nUnicodeEncodeError: 'charmap' codec can't encode character '\\u274c' in position 2: character maps to <undefined>\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    }
+  ],
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "win32",
+    "working_directory": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests",
+    "test_files_found": 6,
+    "mcp_server_available": false,
+    "api_key_configured": false,
+    "ci_mode": false
+  }
+}

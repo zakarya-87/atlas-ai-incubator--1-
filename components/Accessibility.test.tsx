@@ -19,6 +19,30 @@ vi.mock('jest-axe', () => ({
   toHaveNoViolations: vi.fn(),
 }));
 
+// Mock framer-motion with prop filtering to avoid React warnings
+const filterMotionProps = (props: any) => {
+  const {
+    initial, animate, exit, variants, transition, whileHover, whileTap,
+    whileFocus, whileDrag, whileInView, viewport, layout, layoutId,
+    layoutDependency, style, ...domProps
+  } = props;
+  return domProps;
+};
+
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...filterMotionProps(props)}>{children}</div>,
+    button: ({ children, ...props }: any) => <button {...filterMotionProps(props)}>{children}</button>,
+    h3: ({ children, ...props }: any) => <h3 {...filterMotionProps(props)}>{children}</h3>,
+    p: ({ children, ...props }: any) => <p {...filterMotionProps(props)}>{children}</p>,
+    nav: ({ children, ...props }: any) => <nav {...filterMotionProps(props)}>{children}</nav>,
+    ul: ({ children, ...props }: any) => <ul {...filterMotionProps(props)}>{children}</ul>,
+    li: ({ children, ...props }: any) => <li {...filterMotionProps(props)}>{children}</li>,
+    span: ({ children, ...props }: any) => <span {...filterMotionProps(props)}>{children}</span>,
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
 // Import components to test
 import AuthModal from './AuthModal';
 import BusinessInputForm from './BusinessInputForm';

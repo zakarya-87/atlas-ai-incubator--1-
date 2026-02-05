@@ -18,7 +18,7 @@ async function main() {
       // Update existing user to have admin privileges
       fullName: 'Atlas Admin',
       role: 'ADMIN',
-      credits: 999,
+      credits: 9999,
       subscriptionStatus: 'active',
       subscriptionPlan: 'enterprise',
     },
@@ -28,7 +28,7 @@ async function main() {
       password: hashedPassword,
       fullName: 'Atlas Admin',
       role: 'ADMIN',
-      credits: 999,
+      credits: 9999,
       subscriptionStatus: 'active',
       subscriptionPlan: 'enterprise',
     },

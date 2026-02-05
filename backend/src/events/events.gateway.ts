@@ -31,4 +31,8 @@ export class EventsGateway {
   emitLog(room: string, log: any) {
     this.server.to(room).emit('agentLog', log);
   }
+
+  emitAnalysisResult(room: string, data: { jobId: string; result: any }) {
+    this.server.to(room).emit('analysisResult', data);
+  }
 }

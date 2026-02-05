@@ -25,14 +25,11 @@ services:
   atlas-frontend:
     build: .
     ports:
-      - '5173:5173'
+      - '5173:80'
     environment:
       - VITE_BACKEND_URL=http://localhost:3000
     depends_on:
       - atlas-backend
-    volumes:
-      - .:/app
-      - /app/node_modules
     networks:
       - atlas-network
     restart: unless-stopped

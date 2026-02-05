@@ -71,7 +71,14 @@ describe('IntegrationsService', () => {
       const result = await service.getIntegrations('venture-123', 'user-123');
 
       expect(prismaService.venture.create).toHaveBeenCalledWith({
-        data: { id: 'venture-123', userId: 'user-123', name: 'My Venture' },
+        data: { 
+          id: 'venture-123', 
+          userId: 'user-123', 
+          name: 'Venture venture-',
+          description: 'Auto-created venture',
+          industry: 'Technology',
+          stage: 'idea'
+        },
       });
       expect(result).toEqual([]);
     });

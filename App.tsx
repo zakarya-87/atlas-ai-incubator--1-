@@ -375,6 +375,25 @@ const AppContent: React.FC = () => {
     handleGenerate(lastSubmittedImage);
   };
 
+  const handleAnalysisResult = (data: { jobId: string; result: AnyAnalysisData }) => {
+    // Update state with the received analysis result
+    setCurrentAnalysis(data.result);
+    setIsLoading(false);
+
+    // Create a new history record
+    const newRecord: GenerationRecord = {
+      id: data.result.id || `${Date.now()}-${Math.random()}`,
+      timestamp: new Date().toISOString(),
+      module: activeModule,
+      tool: activeTool,
+      toolNameKey:
+        `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
+      inputDescription: businessDescription,
+      data: data.result,
+    };
+    setGenerationHistory((prev) => [newRecord, ...prev]);
+  };
+
   const handleRefinement = (instruction: string) => {
     // Find the ID of the current analysis being viewed/edited
     const currentId = (currentAnalysis as any)?.id || viewingHistoryRecord?.id;
@@ -414,6 +433,7 @@ const AppContent: React.FC = () => {
     onViewHistory: handleViewHistoryRecord,
     onDeleteHistory: handleDeleteHistoryRecord,
     onNavigate: handleNavigate,
+    onAnalysisResult: handleAnalysisResult,
   });
 
   return (

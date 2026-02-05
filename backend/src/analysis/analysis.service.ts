@@ -102,8 +102,12 @@ export class AnalysisService {
 
     try {
       // 0. Check Credits (SaaS Limit)
-      // If userId is dev-bypass, skip check. Otherwise enforce.
-      if (userId !== 'dev-test-user-id') {
+      // Skip credit check for dev-bypass user or admin users
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (userId !== 'dev-test-user-id' && user?.role !== 'ADMIN') {
         await this.usersService.checkAndDeductCredits(userId);
       }
 

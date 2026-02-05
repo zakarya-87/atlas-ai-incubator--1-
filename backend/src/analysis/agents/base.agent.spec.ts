@@ -206,4 +206,80 @@ describe('BaseAgent', () => {
       expect(() => (agent2 as any).getClient()).toThrow();
     });
   });
+
+  describe('Fallback Logic', () => {
+    let mockProviderFactory: any;
+    let mockSecondaryProvider: any;
+
+    beforeEach(() => {
+      mockSecondaryProvider = {
+        complete: jest.fn().mockResolvedValue({
+          text: '{"result": "fallback-success"}',
+          data: { result: 'fallback-success' },
+        }),
+      };
+
+      mockProviderFactory = {
+        getAvailableProviders: jest.fn().mockReturnValue(['gemini', 'openai']),
+        getProvider: jest.fn().mockReturnValue(mockSecondaryProvider),
+      };
+
+      // Create agent instance with provider factory for fallback testing
+      agent = new TestAgent(configService as ConfigService, mockProviderFactory as any);
+    });
+
+    it('should fallback to secondary provider on Gemini rate limit (429)', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockRejectedValue(new Error('RESOURCE_EXHAUSTED (429)')),
+      };
+
+      const client = {
+        getGenerativeModel: jest.fn().mockReturnValue(generativeModel),
+      };
+
+      // Inject mocked client to avoid getClient() logic
+      (agent as any).aiClient = client;
+
+      const result = await agent.generate('test', 'context');
+
+      expect(result.data).toEqual({ result: 'fallback-success' });
+      expect(mockProviderFactory.getProvider).toHaveBeenCalledWith('openai');
+      expect(mockSecondaryProvider.complete).toHaveBeenCalled();
+    });
+
+    it('should exhaust all retries before attempting fallback', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockRejectedValue(new Error('RESOURCE_EXHAUSTED (429)')),
+      };
+
+      const client = {
+        getGenerativeModel: jest.fn().mockReturnValue(generativeModel),
+      };
+
+      (agent as any).aiClient = client;
+
+      await agent.generate('test', 'context');
+
+      // Default maxRetries is 3
+      expect(generativeModel.generateContent).toHaveBeenCalledTimes(3);
+    });
+
+    it('should throw InternalServerErrorException if both primary and fallbacks fail', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockRejectedValue(new Error('RESOURCE_EXHAUSTED (429)')),
+      };
+
+      const client = {
+        getGenerativeModel: jest.fn().mockReturnValue(generativeModel),
+      };
+
+      (agent as any).aiClient = client;
+
+      mockSecondaryProvider.complete.mockRejectedValue(new Error('OpenAI also failed'));
+
+      await expect(agent.generate('test', 'context')).rejects.toThrow(
+        'API rate limit exceeded. We attempted multiple retries and fallbacks.'
+      );
+    });
+  });
 });

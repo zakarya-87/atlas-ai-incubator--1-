@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { API_CONFIG } from '../utils/constants';
-import { AgentLog } from '../types';
+import { AgentLog, AnyAnalysisData } from '../types';
 
 interface UseWebSocketReturn {
   socket: Socket | null;
@@ -9,9 +9,10 @@ interface UseWebSocketReturn {
   joinRoom: (room: string) => void;
   logs: AgentLog[];
   emitLog: (room: string, log: AgentLog) => void;
+  onAnalysisResult?: (result: { jobId: string; result: AnyAnalysisData }) => void;
 }
 
-export const useWebSocket = (room?: string): UseWebSocketReturn => {
+export const useWebSocket = (room?: string, onAnalysisResult?: (result: { jobId: string; result: AnyAnalysisData }) => void): UseWebSocketReturn => {
   const [isConnected, setIsConnected] = useState(false);
   const [logs, setLogs] = useState<AgentLog[]>([]);
   const socketRef = useRef<Socket | null>(null);
@@ -41,11 +42,17 @@ export const useWebSocket = (room?: string): UseWebSocketReturn => {
       setLogs((prev) => [...prev, log]);
     });
 
+    socket.on('analysisResult', (data: { jobId: string; result: AnyAnalysisData }) => {
+      if (onAnalysisResult) {
+        onAnalysisResult(data);
+      }
+    });
+
     return () => {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [room]);
+  }, [room, onAnalysisResult]);
 
   const joinRoom = useCallback((newRoom: string) => {
     if (socketRef.current?.connected) {
@@ -64,7 +71,8 @@ export const useWebSocket = (room?: string): UseWebSocketReturn => {
     isConnected,
     joinRoom,
     logs,
-    emitLog
+    emitLog,
+    onAnalysisResult,
   };
 };
 

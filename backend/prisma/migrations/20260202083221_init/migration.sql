@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "users" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "fullName" TEXT,
@@ -9,48 +9,52 @@ CREATE TABLE "users" (
     "subscriptionStatus" TEXT NOT NULL DEFAULT 'free',
     "subscriptionPlan" TEXT NOT NULL DEFAULT 'free',
     "stripeCustomerId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "refresh_tokens" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "expiresAt" DATETIME NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "refresh_tokens_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "refresh_tokens_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ventures" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
     "industry" TEXT,
     "stage" TEXT,
     "userId" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "ventures_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ventures_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "venture_members" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "ventureId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'viewer',
     "invitedBy" TEXT,
-    "joinedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "venture_members_ventureId_fkey" FOREIGN KEY ("ventureId") REFERENCES "ventures" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "venture_members_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "venture_members_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "analyses" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "ventureId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "module" TEXT NOT NULL,
@@ -58,57 +62,60 @@ CREATE TABLE "analyses" (
     "inputContext" TEXT NOT NULL,
     "resultData" TEXT NOT NULL,
     "parentId" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "analyses_ventureId_fkey" FOREIGN KEY ("ventureId") REFERENCES "ventures" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "analyses_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "analyses_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "analyses" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "analyses_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "integrations" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "userId" TEXT NOT NULL,
+    "id" TEXT NOT NULL,
+    "ventureId" TEXT NOT NULL,
     "provider" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'disconnected',
-    "tokens" TEXT,
-    "metadata" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "config" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "integrations_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "subscriptions" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "stripeSubscriptionId" TEXT NOT NULL,
     "plan" TEXT NOT NULL,
     "status" TEXT NOT NULL,
-    "currentPeriodEnd" DATETIME NOT NULL,
+    "currentPeriodEnd" TIMESTAMP(3) NOT NULL,
     "cancelAtPeriodEnd" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "subscriptions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "jobs" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "status" TEXT NOT NULL,
     "input" TEXT,
     "result" TEXT,
     "error" TEXT,
-    "startedAt" DATETIME,
-    "completedAt" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "jobs_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "startedAt" TIMESTAMP(3),
+    "completedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "jobs_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "audit_logs" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "userId" TEXT,
     "action" TEXT NOT NULL,
     "entity" TEXT NOT NULL,
@@ -116,7 +123,9 @@ CREATE TABLE "audit_logs" (
     "metadata" TEXT,
     "ipAddress" TEXT,
     "userAgent" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -168,10 +177,10 @@ CREATE INDEX "analyses_createdAt_idx" ON "analyses"("createdAt");
 CREATE INDEX "analyses_parentId_idx" ON "analyses"("parentId");
 
 -- CreateIndex
-CREATE INDEX "integrations_userId_idx" ON "integrations"("userId");
+CREATE INDEX "integrations_ventureId_idx" ON "integrations"("ventureId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "integrations_userId_provider_key" ON "integrations"("userId", "provider");
+CREATE UNIQUE INDEX "integrations_ventureId_provider_key" ON "integrations"("ventureId", "provider");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "subscriptions_stripeSubscriptionId_key" ON "subscriptions"("stripeSubscriptionId");
@@ -199,3 +208,27 @@ CREATE INDEX "audit_logs_action_idx" ON "audit_logs"("action");
 
 -- CreateIndex
 CREATE INDEX "audit_logs_createdAt_idx" ON "audit_logs"("createdAt");
+
+-- AddForeignKey
+ALTER TABLE "refresh_tokens" ADD CONSTRAINT "refresh_tokens_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ventures" ADD CONSTRAINT "ventures_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "venture_members" ADD CONSTRAINT "venture_members_ventureId_fkey" FOREIGN KEY ("ventureId") REFERENCES "ventures"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "venture_members" ADD CONSTRAINT "venture_members_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "analyses" ADD CONSTRAINT "analyses_ventureId_fkey" FOREIGN KEY ("ventureId") REFERENCES "ventures"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "analyses" ADD CONSTRAINT "analyses_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "analyses" ADD CONSTRAINT "analyses_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "analyses"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "jobs" ADD CONSTRAINT "jobs_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -771,11 +771,11 @@ async function fetchWithTimeout(
     clearTimeout(timeoutId);
     activeRequests.delete(requestId);
     return response;
-  } catch (error) {
+  } catch (error: any) {
     clearTimeout(timeoutId);
     activeRequests.delete(requestId);
 
-    if (error instanceof Error && error.name === 'AbortError') {
+    if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
       throw new Error(ERROR_CODES.TIMEOUT);
     }
     throw error;
@@ -793,25 +793,31 @@ async function fetchWithRetry(
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const response = await fetchWithTimeout(url, options);
-
-      // Don't retry on 4xx errors (client errors)
-      if (
-        response.status >= 400 &&
-        response.status < 500 &&
-        response.status !== 429
-      ) {
+      // Handle success
+      if (response.ok) {
         return response;
       }
 
-      // Retry on 5xx errors and 429 (rate limit)
+      // Don't retry on most 4xx errors
+      if (response.status >= 400 && response.status < 500 && response.status !== 429) {
+        return response;
+      }
+
+      // Retry on 5xx errors and 429
       if (response.status >= 500 || response.status === 429) {
         if (attempt < maxRetries) {
           const delay = API_CONFIG.RETRY_DELAY * Math.pow(2, attempt);
-          logger.warn(
-            `Request failed with status ${response.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`
-          );
+          logger.warn(`Request failed with status ${response.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
           await new Promise((resolve) => setTimeout(resolve, delay));
           continue;
+        }
+
+        // Retries exhausted
+        if (response.status === 429) {
+          throw new Error(ERROR_CODES.RATE_LIMIT);
+        }
+        if (response.status >= 500) {
+          throw new Error(ERROR_CODES.SERVER_ERROR);
         }
       }
 
@@ -850,7 +856,9 @@ async function generateAnalysis<T>(
   toolName: string,
   moduleName: ModuleType,
   image?: string, // Optional Base64 Image
-  refinement?: { instruction: string; parentId: string } // Optional Refinement
+  refinement?: { instruction: string; parentId: string }, // Optional Refinement
+  pollInterval = 2000,
+  timeout = 900000
 ): Promise<T> {
   const t = (key: any) =>
     (translations[language] as any)[key] || (translations['en'] as any)[key];
@@ -860,11 +868,6 @@ async function generateAnalysis<T>(
     businessDescription
   );
   const token = getAuthToken();
-  if (!token) {
-    console.warn('[GeminiService] SUBMITTING WITHOUT TOKEN! User may be logged out or STORAGE_KEYS mismatch.');
-  } else {
-    console.log('[GeminiService] Submitting with token:', token.substring(0, 10));
-  }
 
   try {
     logger.log(
@@ -899,7 +902,7 @@ async function generateAnalysis<T>(
       if (response.status === 401)
         throw new Error('Authentication Required. Please sign in.');
       if (response.status === 429) throw new Error(ERROR_CODES.RATE_LIMIT);
-      if (response.status === 500) throw new Error(ERROR_CODES.SERVER_ERROR);
+      if (response.status >= 500) throw new Error(ERROR_CODES.SERVER_ERROR);
 
       try {
         const errBody = await response.text();
@@ -913,27 +916,24 @@ async function generateAnalysis<T>(
     logger.log(`[Frontend] Job submitted: ${jobId}, polling for completion...`);
 
     // Poll for completion
-    const result = await pollJobCompletion<T>(jobId);
+    const result = await pollJobCompletion<T>(jobId, pollInterval, timeout);
     return result;
-  } catch (error) {
+  } catch (error: any) {
     logger.error('Error generating analysis from Backend:', error);
-    if (error instanceof Error) {
-      // Rethrow known error codes or specific auth messages
-      if (
-        Object.values(ERROR_CODES).includes(error.message as any) ||
-        error.message.includes('Authentication Required')
-      ) {
-        throw error;
-      }
 
-      if (error.message === 'Failed to fetch') {
-        logger.error(
-          `[Network Error] Could not connect to ${API_CONFIG.BACKEND_URL}.`
-        );
-        throw new Error(ERROR_CODES.NETWORK_ERROR);
-      }
+    const message = error?.message || '';
+
+    // Recognize specific network errors to wrap them
+    if (
+      message.toLowerCase().includes('failed to fetch') ||
+      message.toLowerCase().includes('network error')
+    ) {
+      logger.error(`[Network Error] Could not connect to ${API_CONFIG.BACKEND_URL}.`);
+      throw new Error(ERROR_CODES.NETWORK_ERROR);
     }
-    throw new Error(ERROR_CODES.GENERIC);
+
+    // Otherwise, rethrow the error as-is (e.g., job failures, auth, known error codes)
+    throw error;
   }
 }
 
@@ -941,7 +941,7 @@ async function generateAnalysis<T>(
 async function pollJobCompletion<T>(
   jobId: string,
   pollInterval = 2000,
-  timeout = 300000
+  timeout = 900000
 ): Promise<T> {
   const token = getAuthToken();
   const startTime = Date.now();
@@ -951,7 +951,7 @@ async function pollJobCompletion<T>(
       try {
         if (Date.now() - startTime > timeout) {
           clearInterval(intervalId);
-          reject(new Error('Job timeout after 5 minutes'));
+          reject(new Error(`Job timeout after ${timeout}ms`));
           return;
         }
 
@@ -1230,7 +1230,9 @@ export const generateSwotAnalysis = (
   lang: Language,
   vid: string,
   image?: string,
-  refinement?: any
+  refinement?: any,
+  pollInterval?: number,
+  timeout?: number
 ) =>
   generateAnalysis<SwotData>(
     'geminiPromptSwot',
@@ -1241,7 +1243,9 @@ export const generateSwotAnalysis = (
     'swot',
     'strategy',
     image,
-    refinement
+    refinement,
+    pollInterval,
+    timeout
   );
 export const generatePestelAnalysis = (
   desc: string,

@@ -4,11 +4,15 @@ import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   try {
     // 1. Create the main HTTP application
     const app = await NestFactory.create(AppModule);
+
+    // --- COOKIE PARSER (Required for JWT cookie auth) ---
+    app.use(cookieParser());
 
     // --- SECURITY HEADERS (Helmet) ---
     app.use(helmet());

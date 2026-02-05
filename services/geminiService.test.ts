@@ -1,4 +1,4 @@
-import { expect, vi, describe, it, beforeEach } from 'vitest';
+import { expect, vi, describe, it, beforeEach, afterEach } from 'vitest';
 import {
   generateSwotAnalysis,
   fetchVentureHistory,
@@ -8,7 +8,7 @@ import { STORAGE_KEYS } from '../utils/constants';
 
 // Mock global fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
+vi.stubGlobal('fetch', mockFetch);
 
 // Mock API_CONFIG to reduce retry delays for tests
 vi.mock('../utils/constants', async (importOriginal) => {
@@ -30,6 +30,10 @@ describe('geminiService', () => {
     vi.clearAllMocks();
     localStorage.clear();
     localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'test-token');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('should verify localStorage works in test environment', () => {

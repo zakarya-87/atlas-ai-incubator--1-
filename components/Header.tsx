@@ -35,12 +35,12 @@ const Header: React.FC<HeaderProps> = memo(
     // Fetch credits periodically or on load
     useEffect(() => {
       if (isAuthenticated) {
-        // In demo admin mode, skip backend calls and show stub values
-        if (isAdmin) {
-          setCredits(100);
-          setIsPro(true);
-          return;
-        }
+         // In demo admin mode, show high credits without backend calls
+         if (isAdmin) {
+           setCredits(9999);
+           setIsPro(true);
+           return;
+         }
         const loadCredits = async () => {
           try {
             const profile = await fetchUserProfile();
