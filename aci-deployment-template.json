@@ -1,0 +1,167 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "containerGroupName": {
+      "type": "string",
+      "defaultValue": "atlas-ai-container-group",
+      "metadata": {
+        "description": "Name for the container group"
+      }
+    },
+    "frontendImage": {
+      "type": "string",
+      "defaultValue": "atlas-frontend:latest",
+      "metadata": {
+        "description": "Container image for the frontend"
+      }
+    },
+    "backendImage": {
+      "type": "string",
+      "defaultValue": "atlas-backend:latest",
+      "metadata": {
+        "description": "Container image for the backend"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "frontendPort": {
+      "type": "int",
+      "defaultValue": 80,
+      "metadata": {
+        "description": "Port for the frontend container"
+      }
+    },
+    "backendPort": {
+      "type": "int",
+      "defaultValue": 3000,
+      "metadata": {
+        "description": "Port for the backend container"
+      }
+    },
+    "databaseUrl": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Database connection string"
+      }
+    },
+    "jwtSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "JWT secret for authentication"
+      }
+    },
+    "apiKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "API key for the application"
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2021-09-01",
+      "name": "[parameters('containerGroupName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "containers": [
+          {
+            "name": "atlas-frontend",
+            "properties": {
+              "image": "[parameters('frontendImage')]",
+              "ports": [
+                {
+                  "port": "[parameters('frontendPort')]",
+                  "protocol": "TCP"
+                }
+              ],
+              "environmentVariables": [
+                {
+                  "name": "VITE_BACKEND_URL",
+                  "value": "[concat('http://', reference(resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerGroupName'))).ipAddress.ip, ':', parameters('backendPort'))]"
+                }
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGb": 2
+                }
+              }
+            }
+          },
+          {
+            "name": "atlas-backend",
+            "properties": {
+              "image": "[parameters('backendImage')]",
+              "ports": [
+                {
+                  "port": "[parameters('backendPort')]",
+                  "protocol": "TCP"
+                }
+              ],
+              "environmentVariables": [
+                {
+                  "name": "DATABASE_URL",
+                  "secureValue": "[parameters('databaseUrl')]"
+                },
+                {
+                  "name": "JWT_SECRET",
+                  "secureValue": "[parameters('jwtSecret')]"
+                },
+                {
+                  "name": "API_KEY",
+                  "secureValue": "[parameters('apiKey')]"
+                },
+                {
+                  "name": "NODE_ENV",
+                  "value": "production"
+                },
+                {
+                  "name": "REDIS_HOST",
+                  "value": "redis-service"  // Note: ACI doesn't support internal Redis, this would need to be external
+                },
+                {
+                  "name": "REDIS_PORT",
+                  "value": "6379"
+                }
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": 1,
+                  "memoryInGb": 2
+                }
+              }
+            }
+          }
+        ],
+        "osType": "Linux",
+        "ipAddress": {
+          "type": "Public",
+          "ports": [
+            {
+              "protocol": "TCP",
+              "port": "[parameters('frontendPort')]"
+            },
+            {
+              "protocol": "TCP",
+              "port": "[parameters('backendPort')]"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "frontendIpAddress": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerGroupName'))).ipAddress.ip]"
+    }
+  }
+}
