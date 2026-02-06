@@ -18,7 +18,8 @@ This guide explains how to build Docker images for the ATLAS AI Incubator fronte
 cd C:\Users\zboud\ATLAS AI Incubator
 
 # Build the frontend image
-docker build -t atlas-frontend .
+# IMPORTANT: You MUST provide the VITE_BACKEND_URL build argument!
+docker build -t atlas-frontend --build-arg VITE_BACKEND_URL=https://atlas-ai-backend-app.azurewebsites.net .
 
 # Tag for Azure Container Registry (if needed)
 docker tag atlas-frontend your-acr-name.azurecr.io/atlas-frontend:v1.0.0

@@ -7,6 +7,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# Production stage
+# Add VITE_BACKEND_URL build argument to bake it into the static build
+ARG VITE_BACKEND_URL
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
 # Copy source and build
 COPY . .
 RUN npm run build

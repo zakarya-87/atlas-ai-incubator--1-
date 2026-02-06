@@ -55,6 +55,13 @@ export abstract class BaseAgent implements AiAgent {
     const maxRetries = 3;
     let lastError: Error | null = null;
 
+    const baseUrl = this.configService.get<string>('GEMINI_API_BASE_URL');
+    const apiVersion = this.configService.get<string>('GEMINI_API_VERSION');
+    const requestOptions: any = { timeout: 300000 };
+
+    if (baseUrl) requestOptions.baseUrl = baseUrl;
+    if (apiVersion) requestOptions.apiVersion = apiVersion;
+
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const client = this.getClient();
@@ -95,7 +102,7 @@ export abstract class BaseAgent implements AiAgent {
             responseMimeType: 'application/json',
             responseSchema: schema,
           },
-        });
+        }, requestOptions);
 
         console.log(
           `[Gemini] Starting generation with model: ${selectedModel} (attempt ${attempt + 1}/${maxRetries})`
