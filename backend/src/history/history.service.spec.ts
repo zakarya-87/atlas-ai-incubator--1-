@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -136,6 +136,7 @@ describe('HistoryService', () => {
           tool: true,
           resultData: true,
           inputContext: true,
+          createdAt: true,
         },
       });
       expect(result).toEqual(mockAnalyses);

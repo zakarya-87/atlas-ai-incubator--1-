@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateVersionDto {
@@ -24,7 +24,7 @@ export class CreateVersionDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  data: any;
+  data: Record<string, unknown>;
 
   @ApiProperty({ required: false })
   @IsString()

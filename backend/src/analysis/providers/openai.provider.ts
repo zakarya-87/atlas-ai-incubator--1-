@@ -1,10 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
-  AIProviderInterface,
   AIProvider,
+  AIProviderInterface,
   AIProviderRequest,
   AIProviderResponse,
+  ChatCompletionResponse,
 } from '../interfaces/ai-provider.interface';
 
 @Injectable()
@@ -15,9 +16,9 @@ export class OpenAIProvider implements AIProviderInterface {
   private readonly apiVersion: string;
 
   constructor(private configService: ConfigService) {
-    this.apiKey = this.configService.get<string>('AZURE_OPENAI_API_KEY');
-    this.endpoint = this.configService.get<string>('AZURE_OPENAI_ENDPOINT');
-    this.deployment = this.configService.get<string>('AZURE_OPENAI_DEPLOYMENT');
+    this.apiKey = this.configService.get<string>('AZURE_OPENAI_API_KEY') || '';
+    this.endpoint = this.configService.get<string>('AZURE_OPENAI_ENDPOINT') || '';
+    this.deployment = this.configService.get<string>('AZURE_OPENAI_DEPLOYMENT') || '';
     this.apiVersion = this.configService.get<string>('AZURE_OPENAI_API_VERSION', '2024-04-01-preview');
   }
 
@@ -63,14 +64,14 @@ export class OpenAIProvider implements AIProviderInterface {
         throw new Error(`Azure OpenAI API error: ${response.status} ${error}`);
       }
 
-      const result = await response.json();
+      const result = (await response.json()) as ChatCompletionResponse;
       const text = result.choices[0].message.content;
-      let data = text;
+      let data: Record<string, unknown> = { text };
 
       if (request.schema) {
         try {
-          data = JSON.parse(text);
-        } catch (e) {
+          data = JSON.parse(text) as Record<string, unknown>;
+        } catch {
           console.error('[Azure OpenAI] JSON Parse Error:', text);
           throw new InternalServerErrorException('Azure OpenAI model produced malformed JSON');
         }
@@ -81,9 +82,10 @@ export class OpenAIProvider implements AIProviderInterface {
         data,
         rawResponse: result,
       };
-    } catch (error) {
-      console.error('[Azure OpenAI] API Call failed:', error.message);
-      throw new InternalServerErrorException(`Azure OpenAI generation failed: ${error.message}`);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error('[Azure OpenAI] API Call failed:', msg);
+      throw new InternalServerErrorException(`Azure OpenAI generation failed: ${msg}`);
     }
   }
 }

@@ -18,7 +18,7 @@ export class AuthController {
   async signIn(
     @Body() authCredentialsDto: AuthCredentialsDto,
     @Res({ passthrough: true }) res: Response
-  ) {
+  ): Promise<{ success: boolean; access_token: string }> {
     const { accessToken } = await this.authService.signIn(authCredentialsDto);
 
     // Set JWT as httpOnly cookie for security
@@ -36,7 +36,7 @@ export class AuthController {
 
   @Post('/logout')
   @UseGuards(JwtAuthGuard)
-  logout(@Res({ passthrough: true }) res: Response) {
+  logout(@Res({ passthrough: true }) res: Response): { success: boolean } {
 
     // Clear the JWT cookie
     res.clearCookie('accessToken', {
@@ -51,7 +51,7 @@ export class AuthController {
 
   @Post('/refresh')
   @UseGuards(JwtAuthGuard)
-  async refresh(@Res({ passthrough: true }) res: Response) {
+  refresh(@Res({ passthrough: true }) _res: Response): { success: boolean } {
 
     // This endpoint will validate the cookie and return a success status
     // The JWT validation is handled by the AuthGuard which will refresh the cookie if needed

@@ -86,7 +86,7 @@ describe('AnalysisController', () => {
 
       expect(result).toHaveProperty('jobId');
       expect(jobsService.queueAnalysis).toHaveBeenCalledWith(
-        result.jobId,
+        (result as any).jobId,
         dto,
         mockUser.id
       );

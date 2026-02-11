@@ -12,7 +12,7 @@ echo ""
 echo "Step 1/3: Waiting for PostgreSQL..."
 max_attempts=30
 attempt=0
-while ! pg_isready -h postgres -U atlas_user -d atlas_db > /dev/null 2>&1; do
+while ! pg_isready -h localhost -U atlas_user -d atlas_db > /dev/null 2>&1; do
     attempt=$((attempt + 1))
     if [ $attempt -ge $max_attempts ]; then
         echo "ERROR: PostgreSQL did not become ready after $max_attempts attempts"

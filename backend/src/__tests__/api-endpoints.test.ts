@@ -4,7 +4,6 @@ import * as request from 'supertest';
 import { AppModule } from '../app.module';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 
 // Mock external services
 jest.mock('@google/generative-ai');
@@ -14,7 +13,6 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let jwtService: JwtService;
-  let configService: ConfigService;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -26,7 +24,6 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     jwtService = moduleFixture.get<JwtService>(JwtService);
-    configService = moduleFixture.get<ConfigService>(ConfigService);
 
     // Clear database before each test
     // await prisma.cleanDb();
@@ -37,8 +34,8 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
   });
 
   describe('/auth endpoints', () => {
-    it('should register a new user successfully', () => {
-      return request(app.getHttpServer())
+    it('should register a new user successfully', async () => {
+      await request(app.getHttpServer())
         .post('/auth/register')
         .send({
           email: 'test@example.com',
@@ -46,7 +43,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
           name: 'Test User',
         })
         .expect(201)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(res.body).toHaveProperty('access_token');
           expect(res.body).toHaveProperty('user');
           expect(res.body.user.email).toBe('test@example.com');
@@ -65,7 +62,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         .expect(201);
 
       // Duplicate registration
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/auth/register')
         .send({
           email: 'duplicate@example.com',
@@ -84,21 +81,21 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       });
 
       // Then login
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/auth/login')
         .send({
           email: 'login@example.com',
           password: 'password123',
         })
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(res.body).toHaveProperty('access_token');
           expect(res.body).toHaveProperty('user');
         });
     });
 
-    it('should reject login with invalid credentials', () => {
-      return request(app.getHttpServer())
+    it('should reject login with invalid credentials', async () => {
+      await request(app.getHttpServer())
         .post('/auth/login')
         .send({
           email: 'invalid@example.com',
@@ -125,7 +122,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       const token = loginResponse.body.access_token;
 
       // Use token to access protected route
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .get('/users/profile')
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
@@ -153,8 +150,8 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       authToken = loginResponse.body.access_token;
     });
 
-    it('should create a new venture', () => {
-      return request(app.getHttpServer())
+    it('should create a new venture', async () => {
+      await request(app.getHttpServer())
         .post('/ventures')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
@@ -162,7 +159,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
           description: 'A test business venture',
         })
         .expect(201)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(res.body).toHaveProperty('id');
           expect(res.body.name).toBe('Test Venture');
           expect(res.body.description).toBe('A test business venture');
@@ -179,11 +176,9 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
           description: 'User venture',
         });
 
-      return request(app.getHttpServer())
-        .get('/ventures')
-        .set('Authorization', `Bearer ${authToken}`)
+      await request(app.getHttpServer())
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toBeGreaterThan(0);
           expect(res.body[0]).toHaveProperty('name', 'My Venture');
@@ -203,7 +198,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       const ventureId = createResponse.body.id;
 
       // Update venture
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .put(`/ventures/${ventureId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send({
@@ -211,7 +206,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
           description: 'Updated description',
         })
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(res.body.name).toBe('Updated Name');
           expect(res.body.description).toBe('Updated description');
         });
@@ -236,12 +231,12 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         .expect(200);
 
       // Verify deletion
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .get('/ventures')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
-        .expect((res) => {
-          const deletedVenture = res.body.find((v: any) => v.id === ventureId);
+        .expect((res: request.Response) => {
+          const deletedVenture = res.body.find((v: unknown) => v.id === ventureId);
           expect(deletedVenture).toBeUndefined();
         });
     });
@@ -279,8 +274,8 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       ventureId = ventureResponse.body.id;
     });
 
-    it('should submit analysis generation job', () => {
-      return request(app.getHttpServer())
+    it('should submit analysis generation job', async () => {
+      await request(app.getHttpServer())
         .post('/analysis/generate')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
@@ -301,7 +296,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
           },
         })
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(res.body).toHaveProperty('jobId');
         });
     });
@@ -324,11 +319,11 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       const jobId = submitResponse.body.jobId;
 
       // Poll job status
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .get(`/jobs/${jobId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(res.body).toHaveProperty('status');
           expect(['pending', 'processing', 'completed', 'failed']).toContain(
             res.body.status
@@ -336,12 +331,12 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         });
     });
 
-    it('should retrieve venture analysis history', () => {
-      return request(app.getHttpServer())
+    it('should retrieve venture analysis history', async () => {
+      await request(app.getHttpServer())
         .get(`/history/${ventureId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(Array.isArray(res.body)).toBe(true);
         });
     });
@@ -368,7 +363,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       const firstAnalysis = historyResponse.body[0];
 
       // Save version
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/history/version')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
@@ -415,14 +410,14 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         .set('Authorization', `Bearer ${authToken}`);
 
       const deletedRecord = updatedHistory.body.find(
-        (r: any) => r.id === analysisToDelete.id
+        (r: { id: string }) => r.id === analysisToDelete.id
       );
       expect(deletedRecord).toBeUndefined();
     });
   });
 
   describe('/users endpoints', () => {
-    let authToken: string;
+    let authTokenAfter: string;
     let userId: string;
 
     beforeEach(async () => {
@@ -444,40 +439,40 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
           password: 'password123',
         });
 
-      authToken = loginResponse.body.access_token;
+      authTokenAfter = loginResponse.body.access_token;
     });
 
-    it('should get user profile', () => {
-      return request(app.getHttpServer())
+    it('should get user profile', async () => {
+      await request(app.getHttpServer())
         .get('/users/profile')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${authTokenAfter}`)
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(res.body).toHaveProperty('id', userId);
           expect(res.body).toHaveProperty('email', 'user@example.com');
           expect(res.body).toHaveProperty('name', 'Test User');
         });
     });
 
-    it('should update user profile', () => {
-      return request(app.getHttpServer())
+    it('should update user profile', async () => {
+      await request(app.getHttpServer())
         .put('/users/profile')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${authTokenAfter}`)
         .send({
           name: 'Updated Name',
           bio: 'Updated bio',
         })
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(res.body.name).toBe('Updated Name');
           expect(res.body.bio).toBe('Updated bio');
         });
     });
 
-    it('should change user password', () => {
-      return request(app.getHttpServer())
+    it('should change user password', async () => {
+      await request(app.getHttpServer())
         .put('/users/change-password')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${authTokenAfter}`)
         .send({
           currentPassword: 'password123',
           newPassword: 'newpassword456',
@@ -485,10 +480,10 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         .expect(200);
     });
 
-    it('should reject password change with wrong current password', () => {
-      return request(app.getHttpServer())
+    it('should reject password change with wrong current password', async () => {
+      await request(app.getHttpServer())
         .put('/users/change-password')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${authTokenAfter}`)
         .send({
           currentPassword: 'wrongpassword',
           newPassword: 'newpassword456',
@@ -498,7 +493,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
   });
 
   describe('/subscriptions endpoints', () => {
-    let authToken: string;
+    let subToken: string;
 
     beforeEach(async () => {
       // Create user and get token
@@ -515,14 +510,14 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
           password: 'password123',
         });
 
-      authToken = loginResponse.body.access_token;
+      subToken = loginResponse.body.access_token;
     });
 
-    it('should get subscription plans', () => {
-      return request(app.getHttpServer())
+    it('should get subscription plans', async () => {
+      await request(app.getHttpServer())
         .get('/subscriptions/plans')
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(Array.isArray(res.body)).toBe(true);
           expect(res.body.length).toBeGreaterThan(0);
           expect(res.body[0]).toHaveProperty('name');
@@ -530,27 +525,27 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         });
     });
 
-    it('should create subscription', () => {
-      return request(app.getHttpServer())
+    it('should create subscription', async () => {
+      await request(app.getHttpServer())
         .post('/subscriptions')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${subToken}`)
         .send({
           planId: 'premium-monthly',
           paymentMethodId: 'pm_test_payment_method',
         })
         .expect(201)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(res.body).toHaveProperty('id');
           expect(res.body).toHaveProperty('status');
         });
     });
 
-    it('should get user subscriptions', () => {
-      return request(app.getHttpServer())
+    it('should get user subscriptions', async () => {
+      await request(app.getHttpServer())
         .get('/subscriptions')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${subToken}`)
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(Array.isArray(res.body)).toBe(true);
         });
     });
@@ -559,7 +554,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       // Create subscription first
       const createResponse = await request(app.getHttpServer())
         .post('/subscriptions')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${subToken}`)
         .send({
           planId: 'premium-monthly',
           paymentMethodId: 'pm_test_payment_method',
@@ -568,9 +563,9 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       const subscriptionId = createResponse.body.id;
 
       // Cancel subscription
-      return request(app.getHttpServer())
+      await request(app.getHttpServer())
         .delete(`/subscriptions/${subscriptionId}`)
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${subToken}`)
         .expect(200);
     });
   });
@@ -606,6 +601,10 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
       const ventureId = ventureResponse.body.id;
 
+      // Mock tools and schema for the analysis generation
+      const tools = [{ functionDeclarations: [] }]; // Example mock
+      const schema = { type: 'object', properties: {} }; // Example mock
+
       const analysisResponse = await request(app.getHttpServer())
         .post('/analysis/generate')
         .set('Authorization', `Bearer ${authToken}`)
@@ -616,30 +615,34 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
           description: 'Report test analysis',
           language: 'en',
           prompt: 'Test',
-          responseSchema: {},
+          tools: tools as unknown as { functionDeclarations: unknown[] }[], // SDK expects specific tool array type
+          generationConfig: {
+            responseMimeType: 'application/json',
+            responseSchema: schema as unknown as Record<string, unknown>, // SDK expects its own Schema interface
+          },
         });
 
       analysisId = analysisResponse.body.jobId;
     });
 
-    it('should generate PDF report', () => {
-      return request(app.getHttpServer())
+    it('should generate PDF report', async () => {
+      await request(app.getHttpServer())
         .get(`/reports/${analysisId}/pdf`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
         .expect('Content-Type', /application\/pdf/);
     });
 
-    it('should generate CSV export', () => {
-      return request(app.getHttpServer())
+    it('should generate CSV export', async () => {
+      await request(app.getHttpServer())
         .get(`/reports/${analysisId}/csv`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
         .expect('Content-Type', /text\/csv/);
     });
 
-    it('should generate Markdown export', () => {
-      return request(app.getHttpServer())
+    it('should generate Markdown export', async () => {
+      await request(app.getHttpServer())
         .get(`/reports/${analysisId}/markdown`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
@@ -679,18 +682,18 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       ventureId = ventureResponse.body.id;
     });
 
-    it('should get integration status', () => {
-      return request(app.getHttpServer())
+    it('should get integration status', async () => {
+      await request(app.getHttpServer())
         .get(`/integrations?ventureId=${ventureId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
-        .expect((res) => {
+        .expect((res: request.Response) => {
           expect(Array.isArray(res.body)).toBe(true);
         });
     });
 
-    it('should toggle integration', () => {
-      return request(app.getHttpServer())
+    it('should toggle integration', async () => {
+      await request(app.getHttpServer())
         .post('/integrations/toggle')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
@@ -703,16 +706,16 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
   });
 
   describe('Error handling and validation', () => {
-    it('should handle malformed JSON in requests', () => {
-      return request(app.getHttpServer())
+    it('should handle malformed JSON in requests', async () => {
+      await request(app.getHttpServer())
         .post('/auth/register')
         .set('Content-Type', 'application/json')
         .send('{"invalid": json}')
         .expect(400);
     });
 
-    it('should handle missing required fields', () => {
-      return request(app.getHttpServer())
+    it('should handle missing required fields', async () => {
+      await request(app.getHttpServer())
         .post('/auth/register')
         .send({
           // Missing required fields
@@ -721,26 +724,26 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         .expect(400);
     });
 
-    it('should handle invalid HTTP methods', () => {
-      return request(app.getHttpServer())
+    it('should handle invalid HTTP methods', async () => {
+      await request(app.getHttpServer())
         .patch('/auth/register')
         .send({})
         .expect(404);
     });
 
-    it('should handle unauthorized access to protected routes', () => {
-      return request(app.getHttpServer()).get('/users/profile').expect(401);
+    it('should handle unauthorized access to protected routes', async () => {
+      await request(app.getHttpServer()).get('/users/profile').expect(401);
     });
 
-    it('should handle invalid JWT tokens', () => {
-      return request(app.getHttpServer())
+    it('should handle invalid JWT tokens', async () => {
+      await request(app.getHttpServer())
         .get('/users/profile')
         .set('Authorization', 'Bearer invalid-token')
         .expect(401);
     });
 
-    it('should handle non-existent resources', () => {
-      return request(app.getHttpServer())
+    it('should handle non-existent resources', async () => {
+      await request(app.getHttpServer())
         .get('/ventures/non-existent-id')
         .set('Authorization', `Bearer ${jwtService.sign({ sub: 'test-user' })}`)
         .expect(404);
@@ -748,7 +751,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
   });
 
   describe('Database integration', () => {
-    it('should handle database connection errors gracefully', async () => {
+    it('should handle database connection errors gracefully', () => {
       // Mock database disconnection
       jest
         .spyOn(prisma, '$connect')
@@ -786,7 +789,9 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
       // For now, verify endpoints respond normally under normal load
       const requests = Array(10)
         .fill(null)
-        .map(() => request(app.getHttpServer()).get('/health').expect(200));
+        .map(async () => {
+          await request(app.getHttpServer()).get('/health').expect(200);
+        });
 
       await Promise.all(requests);
     });

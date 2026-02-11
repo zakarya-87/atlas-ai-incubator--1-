@@ -17,6 +17,7 @@ jest.mock('@google/generative-ai', () => ({
 }));
 
 import { ConfigService } from '@nestjs/config';
+import { AIProviderFactory } from '../providers/ai-provider.factory';
 import { BaseAgent } from './base.agent';
 import { SchemaType } from '@google/generative-ai';
 
@@ -28,14 +29,14 @@ class TestAgent extends BaseAgent {
   async generate(
     prompt: string,
     context: string,
-    schema?: any,
+    schema?: Record<string, unknown> | null,
     systemInstruction?: string,
     images?: string[]
   ) {
     return this.executeGeminiCall(
       'gemini-2.5-pro',
       prompt,
-      schema,
+      schema || null,
       systemInstruction,
       images
     );
@@ -117,7 +118,7 @@ describe('BaseAgent', () => {
           title: { type: SchemaType.STRING },
           items: {
             type: SchemaType.ARRAY,
-            items: { type: SchemaType.STRING },
+            schema: { type: 'object' } as Record<string, unknown>,
           },
         },
         required: ['title', 'items'],
@@ -201,9 +202,12 @@ describe('BaseAgent', () => {
         get: () => undefined,
       };
 
-      const agent2 = new TestAgent(noKeyConfig as any);
+      const provider = new TestAgent(
+        noKeyConfig as unknown as ConfigService,
+        undefined as unknown as AIProviderFactory
+      );
 
-      expect(() => (agent2 as any).getClient()).toThrow();
+      expect(() => (provider as unknown as { getClient(): void }).getClient()).toThrow();
     });
   });
 
@@ -225,7 +229,7 @@ describe('BaseAgent', () => {
       };
 
       // Create agent instance with provider factory for fallback testing
-      agent = new TestAgent(configService as ConfigService, mockProviderFactory as any);
+      agent = new TestAgent(configService as ConfigService, mockProviderFactory as unknown as AIProviderFactory);
     });
 
     it('should fallback to secondary provider on Gemini rate limit (429)', async () => {

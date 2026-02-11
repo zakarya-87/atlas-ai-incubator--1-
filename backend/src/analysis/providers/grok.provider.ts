@@ -1,10 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
-  AIProviderInterface,
   AIProvider,
+  AIProviderInterface,
   AIProviderRequest,
   AIProviderResponse,
+  ChatCompletionResponse,
 } from '../interfaces/ai-provider.interface';
 
 @Injectable()
@@ -14,7 +15,7 @@ export class GrokProvider implements AIProviderInterface {
   private readonly apiUrl = 'https://api.x.ai/v1/chat/completions';
 
   constructor(private configService: ConfigService) {
-    this.apiKey = this.configService.get<string>('GROK_API_KEY');
+    this.apiKey = this.configService.get<string>('GROK_API_KEY') || '';
     this.model = this.configService.get<string>('GROK_MODEL', 'grok-beta');
   }
 
@@ -61,14 +62,14 @@ export class GrokProvider implements AIProviderInterface {
         throw new Error(`Grok API error: ${response.status} ${error}`);
       }
 
-      const result = await response.json();
+      const result = (await response.json()) as ChatCompletionResponse;
       const text = result.choices[0].message.content;
-      let data = text;
+      let data: Record<string, unknown> = { text };
 
       if (request.schema) {
         try {
-          data = JSON.parse(text);
-        } catch (e) {
+          data = JSON.parse(text) as Record<string, unknown>;
+        } catch {
           console.error('[Grok] JSON Parse Error:', text);
           throw new InternalServerErrorException('Grok model produced malformed JSON');
         }
@@ -79,9 +80,10 @@ export class GrokProvider implements AIProviderInterface {
         data,
         rawResponse: result,
       };
-    } catch (error) {
-      console.error('[Grok] API Call failed:', error.message);
-      throw new InternalServerErrorException(`Grok generation failed: ${error.message}`);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error('[Grok] API Call failed:', msg);
+      throw new InternalServerErrorException(`Grok generation failed: ${msg}`);
     }
   }
 }

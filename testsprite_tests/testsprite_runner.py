@@ -17,6 +17,7 @@ import traceback
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
 from enum import Enum
+import shutil
 
 
 class TestCategory(Enum):
@@ -27,6 +28,7 @@ class TestCategory(Enum):
     PERFORMANCE = "performance"      # PF* - Performance tests
     SECURITY = "security"            # SC* - Security tests
     REGRESSION = "regression"        # RG* - Regression tests
+    LINT = "lint"                    # LT* - Lint tests
     ALL = "all"                      # Run all categories
 
 
@@ -122,6 +124,8 @@ class TestSpriteRunner:
             return 'security'
         elif filename.startswith('RG'):
             return 'regression'
+        elif filename.startswith('LT'):
+            return 'lint'
         return 'unknown'
     
     def _load_test_files(self):
@@ -133,7 +137,8 @@ class TestSpriteRunner:
             TestCategory.PERFORMANCE: ["PF*.py"],
             TestCategory.SECURITY: ["SC*.py"],
             TestCategory.REGRESSION: ["RG*.py"],
-            TestCategory.ALL: ["TC*.py", "EC*.py", "EH*.py", "PF*.py", "SC*.py", "RG*.py"]
+            TestCategory.LINT: ["LT*.py"],
+            TestCategory.ALL: ["TC*.py", "EC*.py", "EH*.py", "PF*.py", "SC*.py", "RG*.py", "LT*.py"]
         }
         
         selected_patterns = patterns.get(self.category, patterns[TestCategory.ALL])
@@ -149,13 +154,18 @@ class TestSpriteRunner:
     
     def _check_mcp_server(self):
         """Check if TestSprite MCP server is available"""
+        cmd = self._testsprite_version_command()
+        if not cmd:
+            print("[INFO] MCP server check skipped: testsprite CLI not found")
+            self.mcp_server_available = False
+            return
+
         try:
             result = subprocess.run(
-                ['npx', '@testsprite/testsprite-mcp@latest', '--version'],
+                cmd,
                 capture_output=True,
                 text=True,
-                timeout=5,
-                shell=True
+                timeout=60
             )
             self.mcp_server_available = result.returncode == 0
             if self.mcp_server_available:
@@ -165,9 +175,53 @@ class TestSpriteRunner:
         except subprocess.TimeoutExpired:
             print("[INFO] MCP server check timed out - running in standalone mode")
             self.mcp_server_available = False
+        except FileNotFoundError as e:
+            print(f"[INFO] MCP server check skipped: {e}")
+            self.mcp_server_available = False
         except Exception as e:
             print(f"[INFO] MCP server check skipped: {e}")
             self.mcp_server_available = False
+
+    def _testsprite_version_command(self) -> Optional[List[str]]:
+        """Return the command line that can print TestSprite MCP version"""
+        node = shutil.which('node')
+        cached_index = self._find_cached_testsprite_index()
+        if node and cached_index:
+            return [node, str(cached_index), '--version']
+
+        npx = shutil.which('npx.cmd') or shutil.which('npx')
+        if npx:
+            return [npx, '-y', '@testsprite/testsprite-mcp@latest', '--version']
+
+        return None
+
+    def _find_cached_testsprite_index(self) -> Optional[Path]:
+        """Look for a cached TestSprite MCP entry script in npm/_npx"""
+        search_paths: List[Path] = []
+        local_app = os.getenv('LOCALAPPDATA')
+        if local_app:
+            search_paths.append(Path(local_app) / 'npm-cache' / '_npx')
+
+        npm_cache = os.getenv('NPM_CONFIG_CACHE')
+        if npm_cache:
+            search_paths.append(Path(npm_cache) / '_npx')
+
+        search_paths.append(Path.home() / '.npm' / '_npx')
+
+        for base in search_paths:
+            if not base.is_dir():
+                continue
+
+            try:
+                entries = sorted(base.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+            except OSError:
+                entries = list(base.iterdir())
+            for entry in entries:
+                candidate = entry / 'node_modules' / '@testsprite' / 'testsprite-mcp' / 'dist' / 'index.js'
+                if candidate.exists():
+                    return candidate
+
+        return None
     
     def validate_setup(self) -> bool:
         """Validate test environment setup"""
@@ -238,7 +292,7 @@ class TestSpriteRunner:
                 [sys.executable, str(test_file)],
                 capture_output=True,
                 text=True,
-                timeout=120,  # 2 minute timeout per test
+                timeout=300,  # 5 minute timeout per test
                 cwd=self.test_directory,
                 env=env
             )

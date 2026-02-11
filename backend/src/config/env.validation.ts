@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { z } from 'zod';
 
 export const EnvSchema = z.object({
@@ -29,11 +30,12 @@ export const EnvSchema = z.object({
 
 export type Env = z.infer<typeof EnvSchema>;
 
-export function validateEnv(env: NodeJS.ProcessEnv): Env {
+export function validateEnv(env: Record<string, unknown>): Env {
+  const logger = new Logger('EnvValidation');
   const parsed = EnvSchema.safeParse(env);
   if (!parsed.success) {
-    console.error('Environment validation failed:', parsed.error.format());
+    logger.error('Environment validation failed:', parsed.error.format());
     throw new Error('Invalid environment configuration');
   }
-  return parsed.data as any;
+  return parsed.data;
 }

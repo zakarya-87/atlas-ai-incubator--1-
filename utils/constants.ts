@@ -24,8 +24,7 @@ export const STORAGE_KEYS = {
 // ==========================================
 
 export const API_CONFIG = {
-  BACKEND_URL:
-    (import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000',
+  BACKEND_URL: '/api',
   REQUEST_TIMEOUT: 300000, // 5 minutes - Increased for complex AI analyses
   RETRY_ATTEMPTS: 2,
   RETRY_DELAY: 2000, // 2 seconds

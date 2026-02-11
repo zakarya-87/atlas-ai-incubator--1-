@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import { PrismaService } from '../prisma/prisma.service';
 import * as puppeteer from 'puppeteer';
@@ -8,18 +8,18 @@ jest.mock('puppeteer');
 
 describe('ReportsService', () => {
   let service: ReportsService;
-  let prismaService: any;
+  let prismaService: { analysis: { findUnique: jest.Mock } };
 
   const mockAnalysis = {
     id: 'analysis-123',
     tool: 'swot',
-    resultData: {
+    resultData: JSON.stringify({
       strengths: [{ point: 'Strong brand', explanation: 'Well known' }],
       weaknesses: [{ point: 'High costs', explanation: 'Expensive' }],
       opportunities: [],
       threats: [],
-    },
-    inputDescription: 'Coffee shop for remote workers',
+    }),
+    inputContext: 'Coffee shop for remote workers',
     createdAt: new Date(),
     venture: { userId: 'user-123' },
   };
@@ -41,11 +41,13 @@ describe('ReportsService', () => {
     service = module.get<ReportsService>(ReportsService);
 
     (puppeteer.launch as jest.Mock).mockResolvedValue({
-      newPage: async () => ({
-        setContent: async () => {},
-        pdf: async () => Buffer.from('mock-pdf-content'),
-      }),
-      close: async () => {},
+      newPage: async () => {
+        return Promise.resolve({
+          setContent: async () => Promise.resolve(),
+          pdf: async () => Promise.resolve(Buffer.from('mock-pdf-content')),
+        });
+      },
+      close: async () => Promise.resolve(),
     });
   });
 

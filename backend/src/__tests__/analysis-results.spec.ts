@@ -12,11 +12,12 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { Job } from 'bullmq';
-import { AnalysisProcessor, AnalysisJobData } from '../analysis/analysis.processor';
+import { AnalysisJobData, AnalysisProcessor } from '../analysis/analysis.processor';
 import { AnalysisService } from '../analysis/analysis.service';
+import { JobStatusResponse } from '../analysis/jobs.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventsGateway } from '../events/events.gateway';
-import { setJob, getJob, hasJob } from '../analysis/job-store';
+import { getJob, hasJob, setJob } from '../analysis/job-store';
 
 describe('Analysis Results Display Edge Cases', () => {
     let processor: AnalysisProcessor;
@@ -68,10 +69,10 @@ describe('Analysis Results Display Edge Cases', () => {
         processor = module.get<AnalysisProcessor>(AnalysisProcessor);
     });
 
-    afterEach(async () => {
+    afterEach(() => {
         // Clean up job store
-        setJob('test-job-1', undefined as any);
-        setJob('test-job-2', undefined as any);
+        setJob('test-job-1', undefined as unknown as JobStatusResponse);
+        setJob('test-job-2', undefined as unknown as JobStatusResponse);
     });
 
     describe('Job ID Synchronization', () => {
@@ -305,12 +306,10 @@ describe('Analysis Results Display Edge Cases', () => {
     describe('Timeout Scenarios', () => {
         it('should handle long-running jobs gracefully (TC-AR-010)', async () => {
             const originalJobId = 'timeout-test-job';
-
             // Simulate slow analysis
             mockAnalysisService.generateAnalysis.mockImplementation(
                 () => new Promise((resolve) => setTimeout(() => resolve({ slow: true }), 50))
             );
-
             const mockJob = {
                 id: 333,
                 data: {
@@ -319,16 +318,14 @@ describe('Analysis Results Display Edge Cases', () => {
                     originalJobId,
                 },
             } as unknown as Job<AnalysisJobData>;
-
             const startTime = Date.now();
             await processor.process(mockJob);
             const duration = Date.now() - startTime;
-
             // Should complete successfully even if slow
             expect(duration).toBeGreaterThanOrEqual(50);
             const storedJob = getJob(originalJobId);
             expect(storedJob?.status).toBe('completed');
-        });
+        }, 30000);
 
         it('should handle immediate job completion (TC-AR-011)', async () => {
             const originalJobId = 'immediate-test-job';

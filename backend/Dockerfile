@@ -20,7 +20,7 @@ RUN npm config set fetch-timeout 120000 && \
     npm install --legacy-peer-deps --no-audit --no-fund
 
 # Copy source and prisma configuration
-COPY . .
+COPY . ./
 
 # Generate Prisma client
 RUN npx prisma generate

@@ -1,9 +1,9 @@
 import {
+  ConnectedSocket,
+  MessageBody,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  SubscribeMessage,
-  MessageBody,
-  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -24,15 +24,15 @@ export class EventsGateway {
   handleJoinRoom(
     @MessageBody() room: string,
     @ConnectedSocket() client: Socket
-  ) {
-    client.join(room);
+  ): void {
+    void client.join(room);
   }
 
-  emitLog(room: string, log: any) {
+  emitLog(room: string, log: Record<string, unknown>): void {
     this.server.to(room).emit('agentLog', log);
   }
 
-  emitAnalysisResult(room: string, data: { jobId: string; result: any }) {
+  emitAnalysisResult(room: string, data: { jobId: string; result: Record<string, unknown> }): void {
     this.server.to(room).emit('analysisResult', data);
   }
 }

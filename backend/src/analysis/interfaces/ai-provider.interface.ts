@@ -8,16 +8,24 @@ export enum AIProvider {
 export interface AIProviderRequest {
   prompt: string;
   context: string;
-  schema?: any;
+  schema?: Record<string, unknown>;
   systemInstruction?: string;
   images?: string[];
-  tools?: any[];
+  tools?: Record<string, unknown>[];
+}
+
+export interface ChatCompletionResponse {
+  choices: {
+    message: {
+      content: string;
+    };
+  }[];
 }
 
 export interface AIProviderResponse {
   text: string;
-  data: any;
-  rawResponse?: any;
+  data: Record<string, unknown>;
+  rawResponse?: unknown;
 }
 
 export interface AIProviderInterface {

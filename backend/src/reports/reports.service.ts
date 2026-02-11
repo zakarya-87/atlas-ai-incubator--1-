@@ -1,18 +1,21 @@
 import {
-  Injectable,
-  NotFoundException,
   ForbiddenException,
+  Injectable,
   InternalServerErrorException,
+  Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as puppeteer from 'puppeteer';
 import { Buffer } from 'node:buffer';
+import { Analysis, Venture } from '@prisma/client';
 
 @Injectable()
 export class ReportsService {
+  private readonly logger = new Logger(ReportsService.name);
   constructor(private prisma: PrismaService) {}
 
-  private reportCache = new Map<string, any>();
+  private reportCache = new Map<string, Analysis & { pdf?: Buffer; html?: string }>();
 
   async generatePDFReport(
     analysisId: string,
@@ -20,14 +23,14 @@ export class ReportsService {
   ): Promise<Buffer> {
     if (this.reportCache.has(analysisId) && !userId) {
       // Simple cache for testing
-      const data = this.reportCache.get(analysisId);
-      if (data.pdf) return data.pdf;
+      const cached = this.reportCache.get(analysisId);
+      if (cached?.pdf) return cached.pdf;
     }
 
-    const analysis = await (this.prisma as any).analysis.findUnique({
+    const analysis = await this.prisma.analysis.findUnique({
       where: { id: analysisId },
       include: { venture: true },
-    });
+    }) as (Analysis & { venture: Venture }) | null;
 
     if (!analysis) {
       throw new NotFoundException('Analysis not found');
@@ -37,11 +40,11 @@ export class ReportsService {
       throw new ForbiddenException('Access denied to this analysis');
     }
 
-    const data = analysis.resultData;
+    const data = JSON.parse(analysis.resultData) as Record<string, unknown>;
     const htmlContent = this.buildHtml(
       analysis.tool,
       data,
-      analysis.inputContext || analysis.inputDescription
+      analysis.inputContext || ''
     );
 
     let browser;
@@ -68,9 +71,10 @@ export class ReportsService {
       });
 
       return Buffer.from(pdfBuffer);
-    } catch (error) {
+    } catch (error: unknown) {
       if (browser) await browser.close();
-      console.error('PDF Generation Error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error('PDF Generation Error:', errorMessage);
       throw new InternalServerErrorException('Failed to generate PDF report');
     }
   }
@@ -79,47 +83,50 @@ export class ReportsService {
     analysisId: string,
     userId?: string
   ): Promise<string> {
-    const analysis = await (this.prisma as any).analysis.findUnique({
+    const analysis = await this.prisma.analysis.findUnique({
       where: { id: analysisId },
       include: { venture: true },
-    });
+    }) as (Analysis & { venture: Venture }) | null;
 
     if (!analysis) throw new NotFoundException('Analysis not found');
     if (userId && analysis.venture.userId !== userId)
       throw new ForbiddenException('Access denied');
 
+    const data = JSON.parse(analysis.resultData) as Record<string, unknown>;
     const content = this.buildHtml(
       analysis.tool,
-      analysis.resultData,
-      analysis.inputContext || analysis.inputDescription
+      data,
+      analysis.inputContext || ''
     );
     this.reportCache.set(analysisId, { ...analysis, html: content });
     return content;
   }
 
-  async exportAsJSON(analysisId: string, userId?: string): Promise<any> {
-    const analysis = await (this.prisma as any).analysis.findUnique({
+  async exportAsJSON(analysisId: string, userId?: string): Promise<Record<string, unknown>> {
+    const analysis = await this.prisma.analysis.findUnique({
       where: { id: analysisId },
       include: { venture: true },
-    });
+    }) as (Analysis & { venture: Venture }) | null;
+
     if (!analysis) throw new NotFoundException('Analysis not found');
     if (userId && analysis.venture.userId !== userId)
       throw new ForbiddenException('Access denied');
 
     // Exclude user-sensitive data if necessary
-    const { venture, ...exportData } = analysis;
-    return exportData;
+    const exportData = { ...analysis };
+    delete (exportData as { venture?: Venture }).venture;
+    return exportData as unknown as Record<string, unknown>;
   }
 
   async generateCustomReport(
     analysisId: string,
-    template: any,
+    template: { title: string; sections?: string[]; style?: { fontFamily?: string; primaryColor?: string } },
     userId?: string
   ): Promise<string> {
-    const analysis = await (this.prisma as any).analysis.findUnique({
+    const analysis = await this.prisma.analysis.findUnique({
       where: { id: analysisId },
       include: { venture: true },
-    });
+    }) as (Analysis & { venture: Venture }) | null;
 
     if (!analysis) throw new NotFoundException('Analysis not found');
     if (userId && analysis.venture.userId !== userId)
@@ -129,10 +136,12 @@ export class ReportsService {
     const { title, sections, style } = template;
     let customHtml = `<h1>${title}</h1>`;
 
+    const resultData = JSON.parse(analysis.resultData) as Record<string, unknown>;
+
     if (sections) {
       sections.forEach((section: string) => {
-        if (analysis.resultData[section]) {
-          customHtml += `<h2>${section.toUpperCase()}</h2><p>${JSON.stringify(analysis.resultData[section])}</p>`;
+        if (resultData[section]) {
+          customHtml += `<h2>${section.toUpperCase()}</h2><p>${JSON.stringify(resultData[section])}</p>`;
         }
       });
     }
@@ -155,20 +164,21 @@ export class ReportsService {
   async batchGeneratePDFs(
     analysisIds: string[],
     userId?: string
-  ): Promise<any[]> {
-    const results = [];
+  ): Promise<Array<{ id: string; success: boolean; error?: string }>> {
+    const results: Array<{ id: string; success: boolean; error?: string }> = [];
     for (const id of analysisIds) {
       try {
         await this.generatePDFReport(id, userId);
         results.push({ id, success: true });
-      } catch (error) {
-        results.push({ id, success: false, error: error.message });
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        results.push({ id, success: false, error: errorMessage });
       }
     }
     return results;
   }
 
-  private buildHtml(tool: string, data: any, description: string): string {
+  private buildHtml(tool: string, data: Record<string, unknown>, description: string): string {
     const title = tool
       .toUpperCase()
       .replace(/([A-Z])/g, ' $1')
@@ -178,14 +188,17 @@ export class ReportsService {
     let contentHtml = '';
     Object.entries(data).forEach(([key, value]) => {
       if (key === '_sources' || key === 'id') return;
-      contentHtml += `<div class="section"><h2>${key.replace(/([A-Z])/g, ' $1').toUpperCase()}</h2>`;
+      const formattedKey: string = key.replace(/([A-Z])/g, ' $1').toUpperCase();
+      contentHtml += `<div class="section"><h2>${formattedKey}</h2>`;
       if (Array.isArray(value)) {
         contentHtml += `<ul>`;
-        value.forEach((item: any) => {
-          if (typeof item === 'object' && item.point) {
-            contentHtml += `<li><strong>${item.point}</strong><p>${item.explanation}</p></li>`;
-          } else if (typeof item === 'object' && item.name) {
-            contentHtml += `<li><strong>${item.name}</strong><p>${JSON.stringify(item).replace(/"/g, '')}</p></li>`;
+        value.forEach((item: unknown) => {
+          if (typeof item === 'object' && item !== null && 'point' in item) {
+            const pointItem = item as { point: string; explanation?: string };
+            contentHtml += `<li><strong>${pointItem.point}</strong><p>${pointItem.explanation || ''}</p></li>`;
+          } else if (typeof item === 'object' && item !== null && 'name' in item) {
+            const nameItem = item as { name: string };
+            contentHtml += `<li><strong>${nameItem.name}</strong><p>${JSON.stringify(item).replace(/"/g, '')}</p></li>`;
           } else {
             contentHtml += `<li>${JSON.stringify(item)}</li>`;
           }
@@ -194,7 +207,7 @@ export class ReportsService {
       } else if (typeof value === 'object' && value !== null) {
         contentHtml += `<pre>${JSON.stringify(value, null, 2)}</pre>`;
       } else {
-        contentHtml += `<p>${value}</p>`;
+        contentHtml += `<p>${String(value)}</p>`;
       }
       contentHtml += `</div>`;
     });

@@ -4,8 +4,8 @@ import { ConfigService } from '@nestjs/config';
 
 describe('EmailService', () => {
   let service: EmailService;
-  let mockConfigService: any;
-  let mockTransporter: any;
+  let mockConfigService: jest.Mocked<ConfigService>;
+  let mockTransporter: { sendMail: jest.Mock };
 
   beforeEach(async () => {
     mockTransporter = {
@@ -23,7 +23,7 @@ describe('EmailService', () => {
         };
         return config[key];
       }),
-    };
+    } as unknown as jest.Mocked<ConfigService>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -34,12 +34,12 @@ describe('EmailService', () => {
 
     service = module.get<EmailService>(EmailService);
     // Manually set the transporter since constructor runs during module creation
-    (service as any).transporter = mockTransporter;
-    (service as any).isDev = false;
+    (service as unknown as Record<string, unknown>).transporter = mockTransporter;
+    (service as unknown as Record<string, unknown>).isDev = false;
   });
 
   describe('constructor', () => {
-    it('should create service with SMTP credentials', async () => {
+    it('should create service with SMTP credentials', () => {
       const configWithSmtp = {
         get: jest.fn((key: string) => {
           const config: Record<string, string> = {
@@ -52,17 +52,17 @@ describe('EmailService', () => {
         }),
       };
 
-      const testService = new EmailService(configWithSmtp as any);
-      expect((testService as any).isDev).toBe(false);
+      const testService = new EmailService(configWithSmtp as unknown as ConfigService);
+      expect((testService as unknown as Record<string, unknown>).isDev).toBe(false);
     });
 
-    it('should set isDev to true when SMTP credentials are missing', async () => {
+    it('should set isDev to true when SMTP credentials are missing', () => {
       const configWithoutSmtp = {
-        get: jest.fn((key: string) => undefined),
+        get: jest.fn((_key: string) => undefined),
       };
 
-      const testService = new EmailService(configWithoutSmtp as any);
-      expect((testService as any).isDev).toBe(true);
+      const testService = new EmailService(configWithoutSmtp as unknown as ConfigService);
+      expect((testService as unknown as Record<string, unknown>).isDev).toBe(true);
     });
   });
 

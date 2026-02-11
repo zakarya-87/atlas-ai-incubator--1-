@@ -31,6 +31,8 @@ import { AIProviderFactory } from './providers/ai-provider.factory';
       connection: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
+        password: process.env.REDIS_PASSWORD,
+        tls: process.env.REDIS_TLS === 'true' ? {} : undefined,
       },
     }),
   ],
@@ -50,4 +52,4 @@ import { AIProviderFactory } from './providers/ai-provider.factory';
   ],
   exports: [AnalysisService, AIProviderFactory],
 })
-export class AnalysisModule {}
+export class AnalysisModule { }

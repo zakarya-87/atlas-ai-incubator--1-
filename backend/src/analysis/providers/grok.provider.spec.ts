@@ -9,7 +9,6 @@ global.fetch = jest.fn();
 
 describe('GrokProvider', () => {
   let provider: GrokProvider;
-  let configService: ConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,7 +30,6 @@ describe('GrokProvider', () => {
     }).compile();
 
     provider = module.get<GrokProvider>(GrokProvider);
-    configService = module.get<ConfigService>(ConfigService);
     (fetch as jest.Mock).mockClear();
   });
 
@@ -153,7 +151,7 @@ describe('GrokProvider', () => {
       await provider.complete(mockRequest);
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.messages).toHaveLength(2);
       expect(body.messages[0]).toEqual({
@@ -182,7 +180,7 @@ describe('GrokProvider', () => {
       await provider.complete(mockRequest);
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.messages[1].content).toBe('Test context\n\nTask: Test prompt');
     });
@@ -206,7 +204,7 @@ describe('GrokProvider', () => {
       await provider.complete(mockRequest);
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.response_format).toEqual({ type: 'json_object' });
     });
@@ -235,7 +233,7 @@ describe('GrokProvider', () => {
       await provider.complete(requestWithoutSchema);
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.response_format).toBeUndefined();
     });
@@ -259,7 +257,7 @@ describe('GrokProvider', () => {
       await provider.complete({ prompt: 'test', context: '' });
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.stream).toBe(false);
     });
@@ -283,7 +281,7 @@ describe('GrokProvider', () => {
       await provider.complete({ prompt: 'test', context: '' });
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.temperature).toBe(0);
     });
@@ -307,7 +305,7 @@ describe('GrokProvider', () => {
       await provider.complete({ prompt: 'test', context: '' });
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.model).toBe('grok-beta');
     });
@@ -377,7 +375,7 @@ describe('GrokProvider', () => {
       await provider.complete(requestWithoutSystem);
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.messages).toHaveLength(1);
       expect(body.messages[0].role).toBe('user');

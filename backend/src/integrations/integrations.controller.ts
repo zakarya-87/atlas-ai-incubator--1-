@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 
 import { IntegrationsService } from './integrations.service';
 import { GetUser } from '../auth/get-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import type { User } from '@prisma/client';
-import { IsBoolean, IsString, IsNotEmpty } from 'class-validator';
+import { Integration, User } from '@prisma/client';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 class ToggleIntegrationDto {
   @IsString()
@@ -28,7 +28,7 @@ export class IntegrationsController {
   async getIntegrations(
     @Query('ventureId') ventureId: string,
     @GetUser() user: User
-  ) {
+  ): Promise<Integration[]> {
     return this.integrationsService.getIntegrations(ventureId, user.id);
   }
 
@@ -36,7 +36,7 @@ export class IntegrationsController {
   async toggleIntegration(
     @Body() dto: ToggleIntegrationDto,
     @GetUser() user: User
-  ) {
+  ): Promise<Integration> {
     return this.integrationsService.toggleIntegration(
       dto.ventureId,
       user.id,

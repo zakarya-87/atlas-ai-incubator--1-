@@ -7,12 +7,6 @@ describe('IntegrationsService', () => {
   let service: IntegrationsService;
   let prismaService: any;
 
-  const mockUser = {
-    id: 'user-123',
-    email: 'test@example.com',
-    role: 'USER',
-  };
-
   const mockVenture = {
     id: 'venture-123',
     userId: 'user-123',

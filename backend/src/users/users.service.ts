@@ -1,6 +1,6 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -9,13 +9,13 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async findOne(email: string): Promise<User | null> {
-    return (this.prisma as any).user.findUnique({
+    return this.prisma.user.findUnique({
       where: { email },
     });
   }
 
   async findById(id: string): Promise<User | null> {
-    return (this.prisma as any).user.findUnique({
+    return this.prisma.user.findUnique({
       where: { id },
     });
   }
@@ -30,7 +30,7 @@ export class UsersService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(pass, salt);
 
-    await (this.prisma as any).user.create({
+    await this.prisma.user.create({
       data: {
         email,
         password: hashedPassword,
@@ -44,14 +44,14 @@ export class UsersService {
   }
 
   async updateUser(id: string, dto: UpdateUserDto): Promise<User> {
-    const data: any = { ...dto };
+    const data: Prisma.UserUpdateInput = { ...dto };
 
     if (dto.password) {
       const salt = await bcrypt.genSalt();
       data.password = await bcrypt.hash(dto.password, salt);
     }
 
-    return (this.prisma as any).user.update({
+    return this.prisma.user.update({
       where: { id },
       data: data,
     });
@@ -77,7 +77,7 @@ export class UsersService {
     }
 
     // 3. Deduct
-    const updatedUser = await (this.prisma as any).user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data: { credits: { decrement: 1 } },
     });

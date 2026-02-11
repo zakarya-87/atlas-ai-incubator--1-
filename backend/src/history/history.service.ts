@@ -1,17 +1,18 @@
 import {
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { Analysis, User } from '@prisma/client';
+import { CreateVersionDto } from './dto/create-version.dto';
 
 @Injectable()
 export class HistoryService {
   constructor(private prisma: PrismaService) {}
 
-  async getVentureHistory(ventureId: string, userId: string) {
-    const venture = await (this.prisma as any).venture.findUnique({
+  async getVentureHistory(ventureId: string, userId: string): Promise<Analysis[]> {
+    const venture = await this.prisma.venture.findUnique({
       where: { id: ventureId },
     });
 
@@ -21,7 +22,7 @@ export class HistoryService {
       return [];
     }
 
-    return (this.prisma as any).analysis.findMany({
+    return this.prisma.analysis.findMany({
       where: { ventureId },
       orderBy: { createdAt: 'desc' },
     });
@@ -31,8 +32,8 @@ export class HistoryService {
   async getRecentAnalysesForContext(
     ventureId: string,
     excludeTool: string
-  ): Promise<any[]> {
-    return (this.prisma as any).analysis.findMany({
+  ): Promise<Array<{ tool: string; resultData: string; createdAt: Date }>> {
+    return this.prisma.analysis.findMany({
       where: {
         ventureId: ventureId,
         tool: { not: excludeTool },
@@ -43,20 +44,21 @@ export class HistoryService {
         tool: true,
         resultData: true,
         inputContext: true,
+        createdAt: true,
       },
     });
   }
 
-  async getAllAnalysesAdmin() {
-    return (this.prisma as any).analysis.findMany({
+  async getAllAnalysesAdmin(): Promise<Analysis[]> {
+    return this.prisma.analysis.findMany({
       orderBy: { createdAt: 'desc' },
       take: 50,
-      include: { venture: { include: { user: { select: { email: true } } } } },
+      include: { venture: { include: { owner: { select: { email: true } } } } },
     });
   }
 
-  async deleteAnalysis(analysisId: string, user: User) {
-    const analysis = await (this.prisma as any).analysis.findUnique({
+  async deleteAnalysis(analysisId: string, user: User): Promise<Analysis> {
+    const analysis = await this.prisma.analysis.findUnique({
       where: { id: analysisId },
       include: { venture: true },
     });
@@ -74,13 +76,13 @@ export class HistoryService {
       );
     }
 
-    return (this.prisma as any).analysis.delete({
+    return this.prisma.analysis.delete({
       where: { id: analysisId },
     });
   }
 
-  async createManualVersion(dto: any, userId: string) {
-    const venture = await (this.prisma as any).venture.findUnique({
+  async createManualVersion(dto: CreateVersionDto, userId: string): Promise<Analysis> {
+    const venture = await this.prisma.venture.findUnique({
       where: { id: dto.ventureId },
     });
 
@@ -94,7 +96,7 @@ export class HistoryService {
       );
     }
 
-    return (this.prisma as any).analysis.create({
+    return this.prisma.analysis.create({
       data: {
         ventureId: dto.ventureId,
         userId: userId,

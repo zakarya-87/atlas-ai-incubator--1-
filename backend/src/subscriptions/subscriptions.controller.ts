@@ -1,12 +1,12 @@
 import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  UseGuards,
-  Headers,
-  Req,
   BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -15,7 +15,11 @@ import { SubscriptionsService } from './subscriptions.service';
 import { GetUser } from '../auth/get-user.decorator';
 import type { User } from '@prisma/client';
 import { Request } from 'express';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+interface RequestWithRawBody extends Request {
+  rawBody?: string;
+}
 
 @ApiTags('Subscriptions')
 @Controller('subscriptions')
@@ -30,7 +34,7 @@ export class SubscriptionsController {
 
     @GetUser() user: User,
     @Body('planId') planId: string
-  ) {
+  ): Promise<{ url: string }> {
     return this.subscriptionsService.createCheckoutSession(user.id, planId);
   }
 
@@ -38,7 +42,7 @@ export class SubscriptionsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a Stripe Customer Portal Session' })
-  async createPortalSession(@GetUser() user: User) {
+  async createPortalSession(@GetUser() user: User): Promise<{ url: string }> {
 
     return this.subscriptionsService.createPortalSession(user.id);
   }
@@ -47,7 +51,7 @@ export class SubscriptionsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current subscription status' })
-  async getStatus(@GetUser() user: User) {
+  async getStatus(@GetUser() user: User): Promise<{ status: string; plan: string }> {
 
     return this.subscriptionsService.getSubscriptionStatus(user.id);
   }
@@ -56,9 +60,9 @@ export class SubscriptionsController {
   @ApiOperation({ summary: 'Stripe Webhook Handler (Public)' })
   async handleWebhook(
     @Headers('stripe-signature') signature: string,
-    @Body() body: any, // Raw body will be handled via custom middleware in production
-    @Req() request: Request
-  ) {
+    @Body() body: unknown, // Raw body will be handled via custom middleware in production
+    @Req() request: RequestWithRawBody
+  ): Promise<{ received: boolean }> {
     if (!signature)
       throw new BadRequestException('Missing stripe-signature header');
 
@@ -66,7 +70,9 @@ export class SubscriptionsController {
     // In production, configure raw body middleware for this specific endpoint:
     // https://docs.stripe.com/webhooks#verify-webhook-signatures
     // The raw body would be attached to request by custom middleware
-    const rawBody = (request as any).rawBody || JSON.stringify(body);
+    // https://docs.stripe.com/webhooks#verify-webhook-signatures
+    // The raw body would be attached to request by custom middleware
+    const rawBody = request.rawBody || JSON.stringify(body);
     return this.subscriptionsService.handleWebhook(signature, rawBody);
   }
 }

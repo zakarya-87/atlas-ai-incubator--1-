@@ -1,8 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { User } from '@prisma/client';
 
 export const GetUser = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
+  (_data: unknown, ctx: ExecutionContext): User => {
+    const request = ctx.switchToHttp().getRequest<{ user?: User }>();
     // If auth is disabled, return a mock admin user with the seeded user ID
     if (!request.user) {
       return {
@@ -10,19 +11,15 @@ export const GetUser = createParamDecorator(
         email: 'admin@atlas.com',
         role: 'ADMIN',
         fullName: 'Atlas Admin',
-      };
+      } as User;
     }
     return request.user;
   }
 );
 
 // Mock factory for testing
-export const createMockGetUser = (mockUser: any) => {
-  return createParamDecorator((data: unknown, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
-    if (!request.user) {
-      return mockUser;
-    }
-    return request.user;
+export const createMockGetUser = (mockUser: User): ((...args: unknown[]) => ParameterDecorator) => {
+  return createParamDecorator((_data: unknown, _ctx: ExecutionContext): User => {
+    return mockUser;
   });
 };

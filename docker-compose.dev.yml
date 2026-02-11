@@ -47,7 +47,6 @@ services:
     ports:
       - '5173:5173'
     environment:
-      - VITE_BACKEND_URL=http://localhost:3000
       - HTTP_PROXY=${HTTP_PROXY}
       - HTTPS_PROXY=${HTTPS_PROXY}
       - NO_PROXY=${NO_PROXY}

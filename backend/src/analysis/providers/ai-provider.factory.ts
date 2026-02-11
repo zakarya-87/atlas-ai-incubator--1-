@@ -52,8 +52,9 @@ export class AIProviderFactory {
 
     try {
       return await provider.complete(request);
-    } catch (error) {
-      console.error(`[AIProviderFactory] Error with ${selectedProviderName}:`, error.message);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error(`[AIProviderFactory] Error with ${selectedProviderName}:`, msg);
       throw error;
     }
   }

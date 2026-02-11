@@ -1,11 +1,11 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
+  Post,
   Res,
   UseGuards,
-  Post,
-  Body,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -26,7 +26,7 @@ export class ReportsController {
     @Param('id') id: string,
     @GetUser() user: User,
     @Res() res: Response
-  ) {
+  ): Promise<void> {
     const buffer = await this.reportsService.generatePDFReport(id, user.id);
 
     res.set({
@@ -39,20 +39,20 @@ export class ReportsController {
   }
 
   @Get(':id/html')
-  async getHtmlReport(@Param('id') id: string, @GetUser() user: User) {
+  async getHtmlReport(@Param('id') id: string, @GetUser() user: User): Promise<string> {
     return this.reportsService.generateHTMLReport(id, user.id);
   }
 
   @Get(':id/json')
-  async getJsonReport(@Param('id') id: string, @GetUser() user: User) {
+  async getJsonReport(@Param('id') id: string, @GetUser() user: User): Promise<Record<string, unknown>> {
     return this.reportsService.exportAsJSON(id, user.id);
   }
 
   @Post('custom')
   async createCustomReport(
-    @Body() body: { analysisId: string; template: any },
+    @Body() body: { analysisId: string; template: Record<string, unknown> },
     @GetUser() user: User
-  ) {
+  ): Promise<string> {
     const { analysisId, template } = body;
     return this.reportsService.generateCustomReport(
       analysisId,
@@ -65,7 +65,7 @@ export class ReportsController {
   async batchGeneratePdfs(
     @Body() body: { analysisIds: string[] },
     @GetUser() user: User
-  ) {
+  ): Promise<Array<{ id: string; success: boolean; error?: string }>> {
     return this.reportsService.batchGeneratePDFs(body.analysisIds, user.id);
   }
 }

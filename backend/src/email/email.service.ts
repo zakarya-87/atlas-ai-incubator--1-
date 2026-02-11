@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
+  private readonly logger = new Logger(EmailService.name);
   private transporter: nodemailer.Transporter;
   private isDev: boolean;
 
@@ -25,13 +26,13 @@ export class EmailService {
       });
     } else {
       this.isDev = true;
-      console.log(
-        '⚠️  SMTP Credentials not found. EmailService running in DEV mode (Console Log Only).'
+      this.logger.warn(
+        'SMTP Credentials not found. EmailService running in DEV mode (Console Log Only).'
       );
     }
   }
 
-  async sendWelcomeEmail(to: string) {
+  async sendWelcomeEmail(to: string): Promise<void> {
     const subject = 'Welcome to ATLAS AI Incubator';
     const html = `
         <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
@@ -47,7 +48,7 @@ export class EmailService {
     await this.send(to, subject, html);
   }
 
-  async sendInviteEmail(to: string, inviterName: string, ventureName: string) {
+  async sendInviteEmail(to: string, inviterName: string, ventureName: string): Promise<void> {
     const subject = `${inviterName} invited you to join "${ventureName}" on ATLAS`;
     const html = `
         <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
@@ -61,9 +62,9 @@ export class EmailService {
     await this.send(to, subject, html);
   }
 
-  private async send(to: string, subject: string, html: string) {
+  private async send(to: string, subject: string, html: string): Promise<void> {
     if (this.isDev) {
-      console.log(`
+      this.logger.debug(`
           ================ [DEV EMAIL] ================
           TO: ${to}
           SUBJECT: ${subject}
@@ -81,9 +82,9 @@ export class EmailService {
         subject,
         html,
       });
-      console.log(`📧 Email sent to ${to}`);
+      this.logger.log(`📧 Email sent to ${to}`);
     } catch (error) {
-      console.error('Failed to send email:', error);
+      this.logger.error('Failed to send email:', error);
       // Don't throw, just log. Email failure shouldn't block the user flow.
     }
   }

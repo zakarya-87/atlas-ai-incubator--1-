@@ -1,14 +1,14 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
 import { GenerateAnalysisDto } from './dto/generate-analysis.dto';
-import { setJob, getJob } from './job-store';
+import { getJob, setJob } from './job-store';
 
 export interface JobStatusResponse {
   jobId: string;
   status: 'queued' | 'active' | 'completed' | 'failed';
   progress?: number;
-  result?: any;
+  result?: Record<string, unknown>;
   error?: string;
   createdAt?: number;
   finishedAt?: number;
@@ -46,7 +46,7 @@ export class JobsService {
     });
   }
 
-  async getJobStatus(jobId: string): Promise<JobStatusResponse> {
+  getJobStatus(jobId: string): JobStatusResponse {
     const job = getJob(jobId);
 
     if (!job) {

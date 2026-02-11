@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
-  ForbiddenException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { SchemaType } from '@google/generative-ai';
@@ -14,6 +16,7 @@ import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AnalysisService {
+  private readonly logger = new Logger(AnalysisService.name);
   constructor(
     private prisma: PrismaService,
     private historyService: HistoryService,
@@ -51,7 +54,7 @@ export class AnalysisService {
               : dataString;
 
           return `
-    <historical_artifact type="${record.tool}" date="${record.createdAt}">
+    <historical_artifact type="${record.tool}" date="${record.createdAt.toISOString()}">
         ${truncatedData}
     </historical_artifact>`;
         })
@@ -69,26 +72,126 @@ export class AnalysisService {
 </venture_memory_bank>
 `;
     } catch (error) {
-      console.warn('Failed to fetch venture context', error);
+      this.logger.warn('Failed to fetch venture context', error);
       return '';
     }
   }
 
-  private emitLog(ventureId: string, agent: string, messageKey: string) {
+  private emitLog(ventureId: string, agent: string, messageKey: string): void {
     try {
       this.eventsGateway.emitLog(ventureId, {
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 9),
         agent: agent,
         messageKey: messageKey,
         timestamp: Date.now(),
       });
     } catch (e) {
       // Fail silently on log emission errors to prevent crashing the analysis generation
-      console.warn('Failed to emit agent log via WebSocket', e);
+      this.logger.warn('Failed to emit agent log via WebSocket', e);
     }
   }
 
-  async generateAnalysis(dto: GenerateAnalysisDto, userId: string) {
+  private async ensureVentureAccess(
+    ventureId: string,
+    userId: string
+  ): Promise<void> {
+    const venture = await this.prisma.venture.findUnique({
+      where: { id: ventureId },
+    });
+
+    if (!venture) {
+      await this.prisma.venture.create({
+        data: {
+          id: ventureId,
+          name: 'My Venture',
+          userId: userId,
+        },
+      });
+      return;
+    }
+
+    if (venture.userId === userId) return;
+
+    const member = await this.prisma.ventureMember.findUnique({
+      where: {
+        ventureId_userId: {
+          ventureId: ventureId,
+          userId: userId,
+        },
+      },
+    });
+
+    if (member) return;
+
+    // Venture exists but user doesn't have access
+    // Check if this looks like a pre-auth venture (localStorage UUID)
+    const isPreAuthVenture = ventureId.includes('-') && ventureId.length > 30;
+
+    if (isPreAuthVenture) {
+      this.logger.log(
+        `Transferring pre-auth venture ${ventureId} to user ${userId}`
+      );
+      await this.prisma.venture.update({
+        where: { id: ventureId },
+        data: { userId: userId },
+      });
+      return;
+    }
+
+    if (userId === 'dev-test-user-id') {
+      this.logger.warn(
+        `Venture ${ventureId} owner mismatch. Proceeding as Dev Admin.`
+      );
+      return;
+    }
+
+    throw new ForbiddenException('Venture ID mismatch or unauthorized access.');
+  }
+
+  private async getRefinementContext(
+    dto: GenerateAnalysisDto
+  ): Promise<{ prompt: string; systemInstruction: string }> {
+    if (!dto.parentAnalysisId) {
+      throw new BadRequestException('Parent analysis ID required for refinement');
+    }
+
+    const parentAnalysis = await this.prisma.analysis.findUnique({
+      where: { id: dto.parentAnalysisId },
+    });
+
+    if (!parentAnalysis) {
+      throw new NotFoundException('Parent analysis for refinement not found.');
+    }
+
+    const prompt = `
+            CONTEXT - ORIGINAL BUSINESS DESCRIPTION:
+            "${dto.description}"
+
+            CONTEXT - PREVIOUS ANALYSIS RESULT (JSON):
+            ${parentAnalysis.resultData}
+
+            USER REFINEMENT REQUEST:
+            "${dto.refinementInstruction || ''}"
+
+            TASK:
+            Regenerate the analysis. Start with the "PREVIOUS ANALYSIS RESULT" as your baseline.
+            Modify, update, or expand it based on the "USER REFINEMENT REQUEST".
+            Keep the same JSON structure/schema as the previous result.
+          `;
+
+    const systemInstruction = `
+            You are an expert business consultant iterating on a draft.
+            Your goal is to modify the existing analysis to better fit the user's specific feedback.
+            Do not lose valuable information from the previous result unless the refinement contradicts it.
+          `;
+
+    return { prompt, systemInstruction };
+  }
+
+  async generateAnalysis(
+    dto: GenerateAnalysisDto,
+    userId: string
+  ): Promise<Record<string, unknown>> {
     let schema = dto.responseSchema;
     let promptKey = dto.prompt;
 
@@ -117,108 +220,24 @@ export class AnalysisService {
         'agentLogAnalyzingContext'
       );
 
-      // 1. Security & Access Check (Owner OR Member)
-      const venture = await this.prisma.venture.findUnique({
-        where: { id: dto.ventureId },
-      });
-
-      if (!venture) {
-        await this.prisma.venture.create({
-          data: {
-            id: dto.ventureId,
-            name: 'My Venture',
-            userId: userId,
-          },
-        });
-      } else {
-        const isOwner = venture.userId === userId;
-        let isMember = false;
-
-        if (!isOwner) {
-          const member = await this.prisma.ventureMember.findUnique({
-            where: {
-              ventureId_userId: {
-                ventureId: dto.ventureId,
-                userId: userId,
-              },
-            },
-          });
-          isMember = !!member;
-        }
-
-        if (!isOwner && !isMember) {
-          // Venture exists but user doesn't have access
-          // Check if this looks like a pre-auth venture (localStorage UUID)
-          // If so, transfer ownership to the authenticated user
-          const isPreAuthVenture =
-            dto.ventureId.includes('-') && dto.ventureId.length > 30;
-
-          if (isPreAuthVenture) {
-            console.log(
-              `Transferring pre-auth venture ${dto.ventureId} to user ${userId}`
-            );
-            await this.prisma.venture.update({
-              where: { id: dto.ventureId },
-              data: { userId: userId },
-            });
-          } else if (userId === 'dev-test-user-id') {
-            console.warn(
-              `Venture ${dto.ventureId} owner mismatch. Proceeding as Dev Admin.`
-            );
-          } else {
-            throw new ForbiddenException(
-              'Venture ID mismatch or unauthorized access.'
-            );
-          }
-        }
-      }
+      // 1. Security & Access Check
+      await this.ensureVentureAccess(dto.ventureId, userId);
 
       // 2. Context Hydration (Standard or Refinement)
       let context = '';
       let finalPrompt = promptKey;
       let refinementSystemInstruction = '';
 
-      if (dto.refinementInstruction && dto.parentAnalysisId) {
+      if (dto.refinementInstruction) {
         this.emitLog(
           dto.ventureId,
           'Lead Strategist',
           'agentLogAnalyzingContext'
-        ); // Re-use log for "Analyzing Request"
-
-        // Fetch Parent Analysis
-        const parentAnalysis = await (this.prisma as any).analysis.findUnique({
-          where: { id: dto.parentAnalysisId },
-        });
-
-        if (!parentAnalysis)
-          throw new NotFoundException(
-            'Parent analysis for refinement not found.'
-          );
-
-        // Construct Refinement Prompt
-        finalPrompt = `
-            CONTEXT - ORIGINAL BUSINESS DESCRIPTION:
-            "${dto.description}"
-
-            CONTEXT - PREVIOUS ANALYSIS RESULT (JSON):
-            ${JSON.stringify(parentAnalysis.resultData)}
-
-            USER REFINEMENT REQUEST:
-            "${dto.refinementInstruction}"
-
-            TASK:
-            Regenerate the analysis. Start with the "PREVIOUS ANALYSIS RESULT" as your baseline.
-            Modify, update, or expand it based on the "USER REFINEMENT REQUEST".
-            Keep the same JSON structure/schema as the previous result.
-          `;
-
-        refinementSystemInstruction = `
-            You are an expert business consultant iterating on a draft.
-            Your goal is to modify the existing analysis to better fit the user's specific feedback.
-            Do not lose valuable information from the previous result unless the refinement contradicts it.
-          `;
+        );
+        const refContext = await this.getRefinementContext(dto);
+        finalPrompt = refContext.prompt;
+        refinementSystemInstruction = refContext.systemInstruction;
       } else {
-        // Standard Flow
         this.emitLog(
           dto.ventureId,
           'Lead Strategist',
@@ -272,30 +291,44 @@ Synthesize this information to produce the next logical step in their business p
         'Systems Architect',
         'agentLogFinalizingOutput'
       );
-      const savedRecord = await (this.prisma as any).analysis.create({
-        data: {
-          ventureId: dto.ventureId,
-          userId: userId,
-          module: dto.module,
-          tool: dto.tool,
-          inputContext: dto.refinementInstruction
-            ? `Refinement: ${dto.refinementInstruction}`
-            : dto.description,
-          resultData: JSON.stringify(response.data), // Prisma expects a String, not an Object
-          parentId: dto.parentAnalysisId || undefined, // Link versions if refining
-        },
-      });
+
+      const savedRecord = await this.persistAnalysisResult(
+        dto,
+        userId,
+        response.data
+      );
 
       return {
         ...response.data,
         id: savedRecord.id,
       };
-    } catch (error: any) {
-      console.error('Analysis Service Error:', error);
+    } catch (error: unknown) {
+      this.logger.error('Analysis Service Error:', error);
       if (error instanceof ForbiddenException) throw error;
-      throw new InternalServerErrorException(
-        error.message || 'Failed to generate analysis'
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to generate analysis';
+      throw new InternalServerErrorException(errorMessage);
     }
+  }
+
+  private async persistAnalysisResult(
+    dto: GenerateAnalysisDto,
+    userId: string,
+    resultData: Record<string, unknown>
+  ): Promise<{ id: string }> {
+    return this.prisma.analysis.create({
+      data: {
+        ventureId: dto.ventureId,
+        userId: userId,
+        module: dto.module,
+        tool: dto.tool,
+        inputContext: dto.refinementInstruction
+          ? `Refinement: ${dto.refinementInstruction}`
+          : dto.description,
+        resultData: JSON.stringify(resultData),
+        parentId: dto.parentAnalysisId || undefined,
+      },
+      select: { id: true },
+    });
   }
 }

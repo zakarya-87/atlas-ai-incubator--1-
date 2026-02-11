@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
@@ -7,18 +7,19 @@ import { User } from '@prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
   constructor(private usersService: UsersService) {
     super({
       jwtFromRequest: (req: Request) => {
-        let token = req?.cookies?.accessToken;
+        const cookies = req.cookies as Record<string, string> | undefined;
+        let token: string | undefined = cookies?.accessToken;
         if (!token) {
-          token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+          token = ExtractJwt.fromAuthHeaderAsBearerToken()(req) ?? undefined;
         }
-        return token;
+        return token || null;
       },
-      secretOrKey: process.env.JWT_SECRET,
+      secretOrKey: process.env.JWT_SECRET || 'default-secret',
     });
-
   }
 
   async validate(payload: { id: string; email: string }): Promise<User> {
@@ -28,15 +29,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       const user = await this.usersService.findById(id);
 
       if (!user) {
-        console.warn(`[JwtStrategy] User not found for ID: ${id}`);
+        this.logger.warn(`User not found for ID: ${id}`);
         throw new UnauthorizedException('User not found');
       }
 
       return user;
     } catch (error) {
-      console.error(`[JwtStrategy] Validation error for user ID ${id}:`, error);
+      this.logger.error(`Validation error for user ID ${id}:`, error);
       throw error;
     }
   }
-
 }

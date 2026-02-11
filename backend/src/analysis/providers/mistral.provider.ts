@@ -1,10 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
-  AIProviderInterface,
   AIProvider,
+  AIProviderInterface,
   AIProviderRequest,
   AIProviderResponse,
+  ChatCompletionResponse,
 } from '../interfaces/ai-provider.interface';
 
 @Injectable()
@@ -14,7 +15,7 @@ export class MistralProvider implements AIProviderInterface {
   private readonly apiUrl = 'https://api.mistral.ai/v1/chat/completions';
 
   constructor(private configService: ConfigService) {
-    this.apiKey = this.configService.get<string>('MISTRAL_API_KEY');
+    this.apiKey = this.configService.get<string>('MISTRAL_API_KEY') || '';
     this.model = this.configService.get<string>('MISTRAL_MODEL', 'mistral-large-latest');
   }
 
@@ -59,14 +60,14 @@ export class MistralProvider implements AIProviderInterface {
         throw new Error(`Mistral API error: ${response.status} ${error}`);
       }
 
-      const result = await response.json();
+      const result = (await response.json()) as ChatCompletionResponse;
       const text = result.choices[0].message.content;
-      let data = text;
+      let data: Record<string, unknown> = { text };
 
       if (request.schema) {
         try {
-          data = JSON.parse(text);
-        } catch (e) {
+          data = JSON.parse(text) as Record<string, unknown>;
+        } catch {
           console.error('[Mistral] JSON Parse Error:', text);
           throw new InternalServerErrorException('Mistral model produced malformed JSON');
         }
@@ -74,12 +75,13 @@ export class MistralProvider implements AIProviderInterface {
 
       return {
         text,
-        data,
+        data: data as Record<string, unknown>,
         rawResponse: result,
       };
-    } catch (error) {
-      console.error('[Mistral] API Call failed:', error.message);
-      throw new InternalServerErrorException(`Mistral generation failed: ${error.message}`);
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error('[Mistral] API Call failed:', msg);
+      throw new InternalServerErrorException(`Mistral generation failed: ${msg}`);
     }
   }
 }

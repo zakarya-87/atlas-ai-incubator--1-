@@ -16,9 +16,9 @@ export class DesignAgent extends BaseAgent {
   async generate(
     prompt: string,
     context: string,
-    schema?: any,
-    systemInstruction?: string,
-    images?: string[]
+    schema?: Record<string, unknown>,
+    _systemInstruction?: string,
+    _images?: string[]
   ): Promise<AgentGenerationResponse> {
     try {
       // Generate brand identity concept (colors, rationale, prompt) using text model
@@ -41,7 +41,7 @@ export class DesignAgent extends BaseAgent {
       const response = await this.executeGeminiCall(
         'gemini-2.0-flash-lite',
         brandPrompt,
-        schema,
+        schema || null,
         'You are a creative director and brand strategist specializing in startup branding.'
       );
 
@@ -66,10 +66,11 @@ export class DesignAgent extends BaseAgent {
         text: 'Brand identity concept generated successfully. Note: Logo image generation requires Vertex AI setup.',
         data: data,
       };
-    } catch (error: any) {
-      console.error('Design Agent Error:', error);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+    // Use internal logging if needed, but for now we follow the existing pattern
       throw new InternalServerErrorException(
-        `Failed to generate brand identity: ${error.message}`
+        `Failed to generate brand identity: ${message}`
       );
     }
   }

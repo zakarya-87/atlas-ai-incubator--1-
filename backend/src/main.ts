@@ -1,15 +1,20 @@
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as cookieParser from 'cookie-parser';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
+  const logger = new Logger('Bootstrap');
   try {
     // 1. Create the main HTTP application
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+    // Set global prefix for all routes
+    app.setGlobalPrefix('api');
 
     // --- COOKIE PARSER (Required for JWT cookie auth) ---
     app.use(cookieParser());
@@ -19,21 +24,22 @@ async function bootstrap() {
 
     // --- CORS ---
     app.enableCors({
-      origin: (origin, callback) => {
+      origin: (origin: string, callback: (err: Error | null, allow?: boolean) => void) => {
         const allowedOrigins = [
           process.env.FRONTEND_URL,
+          'http://atlas-ai-incubator-app.westus2.azurecontainer.io:8080',
+          'http://atlas-ai-incubator-app.westus2.azurecontainer.io',
           'http://localhost:5173',
           'http://localhost:5174',
+          'http://localhost:8080',
           'http://127.0.0.1:5173',
           'http://127.0.0.1:5174',
+          'http://127.0.0.1:8080',
         ].filter(Boolean) as string[];
 
         if (!origin) {
-          if (process.env.NODE_ENV === 'production') {
-            callback(new Error('Origin required in production'));
-          } else {
-            callback(null, true);
-          }
+          // Allow requests without Origin header (e.g., curl, postman)
+          callback(null, true);
           return;
         }
 
@@ -79,14 +85,14 @@ async function bootstrap() {
     // Start HTTP listener
     await app.listen(port, '0.0.0.0');
 
-    console.log(`=================================================`);
-    console.log(`🚀 Server running at: ${await app.getUrl()}`);
-    console.log(`📄 Swagger Docs at: ${await app.getUrl()}/api/docs`);
-    console.log(`🛡️  Security Headers: Enabled (Helmet)`);
-    console.log(`⭐️ Ready to accept requests on port ${port}`);
-    console.log(`=================================================`);
-  } catch (error) {
-    console.error('❌ Server failed to start:', error);
+    logger.log(`=================================================`);
+    logger.log(`🚀 Server running at: ${await app.getUrl()}`);
+    logger.log(`📄 Swagger Docs at: ${await app.getUrl()}/api/docs`);
+    logger.log(`🛡️  Security Headers: Enabled (Helmet)`);
+    logger.log(`⭐️ Ready to accept requests on port ${port}`);
+    logger.log(`=================================================`);
+  } catch (error: unknown) {
+    logger.error('❌ Server failed to start:', error);
   }
 }
-bootstrap();
+void bootstrap();

@@ -1,15 +1,15 @@
 import {
-  Injectable,
-  NotFoundException,
   ForbiddenException,
+  Injectable,
 } from '@nestjs/common';
+import { Integration } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class IntegrationsService {
   constructor(private prisma: PrismaService) {}
 
-  async getIntegrations(ventureId: string, userId: string) {
+  async getIntegrations(ventureId: string, userId: string): Promise<Integration[]> {
     await this.validateVentureAccess(ventureId, userId);
 
     return this.prisma.integration.findMany({
@@ -22,7 +22,7 @@ export class IntegrationsService {
     userId: string,
     provider: string,
     connect: boolean
-  ) {
+  ): Promise<Integration> {
     await this.validateVentureAccess(ventureId, userId);
 
     if (connect) {
@@ -65,7 +65,7 @@ export class IntegrationsService {
     }
   }
 
-  private async validateVentureAccess(ventureId: string, userId: string) {
+  private async validateVentureAccess(ventureId: string, userId: string): Promise<void> {
     const venture = await this.prisma.venture.findUnique({
       where: { id: ventureId },
     });

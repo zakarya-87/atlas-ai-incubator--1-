@@ -16,7 +16,7 @@ export class DefaultAgent extends BaseAgent {
   async generate(
     prompt: string,
     context: string,
-    schema?: any,
+    schema?: Record<string, unknown>,
     systemInstruction?: string,
     images?: string[]
   ): Promise<AgentGenerationResponse> {
@@ -25,7 +25,7 @@ export class DefaultAgent extends BaseAgent {
     return this.executeGeminiCall(
       'gemini-2.0-flash-lite',
       fullPrompt,
-      schema,
+      schema || null,
       systemInstruction,
       images
     );

@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
@@ -6,16 +6,17 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  private readonly logger = new Logger(PrismaService.name);
   constructor() {
     super();
   }
 
-  async onModuleInit() {
+  async onModuleInit(): Promise<void> {
     try {
-      await (this as any).$connect();
-      console.log('Database connected successfully.');
+      await this.$connect();
+      this.logger.log('Database connected successfully.');
     } catch (error) {
-      console.error(
+      this.logger.error(
         'FAILED to connect to Database (SQLite). Check if "backend/dev.db" exists and is writable.',
         error
       );
@@ -23,7 +24,7 @@ export class PrismaService
     }
   }
 
-  async onModuleDestroy() {
-    await (this as any).$disconnect();
+  async onModuleDestroy(): Promise<void> {
+    await this.$disconnect();
   }
 }

@@ -1,9 +1,9 @@
 import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsObject,
   IsArray,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -49,7 +49,7 @@ export class GenerateAnalysisDto {
   })
   @IsObject()
   @IsOptional()
-  responseSchema?: any;
+  responseSchema?: Record<string, unknown>;
 
   @ApiPropertyOptional({
     description: 'Base64 encoded images for multi-modal analysis',

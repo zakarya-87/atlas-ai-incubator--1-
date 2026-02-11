@@ -127,7 +127,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       await fetch(
-        `${(import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/logout`,
+        `/api/auth/logout`,
         {
           method: 'POST',
           headers,
@@ -185,7 +185,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       
       // Perform actual login to get valid token
       const response = await fetch(
-        `${(import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/signin`,
+        `/api/auth/signin`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

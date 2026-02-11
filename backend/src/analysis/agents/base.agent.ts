@@ -1,14 +1,15 @@
 import { ConfigService } from '@nestjs/config';
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
-import { InternalServerErrorException } from '@nestjs/common';
+import { GoogleGenerativeAI, Part, RequestOptions, Schema } from '@google/generative-ai';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import {
-  AiAgent,
   AgentGenerationResponse,
+  AiAgent,
 } from '../interfaces/ai-agent.interface';
 import { AIProviderFactory } from '../providers/ai-provider.factory';
-import { AIProvider, AIProviderInterface } from '../interfaces/ai-provider.interface';
+import { AIProvider } from '../interfaces/ai-provider.interface';
 
 export abstract class BaseAgent implements AiAgent {
+  protected readonly logger = new Logger(BaseAgent.name);
   protected aiClient: GoogleGenerativeAI | undefined;
   protected providerFactory?: AIProviderFactory;
 
@@ -22,7 +23,7 @@ export abstract class BaseAgent implements AiAgent {
   abstract generate(
     prompt: string,
     context: string,
-    schema?: any,
+    schema?: Record<string, unknown>,
     systemInstruction?: string,
     images?: string[]
   ): Promise<AgentGenerationResponse>;
@@ -32,7 +33,7 @@ export abstract class BaseAgent implements AiAgent {
 
     const apiKey = this.configService.get<string>('GEMINI_API_KEY');
     if (!apiKey) {
-      console.error(
+      this.logger.error(
         'CRITICAL: GEMINI_API_KEY is missing from backend environment variables.'
       );
       throw new Error(
@@ -47,181 +48,247 @@ export abstract class BaseAgent implements AiAgent {
   protected async executeGeminiCall(
     modelName: string,
     fullPrompt: string,
-    schema: any,
+    schema: Record<string, unknown> | null,
     systemInstruction?: string,
     images?: string[],
-    tools?: any[]
+    tools?: Record<string, unknown>[]
   ): Promise<AgentGenerationResponse> {
     const maxRetries = 3;
     let lastError: Error | null = null;
 
-    const baseUrl = this.configService.get<string>('GEMINI_API_BASE_URL');
-    const apiVersion = this.configService.get<string>('GEMINI_API_VERSION');
-    const requestOptions: any = { timeout: 300000 };
-
-    if (baseUrl) requestOptions.baseUrl = baseUrl;
-    if (apiVersion) requestOptions.apiVersion = apiVersion;
+    const requestOptions = this.getGeminiRequestOptions();
 
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
-        const client = this.getClient();
-
-        let contents: any;
-
-        if (images && images.length > 0) {
-          const parts: any[] = [{ text: fullPrompt }];
-          images.forEach((imgBase64) => {
-            const cleanBase64 = imgBase64.replace(
-              /^data:image\/\w+;base64,/,
-              ''
-            );
-            parts.push({
-              inlineData: {
-                mimeType: 'image/jpeg',
-                data: cleanBase64,
-              },
-            });
-          });
-          contents = parts;
-        } else {
-          contents = fullPrompt;
-        }
-
-        const selectedModel = modelName || this.configService.get<string>(
-          'GEMINI_MODEL',
-          'gemini-2.0-flash-lite'
+        return await this.attemptGeminiCall(
+          modelName,
+          fullPrompt,
+          schema,
+          systemInstruction,
+          images,
+          tools,
+          requestOptions,
+          attempt,
+          maxRetries
         );
+      } catch (error: unknown) {
+        lastError = error instanceof Error ? error : new Error(String(error));
 
-        const model = client.getGenerativeModel({
-          model: selectedModel,
-          systemInstruction:
-            systemInstruction ||
-            'You are the ATLAS AI Engine. Provide actionable, structured business analysis.',
-          tools: tools,
-          generationConfig: {
-            responseMimeType: 'application/json',
-            responseSchema: schema,
-          },
-        }, requestOptions);
-
-        console.log(
-          `[Gemini] Starting generation with model: ${selectedModel} (attempt ${attempt + 1}/${maxRetries})`
-        );
-        const startTime = Date.now();
-
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(
-            () => reject(new Error('Gemini API timeout after 300 seconds')),
-            300000
-          );
-        });
-
-        const response = (await Promise.race([
-          model.generateContent(contents),
-          timeoutPromise,
-        ])) as any;
-
-        const elapsed = Date.now() - startTime;
-        console.log(`[Gemini] Generation completed in ${elapsed}ms`);
-
-        const resultText = response.response.text();
-        let resultData;
-
-        try {
-          resultData = JSON.parse(resultText);
-        } catch (e) {
-          console.error('JSON Parse Error. Raw output:', resultText);
-          throw new InternalServerErrorException(
-            'The AI model produced malformed JSON. Please try again.'
-          );
-        }
-
-        return {
-          text: resultText,
-          data: resultData,
-          rawResponse: response,
-        };
-      } catch (error: any) {
-        lastError = error;
-
-        const isRateLimit =
-          error.message?.includes('429') ||
-          error.message?.includes('quota') ||
-          error.message?.includes('rate limit') ||
-          error.message?.includes('RESOURCE_EXHAUSTED');
-
-        if (isRateLimit && attempt < maxRetries - 1) {
-          // Faster randomized exponential backoff: (2^attempt * 1000ms) + jitter
-          const delayMs = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
-          console.warn(
-            `[Gemini] Rate limit hit (429), retrying in ${Math.round(delayMs)}ms... (Attempt ${attempt + 1}/${maxRetries})`
-          );
-          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        if (this.isRateLimit(lastError.message) && attempt < maxRetries - 1) {
+          await this.handleRateLimitRetry(attempt, maxRetries);
           continue;
         }
 
-        console.error(
-          `[Gemini] AI Agent Error [Model: ${modelName || 'default'}, Attempt ${attempt + 1}/${maxRetries}]:`,
-          error.message || error
+        const fallbackResult = await this.handleCallError(
+          lastError,
+          modelName,
+          attempt,
+          maxRetries,
+          fullPrompt,
+          schema,
+          systemInstruction,
+          images
         );
 
-        if (error.message?.includes('timeout')) {
-          throw new InternalServerErrorException(
-            'AI analysis is taking too long. Please try a shorter description or try again later.'
-          );
-        }
-        if (
-          error.message?.includes('GEMINI_API_KEY') ||
-          error.message?.includes('401')
-        ) {
-          throw new InternalServerErrorException(
-            'API configuration error. Please check your Gemini API key.'
-          );
-        }
-
-        if (isRateLimit) {
-          console.warn(`[Gemini] Rate limit exhausted after ${maxRetries} attempts.`);
-
-          if (this.providerFactory) {
-            const availableProviders = this.providerFactory.getAvailableProviders();
-            const fallbackProviders = availableProviders.filter(p => p !== AIProvider.GEMINI);
-
-            for (const fallbackProvider of fallbackProviders) {
-              console.log(`[Fallback] Attempting ${fallbackProvider} due to Gemini rate limits...`);
-              try {
-                const provider = this.providerFactory.getProvider(fallbackProvider);
-                if (!provider) continue;
-
-                const fallbackResponse = await provider.complete({
-                  prompt: fullPrompt,
-                  context: '',
-                  schema,
-                  systemInstruction: systemInstruction || 'You are the ATLAS AI Engine. Provide actionable, structured business analysis.',
-                  images,
-                });
-
-                return {
-                  text: fallbackResponse.text,
-                  data: fallbackResponse.data,
-                };
-              } catch (fallbackError: any) {
-                console.error(`[Fallback] ${fallbackProvider} also failed:`, fallbackError.message);
-                // Continue to next provider in loop
-              }
-            }
-          }
-
-          throw new InternalServerErrorException(
-            'API rate limit exceeded. We attempted multiple retries and fallbacks. Please wait 60 seconds and try again.'
-          );
-        }
-
-        throw new InternalServerErrorException(
-          `AI Generation failed: ${error.message}`
-        );
+        if (fallbackResult) return fallbackResult;
+        throw lastError;
       }
     }
 
-    throw lastError;
+    throw lastError || new Error('Unknown AI generation error');
+  }
+
+  private getGeminiRequestOptions(): RequestOptions {
+    const baseUrl = this.configService.get<string>('GEMINI_API_BASE_URL');
+    const apiVersion = this.configService.get<string>('GEMINI_API_VERSION');
+    const requestOptions: RequestOptions = { timeout: 300000 };
+
+    if (baseUrl) requestOptions.baseUrl = baseUrl;
+    if (apiVersion) requestOptions.apiVersion = apiVersion;
+    return requestOptions;
+  }
+
+  private async attemptGeminiCall(
+    modelName: string,
+    fullPrompt: string,
+    schema: Record<string, unknown> | null,
+    systemInstruction: string | undefined,
+    images: string[] | undefined,
+    tools: Record<string, unknown>[] | undefined,
+    requestOptions: RequestOptions,
+    attempt: number,
+    maxRetries: number
+  ): Promise<AgentGenerationResponse> {
+    const client = this.getClient();
+    const contents = this.prepareContent(fullPrompt, images);
+    const selectedModel =
+      modelName ||
+      this.configService.get<string>('GEMINI_MODEL', 'gemini-2.0-flash-lite');
+
+    const model = client.getGenerativeModel(
+      {
+        model: selectedModel,
+        systemInstruction:
+          systemInstruction ||
+          'You are the ATLAS AI Engine. Provide actionable, structured business analysis.',
+        tools: (tools as unknown) as Record<string, unknown>[],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          responseSchema: (schema as unknown) as Schema,
+        },
+      },
+      requestOptions
+    );
+
+    this.logger.log(
+      `[Gemini] Starting generation with model: ${selectedModel} (attempt ${attempt + 1}/${maxRetries})`
+    );
+
+    const response = await this.raceWithTimeout(
+      model.generateContent(contents),
+      300000
+    );
+
+    const resultText = response.response.text();
+
+    if (!resultText) {
+      throw new InternalServerErrorException('AI model returned empty response');
+    }
+
+    try {
+      const resultData = JSON.parse(resultText) as Record<string, unknown>;
+      return { text: resultText, data: resultData, rawResponse: (response as unknown) as Record<string, unknown> };
+    } catch {
+      this.logger.error('JSON Parse Error. Raw output:', resultText);
+      throw new InternalServerErrorException(
+        'The AI model produced malformed JSON. Please try again.'
+      );
+    }
+  }
+
+  private prepareContent(
+    prompt: string,
+    images?: string[]
+  ): string | (string | Part)[] {
+    if (!images || images.length === 0) return prompt;
+
+    const parts: (string | Part)[] = [{ text: prompt }];
+    images.forEach((imgBase64) => {
+      const cleanBase64 = imgBase64.replace(/^data:image\/\w+;base64,/, '');
+      parts.push({
+        inlineData: {
+          mimeType: 'image/jpeg',
+          data: cleanBase64,
+        },
+      });
+    });
+    return parts;
+  }
+
+  private async raceWithTimeout<T>(
+    promise: Promise<T>,
+    timeoutMs: number
+  ): Promise<T> {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(
+        () => reject(new Error(`Gemini API timeout after ${timeoutMs / 1000} seconds`)),
+        timeoutMs
+      );
+    });
+    return Promise.race([promise, timeoutPromise]);
+  }
+
+  private isRateLimit(message: string): boolean {
+    return (
+      message.includes('429') ||
+      message.includes('quota') ||
+      message.includes('rate limit') ||
+      message.includes('RESOURCE_EXHAUSTED')
+    );
+  }
+
+  private async handleRateLimitRetry(
+    attempt: number,
+    maxRetries: number
+  ): Promise<void> {
+    const delayMs = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+    this.logger.warn(
+      `[Gemini] Rate limit hit (429), retrying in ${Math.round(delayMs)}ms... (Attempt ${attempt + 1}/${maxRetries})`
+    );
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+
+  private async handleCallError(
+    error: Error,
+    modelName: string,
+    attempt: number,
+    maxRetries: number,
+    prompt: string,
+    schema: Record<string, unknown> | null,
+    systemInstruction?: string,
+    images?: string[]
+  ): Promise<AgentGenerationResponse | null> {
+    const message = error.message;
+    this.logger.error(
+      `[Gemini] AI Agent Error [Model: ${modelName || 'default'}, Attempt ${attempt + 1}/${maxRetries}]: ${message}`
+    );
+
+    if (message.includes('timeout')) {
+      throw new InternalServerErrorException(
+        'AI analysis is taking too long. Please try a shorter description or try again later.'
+      );
+    }
+
+    if (message.includes('GEMINI_API_KEY') || message.includes('401')) {
+      throw new InternalServerErrorException(
+        'API configuration error. Please check your Gemini API key.'
+      );
+    }
+
+    if (this.isRateLimit(message)) {
+      this.logger.warn(`[Gemini] Rate limit exhausted after ${maxRetries} attempts.`);
+      return this.attemptFallback(prompt, schema, systemInstruction, images);
+    }
+
+    return null;
+  }
+
+  private async attemptFallback(
+    prompt: string,
+    schema: Record<string, unknown> | null,
+    systemInstruction?: string,
+    images?: string[]
+  ): Promise<AgentGenerationResponse | null> {
+    if (!this.providerFactory) return null;
+
+    const availableProviders = this.providerFactory.getAvailableProviders();
+    const fallbacks = availableProviders.filter((p) => p !== AIProvider.GEMINI);
+
+    for (const fbProvider of fallbacks) {
+      this.logger.log(`[Fallback] Attempting ${fbProvider} due to Gemini rate limits...`);
+      try {
+        const provider = this.providerFactory.getProvider(fbProvider);
+        if (!provider) continue;
+
+        const response = await provider.complete({
+          prompt,
+          context: '',
+          schema: schema || undefined,
+          systemInstruction:
+            systemInstruction ||
+            'You are the ATLAS AI Engine. Provide actionable, structured business analysis.',
+          images,
+        });
+
+        return { text: response.text, data: response.data };
+      } catch (fbError: unknown) {
+        const msg = fbError instanceof Error ? fbError.message : String(fbError);
+        this.logger.error(`[Fallback] ${fbProvider} also failed: ${msg}`);
+      }
+    }
+
+    throw new InternalServerErrorException(
+      'API rate limit exceeded. We attempted multiple retries and fallbacks. Please wait 60 seconds and try again.'
+    );
   }
 }

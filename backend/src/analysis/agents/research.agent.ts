@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BaseAgent } from './base.agent';
 import { AgentGenerationResponse } from '../interfaces/ai-agent.interface';
-import { Tool } from '@google/generative-ai';
 import { AIProviderFactory } from '../providers/ai-provider.factory';
 
 @Injectable()
@@ -17,7 +16,7 @@ export class ResearchAgent extends BaseAgent {
   async generate(
     prompt: string,
     context: string,
-    schema?: any,
+    schema?: Record<string, unknown>,
     systemInstruction?: string,
     images?: string[]
   ): Promise<AgentGenerationResponse> {
@@ -39,10 +38,8 @@ export class ResearchAgent extends BaseAgent {
 
     // Prepare content parts (Text + Optional Images)
     // For generateContent: pass parts array directly, not wrapped with role
-    let searchContents: any;
-
     if (images && images.length > 0) {
-      const parts: any[] = [{ text: searchPrompt }];
+      const parts: Record<string, unknown>[] = [{ text: searchPrompt }];
       images.forEach((imgBase64) => {
         const cleanBase64 = imgBase64.replace(/^data:image\/\w+;base64,/, '');
         parts.push({
@@ -53,10 +50,6 @@ export class ResearchAgent extends BaseAgent {
         });
       });
       // Pass parts array directly for multimodal content
-      searchContents = parts;
-    } else {
-      // For text-only, pass as string
-      searchContents = searchPrompt;
     }
 
     const searchResponse = await this.executeGeminiCall(
@@ -65,20 +58,30 @@ export class ResearchAgent extends BaseAgent {
       null, // No schema for research pass
       systemInstruction || 'You are the ATLAS AI Engine. Conduct comprehensive market research.',
       images,
-      [{ googleSearch: {} } as any] // Pass tools for Grounding
+      [{ googleSearch: {} } as Record<string, unknown>] // Pass tools for Grounding
     );
 
     const rawText = searchResponse.text;
 
-    // Extract citations (Grounding Metadata) from rawResponse
+    // Extract citations (Grounding Metadata) from rawResponse safely
+    const rawResponse = searchResponse.rawResponse as Record<string, unknown>;
+    const candidates = (rawResponse?.response as Record<string, unknown>)
+      ?.candidates as Record<string, unknown>[];
+    const groundingMetadata = candidates?.[0]?.groundingMetadata as Record<
+      string,
+      unknown
+    >;
     const groundingChunks =
-      searchResponse.rawResponse?.response?.candidates?.[0]?.groundingMetadata
-        ?.groundingChunks || [];
+      (groundingMetadata?.groundingChunks as Record<string, unknown>[]) || [];
+
     const sources = groundingChunks
-      .map((chunk: any) =>
-        chunk.web?.uri ? { title: chunk.web.title, url: chunk.web.uri } : null
-      )
-      .filter((source: any) => source !== null);
+      .map((chunk) => {
+        const web = chunk.web as Record<string, string>;
+        return web?.uri ? { title: web.title, url: web.uri } : null;
+      })
+      .filter(
+        (source): source is { title: string; url: string } => source !== null
+      );
 
     // --- PASS 2: STRUCTURE DATA (JSON Formatting) ---
     // Now we feed the research notes into a schema-enforced call to get the UI-ready JSON.
@@ -98,7 +101,7 @@ export class ResearchAgent extends BaseAgent {
     const formattedResponse = await this.executeGeminiCall(
       'gemini-2.0-flash-lite',
       formattingPrompt,
-      schema,
+      schema || null,
       'You are a strict JSON formatting engine.'
     );
 

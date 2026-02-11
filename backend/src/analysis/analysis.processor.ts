@@ -5,8 +5,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EventsGateway } from '../events/events.gateway';
 import { setJob } from './job-store';
 
+import { GenerateAnalysisDto } from './dto/generate-analysis.dto';
+
 export interface AnalysisJobData {
-  dto: any;
+  dto: GenerateAnalysisDto;
   userId: string;
   originalJobId: string;
 }
@@ -21,8 +23,12 @@ export class AnalysisProcessor extends WorkerHost {
     super();
   }
 
-  async process(job: Job<AnalysisJobData>) {
+  async process(job: Job<AnalysisJobData>): Promise<Record<string, unknown>> {
     const { dto, userId } = job.data;
+    if (!job.id) {
+      throw new Error('Job ID is missing');
+    }
+    const jobId = job.id.toString();
 
     try {
       // Update local job store
@@ -35,14 +41,14 @@ export class AnalysisProcessor extends WorkerHost {
 
       // Update job status in DB
       await this.prisma.job.update({
-        where: { id: job.id.toString() },
+        where: { id: jobId },
         data: { status: 'processing', startedAt: new Date() },
       });
 
       // Emit WebSocket event for progress
       if (dto.ventureId) {
         this.eventsGateway.emitLog(dto.ventureId, {
-          id: `job-${job.id}`,
+          id: `job-${jobId}`,
           agent: 'Systems Architect',
           messageKey: 'agentLogProcessing',
           timestamp: Date.now(),
@@ -83,7 +89,7 @@ export class AnalysisProcessor extends WorkerHost {
       // Emit completion event
       if (dto.ventureId) {
         this.eventsGateway.emitLog(dto.ventureId, {
-          id: `job-${job.id}-completed`,
+          id: `job-${jobId}-completed`,
           agent: 'Systems Architect',
           messageKey: 'agentLogCompleted',
           timestamp: Date.now(),
@@ -91,12 +97,13 @@ export class AnalysisProcessor extends WorkerHost {
       }
 
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       // Update local job store to failed
       setJob(job.data.originalJobId, {
         jobId: job.data.originalJobId,
         status: 'failed',
-        error: error.message,
+        error: errorMessage,
         createdAt: Date.now(),
         finishedAt: Date.now(),
       });
@@ -106,14 +113,14 @@ export class AnalysisProcessor extends WorkerHost {
         where: { id: job.id.toString() },
         data: {
           status: 'failed',
-          error: error.message,
+          error: errorMessage,
           completedAt: new Date(),
         },
       });
 
       if (dto.ventureId) {
         this.eventsGateway.emitLog(dto.ventureId, {
-          id: `job-${job.id}-failed`,
+          id: `job-${jobId}-failed`,
           agent: 'Systems Architect',
           messageKey: 'agentLogFailed',
           timestamp: Date.now(),

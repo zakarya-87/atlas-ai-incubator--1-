@@ -9,7 +9,6 @@ global.fetch = jest.fn();
 
 describe('MistralProvider', () => {
   let provider: MistralProvider;
-  let configService: ConfigService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,7 +30,6 @@ describe('MistralProvider', () => {
     }).compile();
 
     provider = module.get<MistralProvider>(MistralProvider);
-    configService = module.get<ConfigService>(ConfigService);
     (fetch as jest.Mock).mockClear();
   });
 
@@ -153,7 +151,7 @@ describe('MistralProvider', () => {
       await provider.complete(mockRequest);
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.messages).toHaveLength(2);
       expect(body.messages[0]).toEqual({
@@ -183,7 +181,7 @@ describe('MistralProvider', () => {
       await provider.complete(mockRequest);
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.messages[1].content).toBe('Test context\n\nTask: Test prompt');
     });
@@ -207,7 +205,7 @@ describe('MistralProvider', () => {
       await provider.complete(mockRequest);
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.response_format).toEqual({ type: 'json_object' });
     });
@@ -236,7 +234,7 @@ describe('MistralProvider', () => {
       await provider.complete(requestWithoutSchema);
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.response_format).toBeUndefined();
     });
@@ -301,7 +299,7 @@ describe('MistralProvider', () => {
       await provider.complete({ prompt: 'test', context: '' });
 
       const callArgs = (fetch as jest.Mock).mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
+      const body = JSON.parse(callArgs[1].body as string);
       
       expect(body.model).toBe('mistral-large-latest');
     });

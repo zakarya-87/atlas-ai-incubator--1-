@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaClient } from '@prisma/client';
 
 // Mock the PrismaClient
 jest.mock('@prisma/client', () => {

@@ -1,6 +1,10 @@
+import { ExecutionContext } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { Request } from 'express';
+
 // Mock implementation for testing
-export const GetUser = jest.fn((data: unknown, ctx: any) => {
-  const request = ctx?.switchToHttp?.()?.getRequest();
+export const GetUser = jest.fn((data: unknown, ctx: ExecutionContext) => {
+  const request = ctx.switchToHttp().getRequest<Request & { user?: User }>();
   if (!request?.user) {
     return {
       id: 'user-123',

@@ -1,14 +1,14 @@
 export interface AgentGenerationResponse {
   text: string;
-  data: any;
-  rawResponse?: any;
+  data: Record<string, unknown>;
+  rawResponse?: unknown;
 }
 
 export interface AiAgent {
   generate(
     prompt: string,
     context: string,
-    schema?: any,
+    schema?: Record<string, unknown>,
     systemInstruction?: string,
     images?: string[]
   ): Promise<AgentGenerationResponse>;

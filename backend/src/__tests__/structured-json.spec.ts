@@ -13,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { OpenAIProvider } from '../analysis/providers/openai.provider';
 import { GrokProvider } from '../analysis/providers/grok.provider';
 import { MistralProvider } from '../analysis/providers/mistral.provider';
-import { AIProvider, AIProviderRequest } from '../analysis/interfaces/ai-provider.interface';
+import { AIProviderRequest } from '../analysis/interfaces/ai-provider.interface';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -137,7 +137,7 @@ describe('Structured JSON Output from LLM Providers', () => {
 
             const result = await provider.complete(request);
 
-            expect(result.data).toBe(plainText);
+            expect(result.data).toEqual({ text: plainText });
             expect(result.text).toBe(plainText);
         });
 
@@ -161,7 +161,7 @@ describe('Structured JSON Output from LLM Providers', () => {
             await provider.complete(request);
 
             const fetchCall = mockFetch.mock.calls[0];
-            const body = JSON.parse(fetchCall[1].body);
+            const body = JSON.parse(fetchCall[1].body as string);
             expect(body.messages).toHaveLength(2);
             expect(body.messages[0].role).toBe('system');
             expect(body.messages[0].content).toBe(systemInstruction);
@@ -276,7 +276,7 @@ describe('Structured JSON Output from LLM Providers', () => {
             await provider.complete(request);
 
             const fetchCall = mockFetch.mock.calls[0];
-            const body = JSON.parse(fetchCall[1].body);
+            const body = JSON.parse(fetchCall[1].body as string);
             expect(body.stream).toBe(false);
         });
 
@@ -298,7 +298,7 @@ describe('Structured JSON Output from LLM Providers', () => {
             await provider.complete(request);
 
             const fetchCall = mockFetch.mock.calls[0];
-            const body = JSON.parse(fetchCall[1].body);
+            const body = JSON.parse(fetchCall[1].body as string);
             expect(body.temperature).toBe(0);
         });
     });
@@ -411,7 +411,7 @@ describe('Structured JSON Output from LLM Providers', () => {
             await provider.complete(request);
 
             const fetchCall = mockFetch.mock.calls[0];
-            const body = JSON.parse(fetchCall[1].body);
+            const body = JSON.parse((fetchCall[1] as { body: string }).body);
             // Mistral provider merges context with prompt into a single user message
             expect(body.messages).toHaveLength(1);
             const userMessage = body.messages[0];
@@ -423,11 +423,11 @@ describe('Structured JSON Output from LLM Providers', () => {
 
     describe('All Providers - JSON Enforcement', () => {
         it('should handle empty JSON object response (TC-SJ-015)', async () => {
-            const createProvider = async (ProviderClass: any, config: any) => {
+            const createProvider = async <T>(ProviderClass: new (...args: any[]) => T, config: string) => {
                 const module = await Test.createTestingModule({
-                    providers: [ProviderClass, { provide: ConfigService, useValue: { get: () => config } }],
+                    providers: [ProviderClass, { provide: ConfigService, useValue: ({ get: () => config } as unknown) as ConfigService }],
                 }).compile();
-                return module.get(ProviderClass);
+                return module.get<T>(ProviderClass) as unknown as { complete(req: AIProviderRequest): Promise<{ data: any, text: string, rawResponse: any }> };
             };
 
             const openaiProvider = await createProvider(OpenAIProvider, 'key');
@@ -488,7 +488,7 @@ describe('Structured JSON Output from LLM Providers', () => {
             };
             mockFetch.mockResolvedValue(mockResponse);
 
-            const provider = new MistralProvider({ get: () => 'key' } as any);
+            const provider = new MistralProvider(({ get: () => 'key' } as unknown) as ConfigService);
             const result = await provider.complete(request);
 
             expect(result.data).toEqual(expectedJson);
@@ -513,7 +513,7 @@ describe('Structured JSON Output from LLM Providers', () => {
             };
             mockFetch.mockResolvedValue(mockResponse);
 
-            const provider = new GrokProvider({ get: () => 'key' } as any);
+            const provider = new GrokProvider(({ get: () => 'key' } as unknown) as ConfigService);
             const result = await provider.complete(request);
 
             expect(result.data).toEqual(expectedJson);
@@ -539,13 +539,16 @@ describe('Structured JSON Output from LLM Providers', () => {
             };
             mockFetch.mockResolvedValue(mockResponse);
 
-            const provider = new OpenAIProvider({
-                get: () => ({
-                    'AZURE_OPENAI_API_KEY': 'key',
-                    'AZURE_OPENAI_ENDPOINT': 'https://test.openai.azure.com',
-                    'AZURE_OPENAI_DEPLOYMENT': 'gpt-4',
-                })
-            } as any);
+            const provider = new OpenAIProvider(({
+                get: (key: string) => {
+                    const config: Record<string, string> = {
+                        'AZURE_OPENAI_API_KEY': 'key',
+                        'AZURE_OPENAI_ENDPOINT': 'https://test.openai.azure.com',
+                        'AZURE_OPENAI_DEPLOYMENT': 'gpt-4',
+                    };
+                    return config[key];
+                }
+            } as unknown) as ConfigService);
             const result = await provider.complete(request);
 
             expect(result.data).toEqual(expectedJson);
@@ -572,13 +575,16 @@ describe('Structured JSON Output from LLM Providers', () => {
             };
             mockFetch.mockResolvedValue(mockResponse);
 
-            const provider = new OpenAIProvider({
-                get: () => ({
-                    'AZURE_OPENAI_API_KEY': 'key',
-                    'AZURE_OPENAI_ENDPOINT': 'https://test.openai.azure.com',
-                    'AZURE_OPENAI_DEPLOYMENT': 'gpt-4',
-                })
-            } as any);
+            const provider = new OpenAIProvider(({
+                get: (key: string) => {
+                    const config: Record<string, string> = {
+                        'AZURE_OPENAI_API_KEY': 'key',
+                        'AZURE_OPENAI_ENDPOINT': 'https://test.openai.azure.com',
+                        'AZURE_OPENAI_DEPLOYMENT': 'gpt-4',
+                    };
+                    return config[key];
+                }
+            } as unknown) as ConfigService);
             const result = await provider.complete(request);
 
             expect(result.rawResponse).toEqual(rawApiResponse);
@@ -587,13 +593,16 @@ describe('Structured JSON Output from LLM Providers', () => {
 
     describe('Error Handling', () => {
         it('should throw for API errors (TC-SJ-020)', async () => {
-            const provider = new OpenAIProvider({
-                get: () => ({
-                    'AZURE_OPENAI_API_KEY': 'key',
-                    'AZURE_OPENAI_ENDPOINT': 'https://test.openai.azure.com',
-                    'AZURE_OPENAI_DEPLOYMENT': 'gpt-4',
-                })
-            } as any);
+            const provider = new OpenAIProvider(({
+                get: (key: string) => {
+                    const config: Record<string, string> = {
+                        'AZURE_OPENAI_API_KEY': 'key',
+                        'AZURE_OPENAI_ENDPOINT': 'https://test.openai.azure.com',
+                        'AZURE_OPENAI_DEPLOYMENT': 'gpt-4',
+                    };
+                    return config[key];
+                }
+            } as unknown) as ConfigService);
 
             mockFetch.mockResolvedValue({
                 ok: false,
@@ -607,7 +616,7 @@ describe('Structured JSON Output from LLM Providers', () => {
         });
 
         it('should throw for network errors (TC-SJ-021)', async () => {
-            const provider = new GrokProvider({ get: () => 'key' } as any);
+            const provider = new GrokProvider(({ get: () => 'key' } as unknown) as ConfigService);
 
             mockFetch.mockRejectedValue(new Error('Network error'));
 
@@ -617,7 +626,7 @@ describe('Structured JSON Output from LLM Providers', () => {
         });
 
         it('should handle missing API key gracefully (TC-SJ-022)', async () => {
-            const provider = new MistralProvider({ get: () => undefined } as any);
+            const provider = new MistralProvider(({ get: () => undefined } as unknown) as ConfigService);
 
             await expect(
                 provider.complete({ prompt: 'test', context: 'test', schema: { type: 'object', properties: {} } })

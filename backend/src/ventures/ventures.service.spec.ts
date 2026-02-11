@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
-  NotFoundException,
-  ForbiddenException,
   BadRequestException,
+  ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { VenturesService } from './ventures.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -37,7 +37,7 @@ describe('VenturesService', () => {
     id: 'venture-123',
     name: 'Test Startup',
     userId: 'owner-123',
-    user: mockOwner,
+    owner: mockOwner,
   };
 
   beforeEach(async () => {
@@ -96,7 +96,7 @@ describe('VenturesService', () => {
 
       expect(prismaService.venture.findUnique).toHaveBeenCalledWith({
         where: { id: mockVenture.id },
-        include: { user: true },
+        include: { owner: true },
       });
       expect(usersService.findOne).toHaveBeenCalledWith(mockInvitee.email);
       expect(prismaService.ventureMember.create).toHaveBeenCalledWith({
@@ -235,7 +235,7 @@ describe('VenturesService', () => {
 
     it('should use owner email if fullName is not available', async () => {
       const ownerWithoutName = { ...mockOwner, fullName: null };
-      const ventureWithoutName = { ...mockVenture, user: ownerWithoutName };
+      const ventureWithoutName = { ...mockVenture, owner: ownerWithoutName };
 
       prismaService.venture.findUnique.mockResolvedValue(ventureWithoutName);
       usersService.findOne.mockResolvedValue(mockInvitee);
@@ -310,7 +310,7 @@ describe('VenturesService', () => {
 
     it('should return list of members for existing member', async () => {
       const memberId = 'member-456';
-      const mockMembers = [];
+      const mockMembers: any[] = [];
 
       prismaService.venture.findUnique.mockResolvedValue(mockVenture);
       prismaService.ventureMember.findUnique.mockResolvedValue({

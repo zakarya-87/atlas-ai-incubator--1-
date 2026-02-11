@@ -43,11 +43,11 @@ RUN chown -R nginx-user:nginx-user /usr/share/nginx/html && \
 # Switch to non-root user
 USER nginx-user
 
-EXPOSE 80
+EXPOSE 8080
 
 # Health check for nginx
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost/ || exit 1
 
-# Substitute environment variables in nginx.conf and start nginx
-CMD ["/bin/sh", "-c", "envsubst '${BACKEND_URL}' < /etc/nginx/conf.d/default.conf > /etc/nginx/conf.d/default.conf.tmp && mv /etc/nginx/conf.d/default.conf.tmp /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

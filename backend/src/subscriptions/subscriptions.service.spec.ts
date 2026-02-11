@@ -1,16 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
-  InternalServerErrorException,
   BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 describe('SubscriptionsService', () => {
   let service: SubscriptionsService;
-  let prismaService: any;
-  let configService: any;
+  let prismaService: PrismaService;
+  let configService: ConfigService;
   let mockStripe: any;
 
   const mockUser = {
@@ -58,7 +60,7 @@ describe('SubscriptionsService', () => {
         };
         return config[key];
       }),
-    };
+    } as unknown as ConfigService;
 
     prismaService = {
       user: {
@@ -66,7 +68,7 @@ describe('SubscriptionsService', () => {
         update: jest.fn(),
         findFirst: jest.fn(),
       },
-    };
+    } as unknown as PrismaService;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -119,7 +121,7 @@ describe('SubscriptionsService', () => {
 
   describe('createCheckoutSession', () => {
     it('should create checkout session for existing customer', async () => {
-      prismaService.user.findUnique.mockResolvedValue(mockUser);
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
 
       const result = await service.createCheckoutSession('user-123', 'pro');
 
@@ -130,7 +132,7 @@ describe('SubscriptionsService', () => {
     });
 
     it('should throw error if user not found', async () => {
-      prismaService.user.findUnique.mockResolvedValue(null);
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(
         service.createCheckoutSession('non-existent', 'pro')
@@ -139,7 +141,7 @@ describe('SubscriptionsService', () => {
 
     it('should throw error if Stripe not configured', async () => {
       (service as any).stripe = undefined;
-      prismaService.user.findUnique.mockResolvedValue(mockUser);
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
 
       await expect(
         service.createCheckoutSession('user-123', 'pro')
@@ -149,7 +151,7 @@ describe('SubscriptionsService', () => {
 
   describe('createPortalSession', () => {
     it('should create portal session for user with customer ID', async () => {
-      prismaService.user.findUnique.mockResolvedValue(mockUser);
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
 
       const result = await service.createPortalSession('user-123');
 
@@ -158,7 +160,7 @@ describe('SubscriptionsService', () => {
     });
 
     it('should throw error if user has no billing account', async () => {
-      prismaService.user.findUnique.mockResolvedValue({
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue({
         ...mockUser,
         stripeCustomerId: null,
       });
@@ -171,7 +173,7 @@ describe('SubscriptionsService', () => {
 
   describe('getSubscriptionStatus', () => {
     it('should return subscription status for user', async () => {
-      prismaService.user.findUnique.mockResolvedValue(mockUser);
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
 
       const result = await service.getSubscriptionStatus('user-123');
 
@@ -182,7 +184,7 @@ describe('SubscriptionsService', () => {
     });
 
     it('should return default status for non-existent user', async () => {
-      prismaService.user.findUnique.mockResolvedValue(null);
+      (prismaService.user.findUnique as jest.Mock).mockResolvedValue(null);
 
       const result = await service.getSubscriptionStatus('non-existent');
 
@@ -196,16 +198,12 @@ describe('SubscriptionsService', () => {
   describe('handleWebhook', () => {
     beforeEach(() => {
       // Reset prisma mock
-      prismaService.user.update.mockReset();
+      (prismaService.user.update as jest.Mock).mockReset();
     });
 
     it.skip('should process checkout completed event - skipped due to complex mocking', async () => {
-      // This test is skipped because mocking the Stripe webhook constructEvent
-      // requires complex setup that interferes with other tests.
-      // The service correctly calls this.stripe.webhooks.constructEvent
-      // and handles the webhook events when properly configured.
       const payload = JSON.stringify({ type: 'checkout.session.completed' });
-      prismaService.user.update.mockResolvedValue(mockUser);
+      (prismaService.user.update as jest.Mock).mockResolvedValue(mockUser);
 
       const result = await service.handleWebhook('sig_123', payload);
 

@@ -190,7 +190,7 @@ describe('AIProviderFactory', () => {
       };
       const mockResponse = {
         text: 'Simple response',
-        data: 'Simple response',
+        data: { text: 'Simple response' },
       };
       jest.spyOn(mistralProvider, 'complete').mockResolvedValue(mockResponse);
 

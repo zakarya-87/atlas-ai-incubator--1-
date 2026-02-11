@@ -132,8 +132,8 @@ describe('AuthController', () => {
   });
 
   describe('POST /auth/refresh', () => {
-    it('should return success', async () => {
-      const result = await controller.refresh(mockResponse);
+    it('should return success', () => {
+      const result = controller.refresh(mockResponse);
 
       expect(result).toEqual({ success: true });
     });

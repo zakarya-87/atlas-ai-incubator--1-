@@ -1,9 +1,10 @@
 import {
+  BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  ForbiddenException,
-  BadRequestException,
 } from '@nestjs/common';
+import { VentureMember } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 import { EmailService } from '../email/email.service';
@@ -21,11 +22,11 @@ export class VenturesService {
     ownerId: string,
     email: string,
     role: string
-  ) {
+  ): Promise<VentureMember> {
     // 1. Verify Owner Access
-    const venture = await (this.prisma as any).venture.findUnique({
+    const venture = await this.prisma.venture.findUnique({
       where: { id: ventureId },
-      include: { user: true }, // include owner details
+      include: { owner: true }, // include owner details
     });
 
     if (!venture) throw new NotFoundException('Venture not found');
@@ -44,7 +45,7 @@ export class VenturesService {
 
     // 3. Create Membership
     // Check if already a member
-    const existingMember = await (this.prisma as any).ventureMember.findUnique({
+    const existingMember = await this.prisma.ventureMember.findUnique({
       where: {
         ventureId_userId: {
           ventureId,
@@ -54,13 +55,13 @@ export class VenturesService {
     });
 
     if (existingMember) {
-      return (this.prisma as any).ventureMember.update({
+      return this.prisma.ventureMember.update({
         where: { id: existingMember.id },
         data: { role },
       });
     }
 
-    const member = await (this.prisma as any).ventureMember.create({
+    const member = await this.prisma.ventureMember.create({
       data: {
         ventureId,
         userId: invitee.id,
@@ -69,7 +70,7 @@ export class VenturesService {
     });
 
     // 4. Send Notification
-    const ownerName = venture.user.fullName || venture.user.email;
+    const ownerName = venture.owner.fullName || venture.owner.email;
     this.emailService
       .sendInviteEmail(email, ownerName, venture.name)
       .catch(console.error);
@@ -77,12 +78,15 @@ export class VenturesService {
     return member;
   }
 
-  async listMembers(ventureId: string, userId: string) {
+  async listMembers(
+    ventureId: string,
+    userId: string
+  ): Promise<(VentureMember & { user: { email: string; fullName: string | null } })[]> {
     // Check access
     const membership = await this.checkAccess(ventureId, userId);
     if (!membership) throw new ForbiddenException('Access denied');
 
-    const members = await (this.prisma as any).ventureMember.findMany({
+    const members = await this.prisma.ventureMember.findMany({
       where: { ventureId },
       include: { user: { select: { email: true, fullName: true } } },
     });
@@ -91,12 +95,12 @@ export class VenturesService {
   }
 
   async checkAccess(ventureId: string, userId: string): Promise<boolean> {
-    const venture = await (this.prisma as any).venture.findUnique({
+    const venture = await this.prisma.venture.findUnique({
       where: { id: ventureId },
     });
     if (venture && venture.userId === userId) return true;
 
-    const member = await (this.prisma as any).ventureMember.findUnique({
+    const member = await this.prisma.ventureMember.findUnique({
       where: { ventureId_userId: { ventureId, userId } },
     });
     return !!member;
