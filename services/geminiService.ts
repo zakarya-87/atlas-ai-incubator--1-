@@ -723,6 +723,7 @@ const fundraisingRoadmapSchema = {
 
 // Active request controllers for cancellation
 const activeRequests = new Map<string, AbortController>();
+const activeTimers = new Set<NodeJS.Timeout>();
 
 // Helper to get the JWT token
 const getAuthToken = () => {
@@ -735,6 +736,10 @@ export const cancelAllRequests = () => {
     controller.abort();
     activeRequests.delete(key);
   });
+  activeTimers.forEach((timer) => {
+    clearTimeout(timer);
+  });
+  activeTimers.clear();
 };
 
 // Cancel a specific request
@@ -783,10 +788,19 @@ async function fetchWithTimeout(
 }
 
 // Retry with exponential backoff
+export interface AnalysisOptions {
+  pollInterval?: number;
+  timeout?: number;
+  retryDelay?: number;
+  image?: string;
+  refinement?: { instruction: string; parentId: string };
+}
+
 async function fetchWithRetry(
   url: string,
   options: RequestInit,
-  maxRetries = API_CONFIG.RETRY_ATTEMPTS
+  maxRetries = API_CONFIG.RETRY_ATTEMPTS,
+  retryDelay = API_CONFIG.RETRY_DELAY
 ): Promise<Response> {
   let lastError: Error | null = null;
 
@@ -806,9 +820,19 @@ async function fetchWithRetry(
       // Retry on 5xx errors and 429
       if (response.status >= 500 || response.status === 429) {
         if (attempt < maxRetries) {
-          const delay = API_CONFIG.RETRY_DELAY * Math.pow(2, attempt);
+          const delay = retryDelay * Math.pow(2, attempt);
           logger.warn(`Request failed with status ${response.status}, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
-          await new Promise((resolve) => setTimeout(resolve, delay));
+          await new Promise<void>((resolve, reject) => {
+            const timer = setTimeout(() => {
+              activeTimers.delete(timer);
+              resolve();
+            }, delay);
+            activeTimers.add(timer);
+
+            // If cancelAllRequests is called, this promise should reject to break the retry loop
+            // We can check this by setting a 'cancelled' flag or relying on the AbortController if we had one here.
+            // For now, being able to clear the timeout is enough to stop the next iteration.
+          });
           continue;
         }
 
@@ -831,12 +855,18 @@ async function fetchWithRetry(
       }
 
       if (attempt < maxRetries) {
-        const delay = API_CONFIG.RETRY_DELAY * Math.pow(2, attempt);
+        const delay = retryDelay * Math.pow(2, attempt);
         logger.warn(
           `Request failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`,
           error
         );
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        await new Promise<void>((resolve) => {
+          const timer = setTimeout(() => {
+            activeTimers.delete(timer);
+            resolve();
+          }, delay);
+          activeTimers.add(timer);
+        });
       }
     }
   }
@@ -858,7 +888,8 @@ async function generateAnalysis<T>(
   image?: string, // Optional Base64 Image
   refinement?: { instruction: string; parentId: string }, // Optional Refinement
   pollInterval = 2000,
-  timeout = 900000
+  timeout = 900000,
+  retryDelay = API_CONFIG.RETRY_DELAY
 ): Promise<T> {
   const t = (key: any) =>
     (translations[language] as any)[key] || (translations['en'] as any)[key];
@@ -895,12 +926,14 @@ async function generateAnalysis<T>(
           refinementInstruction: refinement?.instruction,
           parentAnalysisId: refinement?.parentId,
         }),
-      }
+      },
+      API_CONFIG.RETRY_ATTEMPTS,
+      retryDelay
     );
 
     if (!response.ok) {
       if (response.status === 401)
-        throw new Error('Authentication Required. Please sign in.');
+        throw new Error(ERROR_CODES.AUTH_REQUIRED);
       if (response.status === 429) throw new Error(ERROR_CODES.RATE_LIMIT);
       if (response.status >= 500) throw new Error(ERROR_CODES.SERVER_ERROR);
 
@@ -947,11 +980,20 @@ async function pollJobCompletion<T>(
   const startTime = Date.now();
 
   return new Promise((resolve, reject) => {
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    const cleanup = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        activeTimers.delete(timeoutId);
+      }
+    };
+
     const poll = async () => {
       try {
         if (Date.now() - startTime > timeout) {
-          clearInterval(intervalId);
-          reject(new Error(`Job timeout after ${timeout}ms`));
+          cleanup();
+          reject(new Error(`${ERROR_CODES.TIMEOUT} after ${timeout}ms`));
           return;
         }
 
@@ -969,24 +1011,27 @@ async function pollJobCompletion<T>(
         const status = await statusResponse.json();
 
         if (status.status === 'completed') {
-          clearInterval(intervalId);
+          cleanup();
           logger.log(`[Frontend] Job ${jobId} completed successfully`);
           resolve(status.result as T);
         } else if (status.status === 'failed') {
-          clearInterval(intervalId);
+          cleanup();
           logger.error(`[Frontend] Job ${jobId} failed:`, status.error);
           reject(new Error(status.error || 'Job failed'));
         } else {
           logger.log(`[Frontend] Job ${jobId} status: ${status.status}`);
+          timeoutId = setTimeout(poll, pollInterval);
+          activeTimers.add(timeoutId);
         }
-      } catch (error) {
-        clearInterval(intervalId);
+      } catch (error: any) {
+        cleanup();
         reject(error);
       }
     };
 
-    const intervalId = setInterval(poll, pollInterval);
-    poll(); // Initial poll
+    // Initial poll
+    timeoutId = setTimeout(poll, 0);
+    activeTimers.add(timeoutId);
   });
 }
 
@@ -1052,7 +1097,7 @@ export const saveAnalysisVersion = async (
 ): Promise<void> => {
   try {
     const token = getAuthToken();
-    if (!token) throw new Error('Authentication required to save versions.');
+    if (!token) throw new Error(ERROR_CODES.AUTH_REQUIRED);
 
     const response = await fetchWithTimeout(
       `${API_CONFIG.BACKEND_URL}/history/version`,
@@ -1087,7 +1132,7 @@ export const deleteAnalysisRecord = async (
   analysisId: string
 ): Promise<void> => {
   const token = getAuthToken();
-  if (!token) throw new Error('Authentication required.');
+  if (!token) throw new Error(ERROR_CODES.AUTH_REQUIRED);
 
   const response = await fetchWithTimeout(
     `${API_CONFIG.BACKEND_URL}/history/${analysisId}`,
@@ -1111,7 +1156,7 @@ export const inviteTeamMember = async (
   role: string
 ): Promise<void> => {
   const token = getAuthToken();
-  if (!token) throw new Error('Authentication required.');
+  if (!token) throw new Error(ERROR_CODES.AUTH_REQUIRED);
 
   const response = await fetchWithTimeout(
     `${API_CONFIG.BACKEND_URL}/ventures/${ventureId}/invite`,
@@ -1207,7 +1252,7 @@ export const toggleIntegration = async (
   connect: boolean
 ): Promise<void> => {
   const token = getAuthToken();
-  if (!token) throw new Error('Authentication required.');
+  if (!token) throw new Error(ERROR_CODES.AUTH_REQUIRED);
 
   const response = await fetch(
     `${API_CONFIG.BACKEND_URL}/integrations/toggle`,
@@ -1229,10 +1274,7 @@ export const generateSwotAnalysis = (
   desc: string,
   lang: Language,
   vid: string,
-  image?: string,
-  refinement?: any,
-  pollInterval?: number,
-  timeout?: number
+  options: AnalysisOptions = {}
 ) =>
   generateAnalysis<SwotData>(
     'geminiPromptSwot',
@@ -1242,10 +1284,11 @@ export const generateSwotAnalysis = (
     vid,
     'swot',
     'strategy',
-    image,
-    refinement,
-    pollInterval,
-    timeout
+    options.image,
+    options.refinement,
+    options.pollInterval,
+    options.timeout,
+    options.retryDelay
   );
 export const generatePestelAnalysis = (
   desc: string,

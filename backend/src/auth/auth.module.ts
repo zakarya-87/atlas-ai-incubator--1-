@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { EmailModule } from '../email/email.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import type { StringValue } from 'ms';
 
 @Module({
   imports: [
@@ -16,10 +17,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: config.get<string | number>('JWT_TTL') || '24h' },
-      }),
+      useFactory: (config: ConfigService) => {
+        const expiresIn = (config.get<string>('JWT_TTL') || '24h') as unknown as StringValue;
+        return {
+          secret: config.get<string>('JWT_SECRET'),
+          signOptions: { expiresIn },
+        };
+      },
     }),
 
   ],

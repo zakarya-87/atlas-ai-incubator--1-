@@ -15,6 +15,15 @@ import { ReportsService } from './reports.service';
 import { GetUser } from '../auth/get-user.decorator';
 import type { User } from '@prisma/client';
 
+interface CustomReportTemplate {
+  title: string;
+  sections?: string[];
+  style?: {
+    fontFamily?: string;
+    primaryColor?: string;
+  };
+}
+
 @Controller('reports')
   @UseGuards(JwtAuthGuard)
 export class ReportsController {
@@ -50,7 +59,7 @@ export class ReportsController {
 
   @Post('custom')
   async createCustomReport(
-    @Body() body: { analysisId: string; template: Record<string, unknown> },
+    @Body() body: { analysisId: string; template: CustomReportTemplate },
     @GetUser() user: User
   ): Promise<string> {
     const { analysisId, template } = body;

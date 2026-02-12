@@ -1,0 +1,121 @@
+apiVersion: "2021-09-01"
+location: westus2
+name: atlasinstance
+properties:
+  containers:
+    - name: atlas-backend
+      properties:
+        image: atlasairegistry.azurecr.io/atlas-backend:latest
+        command:
+          - /bin/sh
+          - -c
+          - "sed -i 's/pg_isready -h postgres/pg_isready -h localhost/g' /app/startup.sh && sed -i 's/exec node dist\\/main.js/exec node dist\\/main.js 2>&1 | tee \\/tmp\\/backend.log/g' /app/startup.sh && /app/startup.sh"
+        ports:
+          - port: 3000
+            protocol: TCP
+        environmentVariables:
+          - name: DATABASE_URL
+            value: "postgresql://atlas_user:atlas_password@localhost:5432/atlas_db"
+          - name: PGHOST
+            value: "localhost"
+          - name: PGUSER
+            value: "atlas_user"
+          - name: PGDATABASE
+            value: "atlas_db"
+          - name: JWT_SECRET
+            value: "a_very_secure_production_secret_key_that_is_long_and_random"
+          - name: NODE_ENV
+            value: "production"
+          - name: FRONTEND_URL
+            value: "http://atlas-ai-incubator-app.westus2.azurecontainer.io:8080"
+          - name: PORT
+            value: "3000"
+          - name: REDIS_HOST
+            value: "atlas-redis-202602070131.redis.cache.windows.net"
+          - name: REDIS_PORT
+            value: "6380"
+          - name: REDIS_PASSWORD
+            value: "75gRN7xBbkFQfFc4Hl3GOfSTd5yXcSP4GAzCaCPjPNQ="
+          - name: REDIS_TLS
+            value: "true"
+          - name: DEFAULT_AI_PROVIDER
+            value: "mistral"
+          - name: GROK_API_KEY
+            value: "your-api-key-here"
+          - name: GROK_MODEL
+            value: "grok-beta"
+          - name: MISTRAL_API_KEY
+            value: "KdHCoH9EObE6IkQVcDx74B9paobzCKNj"
+          - name: MISTRAL_MODEL
+            value: "mistral-large-latest"
+          - name: GEMINI_API_KEY
+            value: "AIzaSyCsOdTsRxaZRfMS2b5pSlnyCAACUPmiZFY"
+          - name: GEMINI_MODEL
+            value: "gemini-2.0-flash-lite"
+          - name: AZURE_OPENAI_ENDPOINT
+            value: "https://atlasincubapi.cognitiveservices.azure.com/"
+          - name: AZURE_OPENAI_API_KEY
+            value: "99xaOFbJpTwaSqke1VRQvZfTdWMXdLFkf9HRjh0IMIgkDDQWLsinJQQJ99CAAC5T7U2XJ3w3AAABACOGlry5"
+          - name: AZURE_OPENAI_API_VERSION
+            value: "2024-04-01-preview"
+          - name: AZURE_OPENAI_DEPLOYMENT
+            value: "gpt-4.1"
+          - name: AZURE_OPENAI_MODEL
+            value: "gpt-4.1"
+        resources:
+          requests:
+            cpu: 1.5
+            memoryInGb: 2.5
+    - name: atlas-frontend
+      properties:
+        image: atlasairegistry.azurecr.io/atlas-frontend:latest
+        command:
+          - /bin/sh
+          - -c
+          - "nginx -g 'daemon off;'"
+        ports:
+          - port: 8080
+            protocol: TCP
+        environmentVariables:
+          - name: VITE_BACKEND_URL
+            value: "http://atlas-ai-incubator-app.westus2.azurecontainer.io:3000"
+        resources:
+          requests:
+            cpu: 1.0
+            memoryInGb: 2.5
+    - name: postgres
+      properties:
+        image: atlasairegistry.azurecr.io/postgres:16-alpine
+        ports:
+          - port: 5432
+            protocol: TCP
+        environmentVariables:
+          - name: POSTGRES_DB
+            value: "atlas_db"
+          - name: POSTGRES_USER
+            value: "atlas_user"
+          - name: POSTGRES_PASSWORD
+            value: "atlas_password"
+          - name: PGDATA
+            value: "/var/lib/postgresql/data/pgdata"
+        resources:
+          requests:
+            cpu: 1.5
+            memoryInGb: 3.0
+  osType: Linux
+  restartPolicy: OnFailure
+  ipAddress:
+    type: Public
+    dnsNameLabel: atlas-ai-incubator-app
+    ports:
+      - protocol: TCP
+        port: 8080
+      - protocol: TCP
+        port: 3000
+  imageRegistryCredentials:
+    - server: atlasairegistry.azurecr.io
+      username: atlasairegistry
+      password: Aloa2WpL19fRB5ZKrdGwKfLdMvAy30jCHu92dYppgDKwS1bsylvIJQQJ99CBACYeBjFEqg7NAAACAZCRgv0l
+tags:
+  Project: ATLAS-AI-Incubator
+type: Microsoft.ContainerInstance/containerGroups

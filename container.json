@@ -1,0 +1,611 @@
+{
+  "confidentialComputeProperties": null,
+  "containerGroupProfile": null,
+  "containers": [
+    {
+      "command": [
+        "/bin/sh",
+        "-c",
+        "sed -i 's/pg_isready -h postgres/pg_isready -h localhost/g' /app/startup.sh && sed -i 's/exec node dist\\/main.js/exec node dist\\/main.js 2>\\&1 | tee \\/tmp\\/backend.log/g' /app/startup.sh && /app/startup.sh"
+      ],
+      "configMap": {
+        "keyValuePairs": {}
+      },
+      "environmentVariables": [
+        {
+          "name": "DATABASE_URL",
+          "secureValue": null,
+          "value": "postgresql://atlas_user:atlas_password@localhost:5432/atlas_db"
+        },
+        {
+          "name": "PGHOST",
+          "secureValue": null,
+          "value": "localhost"
+        },
+        {
+          "name": "PGUSER",
+          "secureValue": null,
+          "value": "atlas_user"
+        },
+        {
+          "name": "PGDATABASE",
+          "secureValue": null,
+          "value": "atlas_db"
+        },
+        {
+          "name": "JWT_SECRET",
+          "secureValue": null,
+          "value": "a_very_secure_production_secret_key_that_is_long_and_random"
+        },
+        {
+          "name": "NODE_ENV",
+          "secureValue": null,
+          "value": "production"
+        },
+        {
+          "name": "FRONTEND_URL",
+          "secureValue": null,
+          "value": "http://atlas-ai-incubator-app.westus2.azurecontainer.io"
+        },
+        {
+          "name": "PORT",
+          "secureValue": null,
+          "value": "3000"
+        },
+        {
+          "name": "REDIS_HOST",
+          "secureValue": null,
+          "value": "atlas-redis-202602070131.redis.cache.windows.net"
+        },
+        {
+          "name": "REDIS_PORT",
+          "secureValue": null,
+          "value": "6380"
+        },
+        {
+          "name": "REDIS_PASSWORD",
+          "secureValue": null,
+          "value": "75gRN7xBbkFQfFc4Hl3GOfSTd5yXcSP4GAzCaCPjPNQ="
+        },
+        {
+          "name": "REDIS_TLS",
+          "secureValue": null,
+          "value": "true"
+        },
+        {
+          "name": "DEFAULT_AI_PROVIDER",
+          "secureValue": null,
+          "value": "mistral"
+        },
+        {
+          "name": "GROK_API_KEY",
+          "secureValue": null,
+          "value": "your-api-key-here"
+        },
+        {
+          "name": "GROK_MODEL",
+          "secureValue": null,
+          "value": "grok-beta"
+        },
+        {
+          "name": "MISTRAL_API_KEY",
+          "secureValue": null,
+          "value": "KdHCoH9EObE6IkQVcDx74B9paobzCKNj"
+        },
+        {
+          "name": "MISTRAL_MODEL",
+          "secureValue": null,
+          "value": "mistral-large-latest"
+        },
+        {
+          "name": "GEMINI_API_KEY",
+          "secureValue": null,
+          "value": "AIzaSyCsOdTsRxaZRfMS2b5pSlnyCAACUPmiZFY"
+        },
+        {
+          "name": "GEMINI_MODEL",
+          "secureValue": null,
+          "value": "gemini-2.0-flash-lite"
+        },
+        {
+          "name": "AZURE_OPENAI_ENDPOINT",
+          "secureValue": null,
+          "value": "https://atlasincubapi.cognitiveservices.azure.com/"
+        },
+        {
+          "name": "AZURE_OPENAI_API_KEY",
+          "secureValue": null,
+          "value": "99xaOFbJpTwaSqke1VRQvZfTdWMXdLFkf9HRjh0IMIgkDDQWLsinJQQJ99CAAC5T7U2XJ3w3AAABACOGlry5"
+        },
+        {
+          "name": "AZURE_OPENAI_API_VERSION",
+          "secureValue": null,
+          "value": "2024-04-01-preview"
+        },
+        {
+          "name": "AZURE_OPENAI_DEPLOYMENT",
+          "secureValue": null,
+          "value": "gpt-4.1"
+        },
+        {
+          "name": "AZURE_OPENAI_MODEL",
+          "secureValue": null,
+          "value": "gpt-4.1"
+        }
+      ],
+      "image": "atlasairegistry.azurecr.io/atlas-backend:latest",
+      "instanceView": {
+        "currentState": {
+          "detailStatus": "",
+          "exitCode": null,
+          "finishTime": null,
+          "startTime": "2026-02-09T13:37:01.014000+00:00",
+          "state": "Running"
+        },
+        "events": [
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-08T15:07:40+00:00",
+            "lastTimestamp": "2026-02-08T15:07:40+00:00",
+            "message": "pulling image \"atlasairegistry.azurecr.io/atlas-backend@sha256:cbfb06bdc6059fc7d8c41d4256eb6fceb60a5d0409dbb24db69657f5cc7d5955\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-08T15:08:47+00:00",
+            "lastTimestamp": "2026-02-08T15:08:47+00:00",
+            "message": "Successfully pulled image \"atlasairegistry.azurecr.io/atlas-backend@sha256:cbfb06bdc6059fc7d8c41d4256eb6fceb60a5d0409dbb24db69657f5cc7d5955\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 3,
+            "firstTimestamp": "2026-02-08T15:08:55+00:00",
+            "lastTimestamp": "2026-02-09T12:27:24+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          },
+          {
+            "count": 3,
+            "firstTimestamp": "2026-02-09T12:27:13+00:00",
+            "lastTimestamp": "2026-02-09T13:12:32+00:00",
+            "message": "Killing container atlas-backend (platform initiated).",
+            "name": "Killing",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:12:48+00:00",
+            "lastTimestamp": "2026-02-09T13:12:48+00:00",
+            "message": "pulling image \"atlasairegistry.azurecr.io/atlas-backend@sha256:cbfb06bdc6059fc7d8c41d4256eb6fceb60a5d0409dbb24db69657f5cc7d5955\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:13:40+00:00",
+            "lastTimestamp": "2026-02-09T13:13:40+00:00",
+            "message": "Successfully pulled image \"atlasairegistry.azurecr.io/atlas-backend@sha256:cbfb06bdc6059fc7d8c41d4256eb6fceb60a5d0409dbb24db69657f5cc7d5955\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:13:52+00:00",
+            "lastTimestamp": "2026-02-09T13:13:52+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          },
+          {
+            "count": 3,
+            "firstTimestamp": "2026-02-09T13:35:36+00:00",
+            "lastTimestamp": "2026-02-09T13:35:36+00:00",
+            "message": "Killing container atlas-backend (platform initiated).",
+            "name": "Killing",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:35:47+00:00",
+            "lastTimestamp": "2026-02-09T13:35:47+00:00",
+            "message": "pulling image \"atlasairegistry.azurecr.io/atlas-backend@sha256:eeb3f7b1c2eebd14a63887f80f17f4eeb368081b9e81b98faa2a513771492e6e\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:36:51+00:00",
+            "lastTimestamp": "2026-02-09T13:36:51+00:00",
+            "message": "Successfully pulled image \"atlasairegistry.azurecr.io/atlas-backend@sha256:eeb3f7b1c2eebd14a63887f80f17f4eeb368081b9e81b98faa2a513771492e6e\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:37:01+00:00",
+            "lastTimestamp": "2026-02-09T13:37:01+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          }
+        ],
+        "previousState": null,
+        "restartCount": 0
+      },
+      "livenessProbe": null,
+      "name": "atlas-backend",
+      "ports": [
+        {
+          "port": 3000,
+          "protocol": "TCP"
+        }
+      ],
+      "readinessProbe": null,
+      "resources": {
+        "limits": null,
+        "requests": {
+          "cpu": 1.5,
+          "gpu": null,
+          "memoryInGb": 2.5
+        }
+      },
+      "securityContext": null,
+      "volumeMounts": null
+    },
+    {
+      "command": [
+        "/bin/sh",
+        "-c",
+        "nginx -g 'daemon off;'"
+      ],
+      "configMap": {
+        "keyValuePairs": {}
+      },
+      "environmentVariables": [
+        {
+          "name": "VITE_BACKEND_URL",
+          "secureValue": null,
+          "value": "http://atlas-ai-incubator-app.westus2.azurecontainer.io:3000"
+        }
+      ],
+      "image": "atlasairegistry.azurecr.io/atlas-frontend:latest",
+      "instanceView": {
+        "currentState": {
+          "detailStatus": "",
+          "exitCode": null,
+          "finishTime": null,
+          "startTime": "2026-02-09T13:37:00.956000+00:00",
+          "state": "Running"
+        },
+        "events": [
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-08T15:07:40+00:00",
+            "lastTimestamp": "2026-02-08T15:07:40+00:00",
+            "message": "pulling image \"atlasairegistry.azurecr.io/atlas-frontend@sha256:02c9f3e1bab7021e66f1c14c9086182284993403df2ded6d12d45c86b9a160e7\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-08T15:08:47+00:00",
+            "lastTimestamp": "2026-02-08T15:08:47+00:00",
+            "message": "Successfully pulled image \"atlasairegistry.azurecr.io/atlas-frontend@sha256:02c9f3e1bab7021e66f1c14c9086182284993403df2ded6d12d45c86b9a160e7\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 3,
+            "firstTimestamp": "2026-02-08T15:08:55+00:00",
+            "lastTimestamp": "2026-02-09T12:27:24+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          },
+          {
+            "count": 3,
+            "firstTimestamp": "2026-02-09T12:27:22+00:00",
+            "lastTimestamp": "2026-02-09T13:12:42+00:00",
+            "message": "Killing container atlas-frontend (platform initiated).",
+            "name": "Killing",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:12:48+00:00",
+            "lastTimestamp": "2026-02-09T13:12:48+00:00",
+            "message": "pulling image \"atlasairegistry.azurecr.io/atlas-frontend@sha256:02c9f3e1bab7021e66f1c14c9086182284993403df2ded6d12d45c86b9a160e7\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:13:40+00:00",
+            "lastTimestamp": "2026-02-09T13:13:40+00:00",
+            "message": "Successfully pulled image \"atlasairegistry.azurecr.io/atlas-frontend@sha256:02c9f3e1bab7021e66f1c14c9086182284993403df2ded6d12d45c86b9a160e7\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:13:51+00:00",
+            "lastTimestamp": "2026-02-09T13:13:51+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          },
+          {
+            "count": 3,
+            "firstTimestamp": "2026-02-09T13:35:43+00:00",
+            "lastTimestamp": "2026-02-09T13:35:43+00:00",
+            "message": "Killing container atlas-frontend (platform initiated).",
+            "name": "Killing",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:35:47+00:00",
+            "lastTimestamp": "2026-02-09T13:35:47+00:00",
+            "message": "pulling image \"atlasairegistry.azurecr.io/atlas-frontend@sha256:02c9f3e1bab7021e66f1c14c9086182284993403df2ded6d12d45c86b9a160e7\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:36:51+00:00",
+            "lastTimestamp": "2026-02-09T13:36:51+00:00",
+            "message": "Successfully pulled image \"atlasairegistry.azurecr.io/atlas-frontend@sha256:02c9f3e1bab7021e66f1c14c9086182284993403df2ded6d12d45c86b9a160e7\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:37:00+00:00",
+            "lastTimestamp": "2026-02-09T13:37:00+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          }
+        ],
+        "previousState": null,
+        "restartCount": 0
+      },
+      "livenessProbe": null,
+      "name": "atlas-frontend",
+      "ports": [
+        {
+          "port": 8080,
+          "protocol": "TCP"
+        }
+      ],
+      "readinessProbe": null,
+      "resources": {
+        "limits": null,
+        "requests": {
+          "cpu": 1.0,
+          "gpu": null,
+          "memoryInGb": 2.5
+        }
+      },
+      "securityContext": null,
+      "volumeMounts": null
+    },
+    {
+      "command": null,
+      "configMap": {
+        "keyValuePairs": {}
+      },
+      "environmentVariables": [
+        {
+          "name": "POSTGRES_DB",
+          "secureValue": null,
+          "value": "atlas_db"
+        },
+        {
+          "name": "POSTGRES_USER",
+          "secureValue": null,
+          "value": "atlas_user"
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "secureValue": null,
+          "value": "atlas_password"
+        },
+        {
+          "name": "PGDATA",
+          "secureValue": null,
+          "value": "/var/lib/postgresql/data/pgdata"
+        }
+      ],
+      "image": "atlasairegistry.azurecr.io/postgres:16-alpine",
+      "instanceView": {
+        "currentState": {
+          "detailStatus": "",
+          "exitCode": null,
+          "finishTime": null,
+          "startTime": "2026-02-09T13:37:00.912000+00:00",
+          "state": "Running"
+        },
+        "events": [
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-08T15:07:40+00:00",
+            "lastTimestamp": "2026-02-08T15:07:40+00:00",
+            "message": "pulling image \"atlasairegistry.azurecr.io/postgres@sha256:63cf43b1a12b5b9d1f7a576f8f5852d7ce0792618661969135ac6c276237eec9\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-08T15:08:47+00:00",
+            "lastTimestamp": "2026-02-08T15:08:47+00:00",
+            "message": "Successfully pulled image \"atlasairegistry.azurecr.io/postgres@sha256:63cf43b1a12b5b9d1f7a576f8f5852d7ce0792618661969135ac6c276237eec9\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 3,
+            "firstTimestamp": "2026-02-08T15:08:55+00:00",
+            "lastTimestamp": "2026-02-09T12:27:24+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          },
+          {
+            "count": 3,
+            "firstTimestamp": "2026-02-09T12:27:13+00:00",
+            "lastTimestamp": "2026-02-09T13:12:32+00:00",
+            "message": "Killing container postgres (platform initiated).",
+            "name": "Killing",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:12:48+00:00",
+            "lastTimestamp": "2026-02-09T13:12:48+00:00",
+            "message": "pulling image \"atlasairegistry.azurecr.io/postgres@sha256:63cf43b1a12b5b9d1f7a576f8f5852d7ce0792618661969135ac6c276237eec9\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:13:40+00:00",
+            "lastTimestamp": "2026-02-09T13:13:40+00:00",
+            "message": "Successfully pulled image \"atlasairegistry.azurecr.io/postgres@sha256:63cf43b1a12b5b9d1f7a576f8f5852d7ce0792618661969135ac6c276237eec9\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:13:51+00:00",
+            "lastTimestamp": "2026-02-09T13:13:51+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          },
+          {
+            "count": 3,
+            "firstTimestamp": "2026-02-09T13:35:36+00:00",
+            "lastTimestamp": "2026-02-09T13:35:36+00:00",
+            "message": "Killing container postgres (platform initiated).",
+            "name": "Killing",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:35:47+00:00",
+            "lastTimestamp": "2026-02-09T13:35:47+00:00",
+            "message": "pulling image \"atlasairegistry.azurecr.io/postgres@sha256:63cf43b1a12b5b9d1f7a576f8f5852d7ce0792618661969135ac6c276237eec9\"",
+            "name": "Pulling",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:36:51+00:00",
+            "lastTimestamp": "2026-02-09T13:36:51+00:00",
+            "message": "Successfully pulled image \"atlasairegistry.azurecr.io/postgres@sha256:63cf43b1a12b5b9d1f7a576f8f5852d7ce0792618661969135ac6c276237eec9\"",
+            "name": "Pulled",
+            "type": "Normal"
+          },
+          {
+            "count": 1,
+            "firstTimestamp": "2026-02-09T13:37:00+00:00",
+            "lastTimestamp": "2026-02-09T13:37:00+00:00",
+            "message": "Started container",
+            "name": "Started",
+            "type": "Normal"
+          }
+        ],
+        "previousState": null,
+        "restartCount": 0
+      },
+      "livenessProbe": null,
+      "name": "postgres",
+      "ports": [
+        {
+          "port": 5432,
+          "protocol": "TCP"
+        }
+      ],
+      "readinessProbe": null,
+      "resources": {
+        "limits": null,
+        "requests": {
+          "cpu": 1.5,
+          "gpu": null,
+          "memoryInGb": 3.0
+        }
+      },
+      "securityContext": null,
+      "volumeMounts": null
+    }
+  ],
+  "diagnostics": null,
+  "dnsConfig": null,
+  "encryptionProperties": null,
+  "extensions": null,
+  "id": "/subscriptions/5689f64a-dd95-4134-b15e-5a9cd0d59779/resourceGroups/ATLAScontainer/providers/Microsoft.ContainerInstance/containerGroups/atlasinstance",
+  "identity": {
+    "principalId": "5175402e-0487-4ce1-a77f-56d30919a284",
+    "tenantId": "9c4a0b5c-fdc6-41af-a1e7-d8195688f191",
+    "type": "SystemAssigned, UserAssigned",
+    "userAssignedIdentities": {
+      "/subscriptions/5689f64a-dd95-4134-b15e-5a9cd0d59779/resourceGroups/ATLAScontainer/providers/Microsoft.ManagedIdentity/userAssignedIdentities/managedEnvironment-ATLAScontainer-901bATLAScontainerOidc": {
+        "clientId": null,
+        "principalId": null
+      }
+    }
+  },
+  "imageRegistryCredentials": [
+    {
+      "identity": null,
+      "identityUrl": null,
+      "isDelegatedIdentity": false,
+      "password": null,
+      "server": "atlasairegistry.azurecr.io",
+      "username": "atlasairegistry"
+    }
+  ],
+  "initContainers": [],
+  "instanceView": {
+    "events": [],
+    "state": "Running"
+  },
+  "ipAddress": {
+    "autoGeneratedDomainNameLabelScope": "Unsecure",
+    "dnsNameLabel": "atlas-ai-incubator-app",
+    "fqdn": "atlas-ai-incubator-app.westus2.azurecontainer.io",
+    "ip": "20.59.54.91",
+    "ports": [
+      {
+        "port": 8080,
+        "protocol": "TCP"
+      },
+      {
+        "port": 3000,
+        "protocol": "TCP"
+      }
+    ],
+    "type": "Public"
+  },
+  "isCreatedFromStandbyPool": false,
+  "location": "westus2",
+  "name": "atlasinstance",
+  "osType": "Linux",
+  "priority": null,
+  "provisioningState": "Succeeded",
+  "resourceGroup": "ATLAScontainer",
+  "restartPolicy": "OnFailure",
+  "sku": "Standard",
+  "standbyPoolProfile": null,
+  "subnetIds": null,
+  "tags": {
+    "Project": "ATLAS-AI-Incubator"
+  },
+  "type": "Microsoft.ContainerInstance/containerGroups",
+  "volumes": null,
+  "zones": null
+}

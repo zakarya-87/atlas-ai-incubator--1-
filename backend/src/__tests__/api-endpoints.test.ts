@@ -9,6 +9,13 @@ import { JwtService } from '@nestjs/jwt';
 jest.mock('@google/generative-ai');
 jest.mock('nodemailer');
 
+// Type definitions for API responses
+interface VentureResponse {
+  id: string;
+  name: string;
+  description: string;
+}
+
 describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
@@ -177,6 +184,8 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         });
 
       await request(app.getHttpServer())
+        .get('/ventures')
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
         .expect((res: request.Response) => {
           expect(Array.isArray(res.body)).toBe(true);
@@ -236,7 +245,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
         .expect((res: request.Response) => {
-          const deletedVenture = res.body.find((v: unknown) => v.id === ventureId);
+          const deletedVenture = res.body.find((v: VentureResponse) => v.id === ventureId);
           expect(deletedVenture).toBeUndefined();
         });
     });
