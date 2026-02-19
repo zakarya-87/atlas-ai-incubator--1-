@@ -102,7 +102,9 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
     setConnectionStatus('connecting');
 
     // Initialize WebSocket with authentication
-    socketRef.current = io(API_CONFIG.BACKEND_URL, {
+    // Connect to root namespace '/' - the backend gateway is not under /api
+    socketRef.current = io('/', {
+      path: '/socket.io',
       auth: {
         token: token || '',
       },

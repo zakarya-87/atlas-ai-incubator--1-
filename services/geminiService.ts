@@ -1274,7 +1274,8 @@ export const generateSwotAnalysis = (
   desc: string,
   lang: Language,
   vid: string,
-  options: AnalysisOptions = {}
+  image?: string,
+  refinement?: any
 ) =>
   generateAnalysis<SwotData>(
     'geminiPromptSwot',
@@ -1284,11 +1285,8 @@ export const generateSwotAnalysis = (
     vid,
     'swot',
     'strategy',
-    options.image,
-    options.refinement,
-    options.pollInterval,
-    options.timeout,
-    options.retryDelay
+    image,
+    refinement
   );
 export const generatePestelAnalysis = (
   desc: string,

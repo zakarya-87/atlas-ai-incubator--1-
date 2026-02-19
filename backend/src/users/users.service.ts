@@ -43,9 +43,36 @@ export class UsersService {
     });
   }
 
-  async updateUser(id: string, dto: UpdateUserDto): Promise<User> {
-    const data: Prisma.UserUpdateInput = { ...dto };
+  async createUserWithName(email: string, pass: string, name: string): Promise<User> {
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(pass, salt);
 
+    return this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        credits: 100, // Default credits for new users
+        role: 'USER',
+        subscriptionStatus: 'free',
+        subscriptionPlan: 'free',
+        fullName: name,
+      },
+    });
+  }
+
+  async updateUser(id: string, dto: UpdateUserDto): Promise<User> {
+    const data: Prisma.UserUpdateInput = {};
+
+    // Map name to fullName if provided
+    if (dto.name) {
+      data.fullName = dto.name;
+    } else if (dto.fullName) {
+      data.fullName = dto.fullName;
+    }
+
+    // Handle bio field (store in a metadata field or ignore if not in schema)
+    // Note: bio is not in the current schema, so we'll skip it for now
+    
     if (dto.password) {
       const salt = await bcrypt.genSalt();
       data.password = await bcrypt.hash(dto.password, salt);

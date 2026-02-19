@@ -53,7 +53,7 @@ This test suite implements a multi-dimensional testing strategy:
 ```
 testsprite_tests/
 │
-├── core/                          # Core functionality tests (TC*)
+├── Core Functionality Tests (TC*)     # Primary feature validation
 │   ├── TC001_user_login_with_valid_credentials.py
 │   ├── TC002_user_registration_with_new_email.py
 │   ├── TC003_generate_business_analysis_with_valid_input.py
@@ -65,40 +65,59 @@ testsprite_tests/
 │   ├── TC009_invite_team_member_with_valid_details.py
 │   └── TC010_export_analysis_in_requested_format.py
 │
-├── edge_cases/                    # Edge case tests (EC*)
-│   ├── EC001_input_validation.py       ✅ Input boundaries
-│   ├── EC002_boundary_conditions.py    ✅ Numeric/temporal limits
-│   ├── EC003_concurrent_access.py      📝 Concurrent scenarios
-│   ├── EC004_data_limits.py            📝 Resource limits
-│   ├── EC005_special_characters.py     📝 Encoding edge cases
-│   └── EC006_timezone_edge_cases.py    📝 Temporal boundaries
+├── Edge Case Tests (EC*)              # Boundary conditions and unusual scenarios
+│   ├── EC001_input_validation.py           ✅ Input boundaries
+│   ├── EC002_boundary_conditions.py        ✅ Numeric/temporal limits
+│   ├── EC003_concurrent_access.py          📝 Concurrent scenarios
+│   ├── EC004_data_limits.py                📝 Resource limits
+│   ├── EC005_special_characters.py         📝 Encoding edge cases
+│   └── EC006_timezone_edge_cases.py        📝 Temporal boundaries
 │
-├── error_handling/                # Error handling tests (EH*)
-│   ├── EH001_network_failures.py       ✅ Network error scenarios
-│   ├── EH002_api_errors.py             ✅ API failure handling
-│   ├── EH003_database_errors.py        📝 Database failure tests
-│   ├── EH004_ai_service_failures.py    📝 AI service error tests
-│   ├── EH005_authentication_errors.py  📝 Auth failure tests
-│   └── EH006_validation_errors.py      📝 Validation error tests
+├── Error Handling Tests (EH*)         # Failure recovery and resilience
+│   ├── EH001_network_failures.py           ✅ Network error scenarios
+│   ├── EH002_api_errors.py                 ✅ API failure handling
+│   ├── EH003_database_errors.py            ✅ Database failure tests
+│   ├── EH004_ai_service_failures.py        ✅ AI service error tests
+│   ├── EH005_authentication_errors.py      ✅ Auth failure tests
+│   └── EH006_validation_errors.py          ✅ Validation error tests
 │
-├── security/                      # Security tests (SC*)
-│   ├── SC001_sql_injection.py          📝 SQL injection tests
-│   ├── SC002_xss_protection.py         📝 XSS prevention tests
-│   ├── SC003_auth_bypass.py            📝 Authentication bypass
-│   └── SC004_rate_limiting.py          📝 Rate limiting tests
+├── Security Tests (SC*)               # Vulnerability and penetration testing
+│   ├── SC001_sql_injection.py              ✅ SQL injection tests
+│   ├── SC002_xss_protection.py             ✅ XSS prevention tests
+│   ├── SC003_auth_bypass.py                ✅ Authentication bypass
+│   └── SC004_rate_limiting.py              ✅ Rate limiting tests
 │
-├── performance/                   # Performance tests (PF*)
-│   ├── PF001_response_times.py         📝 API response benchmarks
-│   ├── PF002_concurrent_users.py       📝 Load tests
-│   └── PF003_memory_usage.py           📝 Memory leak detection
+├── Performance Tests (PF*)            # Load and stress testing
+│   ├── PF001_response_times.py             ✅ API response benchmarks
+│   ├── PF002_concurrent_users.py           ✅ Load tests
+│   └── PF003_memory_usage.py               ✅ Memory leak detection
 │
-├── regression/                    # Regression tests (RG*)
-│   └── RG001_critical_paths.py         📝 Critical path validation
+├── Regression Tests (RG*)             # Change validation and prevention
+│   └── RG001_critical_paths.py             ✅ Critical path validation
 │
-├── testsprite_runner.py           # Advanced test runner with MCP integration
-├── setup.bat                      # Windows environment setup
-├── .env.example                   # Environment variables template
-└── README.md                      # This file
+├── Lint Tests (LT*)                   # Code quality checks
+│   └── LT001_lint_check.py                 ✅ Lint validation
+│
+├── Test Runner & Utilities
+│   ├── testsprite_runner.py           # Advanced test runner with MCP integration
+│   ├── integration_test_suite.py      # End-to-end integration tests
+│   ├── generate_summary.py            # Report summary generator
+│   ├── quick_check.py                 # Quick validation script
+│   ├── validate_security_performance.py # Security/performance validation
+│   ├── setup.bat                      # Windows environment setup
+│   ├── run_all_tests.bat              # Run all tests (Windows)
+│   ├── run_all_tests.sh               # Run all tests (Unix)
+│   ├── .env.example                   # Environment variables template
+│   └── README.md                      # This file
+│
+├── Test Plans & Configuration
+│   ├── standard_prd.json              # Product requirements document
+│   ├── testsprite_backend_test_plan.json
+│   └── testsprite_frontend_test_plan.json
+│
+└── Test Reports (auto-generated)
+    ├── testsprite_report_*.json       # JSON format reports
+    └── testsprite_report_*.md         # Markdown format reports
 ```
 
 **Legend:**

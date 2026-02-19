@@ -22,7 +22,11 @@
       ],
       "env": {
         "API_KEY": "${TESTSPRITE_API_KEY}",
-        "PROJECT_PATH": "c:/Users/zboud/ATLAS AI Incubator"
+        "PROJECT_PATH": "c:/Users/zboud/ATLAS AI Incubator",
+        "COVERAGE_THRESHOLD": "85",
+        "EDGE_CASE_MODE": "aggressive",
+        "ERROR_TESTING": "comprehensive",
+        "AUTO_GENERATE": "true"
       }
     }
   }

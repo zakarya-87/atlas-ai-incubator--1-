@@ -25,6 +25,8 @@ describe('Analysis Results Display Edge Cases', () => {
     let mockPrismaService: any;
     let mockEventsGateway: jest.Mocked<EventsGateway>;
 
+    let module: TestingModule;
+
     beforeEach(async () => {
         jest.clearAllMocks();
 
@@ -48,7 +50,7 @@ describe('Analysis Results Display Edge Cases', () => {
             emitAnalysisResult: jest.fn(),
         } as unknown as jest.Mocked<EventsGateway>;
 
-        const module: TestingModule = await Test.createTestingModule({
+        module = await Test.createTestingModule({
             providers: [
                 AnalysisProcessor,
                 {
@@ -69,11 +71,16 @@ describe('Analysis Results Display Edge Cases', () => {
         processor = module.get<AnalysisProcessor>(AnalysisProcessor);
     });
 
-    afterEach(() => {
+    afterEach(async () => {
         // Clean up job store
         setJob('test-job-1', undefined as unknown as JobStatusResponse);
         setJob('test-job-2', undefined as unknown as JobStatusResponse);
+        // Close the NestJS module to release BullMQ WorkerHost and other resources
+        if (module) {
+            await module.close();
+        }
     });
+
 
     describe('Job ID Synchronization', () => {
         it('should use originalJobId for job store lookups (TC-AR-001)', async () => {

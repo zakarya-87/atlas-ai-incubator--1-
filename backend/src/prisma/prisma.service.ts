@@ -17,7 +17,7 @@ export class PrismaService
       this.logger.log('Database connected successfully.');
     } catch (error) {
       this.logger.error(
-        'FAILED to connect to Database (SQLite). Check if "backend/dev.db" exists and is writable.',
+        'FAILED to connect to Database (PostgreSQL). Check DATABASE_URL and ensure the database is reachable.',
         error
       );
       // We do not throw here to allow the server to start and respond with 500s instead of crashing
@@ -26,5 +26,15 @@ export class PrismaService
 
   async onModuleDestroy(): Promise<void> {
     await this.$disconnect();
+  }
+
+  /** Used by health checks to verify database connectivity. */
+  async isHealthy(): Promise<boolean> {
+    try {
+      await this.$queryRaw`SELECT 1`;
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

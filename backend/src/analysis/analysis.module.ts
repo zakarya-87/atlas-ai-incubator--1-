@@ -11,6 +11,7 @@ import { UsersModule } from '../users/users.module';
 import { EventsModule } from '../events/events.module';
 import { JobsController } from './jobs.controller';
 import { JobsService } from './jobs.service';
+import { AnalysisProcessor } from './analysis.processor';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule } from '@nestjs/config';
 import { GrokProvider } from './providers/grok.provider';
@@ -26,20 +27,14 @@ import { AIProviderFactory } from './providers/ai-provider.factory';
     HistoryModule,
     UsersModule,
     EventsModule,
-    BullModule.registerQueue({
-      name: 'analysis',
-      connection: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-        password: process.env.REDIS_PASSWORD,
-        tls: process.env.REDIS_TLS === 'true' ? {} : undefined,
-      },
-    }),
+    // Connection is inherited from BullModule.forRootAsync() in AppModule
+    BullModule.registerQueue({ name: 'analysis-queue' }),
   ],
   controllers: [AnalysisController, JobsController],
   providers: [
     AnalysisService,
     JobsService,
+    AnalysisProcessor,
     AnalysisAgentFactory,
     DefaultAgent,
     ResearchAgent,
@@ -48,7 +43,6 @@ import { AIProviderFactory } from './providers/ai-provider.factory';
     MistralProvider,
     OpenAIProvider,
     AIProviderFactory,
-
   ],
   exports: [AnalysisService, AIProviderFactory],
 })

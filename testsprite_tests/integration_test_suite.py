@@ -8,7 +8,7 @@ import sys
 import os
 from typing import Dict, Any, List
 
-BASE_URL = os.getenv('ATLAS_API_URL', 'http://localhost:3000')
+BASE_URL = os.getenv('ATLAS_API_URL', 'http://localhost:5173')
 TEST_MODE = os.getenv('TEST_MODE', 'unit')  # 'unit' or 'integration'
 
 

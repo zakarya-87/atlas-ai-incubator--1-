@@ -8,9 +8,11 @@ echo "ATLAS AI Incubator - Azure Deployment"
 echo "========================================="
 
 # Configuration
+SUBSCRIPTION_ID="5689f64a-dd95-4134-b15e-5a9cd0d59779"
 RESOURCE_GROUP="atlas-ai-rg"
 LOCATION="eastus"
 CONTAINER_GROUP_NAME="atlas-ai-container-group"
+REGISTRY_NAME="atlasairegistry"  # Main registry for eastus
 FRONTEND_IMAGE="atlas-frontend:latest"
 BACKEND_IMAGE="atlas-backend:latest"
 
@@ -23,9 +25,10 @@ fi
 
 # Login to Azure (optional - you might already be logged in)
 echo "Checking Azure login status..."
-az account show &>/dev/null || {
-    echo "You are not logged in to Azure. Initiating login..."
+az account set --subscription "$SUBSCRIPTION_ID" 2>/dev/null || {
+    echo "Initiating login..."
     az login
+    az account set --subscription "$SUBSCRIPTION_ID"
 }
 
 # Get subscription ID

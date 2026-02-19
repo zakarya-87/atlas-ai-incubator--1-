@@ -59,7 +59,33 @@
     "apiKey": {
       "type": "securestring",
       "metadata": {
-        "description": "API key for the application"
+        "description": "API Key for the application"
+      }
+    },
+    "registryServer": {
+      "type": "string",
+      "defaultValue": "atlasairegistry.azurecr.io",
+      "metadata": {
+        "description": "The registry server URL"
+      }
+    },
+    "registryUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The registry username"
+      }
+    },
+    "registryPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The registry password"
+      }
+    },
+    "dnsNameLabel": {
+      "type": "string",
+      "defaultValue": "atlas-ai-incubator",
+      "metadata": {
+        "description": "The DNS name label for the container group"
       }
     }
   },
@@ -71,6 +97,13 @@
       "name": "[parameters('containerGroupName')]",
       "location": "[parameters('location')]",
       "properties": {
+        "imageRegistryCredentials": [
+          {
+            "server": "[parameters('registryServer')]",
+            "username": "[parameters('registryUsername')]",
+            "password": "[parameters('registryPassword')]"
+          }
+        ],
         "containers": [
           {
             "name": "atlas-frontend",
@@ -85,7 +118,7 @@
               "environmentVariables": [
                 {
                   "name": "VITE_BACKEND_URL",
-                  "value": "[concat('http://', reference(resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerGroupName'))).ipAddress.ip, ':', parameters('backendPort'))]"
+                  "value": "[concat('http://', parameters('dnsNameLabel'), '.', parameters('location'), '.azurecontainer.io:', parameters('backendPort'))]"
                 }
               ],
               "resources": {
@@ -125,7 +158,7 @@
                 },
                 {
                   "name": "REDIS_HOST",
-                  "value": "redis-service"  // Note: ACI doesn't support internal Redis, this would need to be external
+                  "value": "localhost"
                 },
                 {
                   "name": "REDIS_PORT",
@@ -139,11 +172,62 @@
                 }
               }
             }
+          },
+          {
+            "name": "postgres",
+            "properties": {
+              "image": "[concat(parameters('registryServer'), '/postgres:16-alpine')]",
+              "ports": [
+                {
+                  "port": 5432,
+                  "protocol": "TCP"
+                }
+              ],
+              "environmentVariables": [
+                {
+                  "name": "POSTGRES_USER",
+                  "value": "atlas_user"
+                },
+                {
+                  "name": "POSTGRES_PASSWORD",
+                  "value": "atlas_secure_password_2026"
+                },
+                {
+                  "name": "POSTGRES_DB",
+                  "value": "atlas_prod_db"
+                }
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": 0.5,
+                  "memoryInGb": 1
+                }
+              }
+            }
+          },
+          {
+            "name": "redis",
+            "properties": {
+              "image": "[concat(parameters('registryServer'), '/redis:alpine')]",
+              "ports": [
+                {
+                  "port": 6379,
+                  "protocol": "TCP"
+                }
+              ],
+              "resources": {
+                "requests": {
+                  "cpu": 0.5,
+                  "memoryInGb": 0.5
+                }
+              }
+            }
           }
         ],
         "osType": "Linux",
         "ipAddress": {
           "type": "Public",
+          "dnsNameLabel": "[parameters('dnsNameLabel')]",
           "ports": [
             {
               "protocol": "TCP",
@@ -162,6 +246,10 @@
     "frontendIpAddress": {
       "type": "string",
       "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerGroupName'))).ipAddress.ip]"
+    },
+    "fqdn": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerGroupName'))).ipAddress.fqdn]"
     }
   }
 }

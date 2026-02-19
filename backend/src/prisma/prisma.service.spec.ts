@@ -38,6 +38,18 @@ describe('PrismaService', () => {
       await service.onModuleInit();
       expect(connectSpy).toHaveBeenCalled();
     });
+
+    it('should log error but NOT throw when $connect fails', async () => {
+      jest.spyOn(service as any, '$connect').mockRejectedValue(new Error('ECONNREFUSED'));
+      const loggerSpy = jest.spyOn((service as any).logger, 'error').mockImplementation(() => { });
+
+      // Should resolve (not reject) so the process doesn't crash
+      await expect(service.onModuleInit()).resolves.toBeUndefined();
+      expect(loggerSpy).toHaveBeenCalledWith(
+        expect.stringContaining('PostgreSQL'),
+        expect.any(Error)
+      );
+    });
   });
 
   describe('onModuleDestroy', () => {

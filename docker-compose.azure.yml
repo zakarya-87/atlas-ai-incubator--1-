@@ -44,7 +44,7 @@ services:
       - atlas-network
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     environment:
       POSTGRES_USER: atlas_user
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

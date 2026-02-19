@@ -189,13 +189,18 @@ export abstract class BaseAgent implements AiAgent {
     promise: Promise<T>,
     timeoutMs: number
   ): Promise<T> {
+    let timeoutHandle: ReturnType<typeof setTimeout>;
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(
+      timeoutHandle = setTimeout(
         () => reject(new Error(`Gemini API timeout after ${timeoutMs / 1000} seconds`)),
         timeoutMs
       );
+      // Allow Node.js to exit even if this timer is still pending (important for test teardown)
+      timeoutHandle.unref();
     });
-    return Promise.race([promise, timeoutPromise]);
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+      clearTimeout(timeoutHandle);
+    });
   }
 
   private isRateLimit(message: string): boolean {
@@ -215,7 +220,10 @@ export abstract class BaseAgent implements AiAgent {
     this.logger.warn(
       `[Gemini] Rate limit hit (429), retrying in ${Math.round(delayMs)}ms... (Attempt ${attempt + 1}/${maxRetries})`
     );
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    await new Promise<void>((resolve) => {
+      const timer = setTimeout(resolve, delayMs);
+      timer.unref();
+    });
   }
 
   private async handleCallError(

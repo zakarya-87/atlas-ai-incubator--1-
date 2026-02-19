@@ -17,7 +17,7 @@ export interface JobStatusResponse {
 @Injectable()
 export class JobsService {
   constructor(
-    @InjectQueue('analysis') private analysisQueue: Queue
+    @InjectQueue('analysis-queue') private analysisQueue: Queue
   ) { }
 
   async queueAnalysis(

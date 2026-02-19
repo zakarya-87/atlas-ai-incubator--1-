@@ -20,6 +20,11 @@ export const EnvSchema = z.object({
   SMTP_PORT: z.string().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
+  // Redis / BullMQ
+  REDIS_HOST: z.string().default('localhost'),
+  REDIS_PORT: z.string().regex(/^\d+$/).transform(Number).default('6379'),
+  REDIS_PASSWORD: z.string().optional(),
+  REDIS_TLS: z.enum(['true', 'false']).default('false'),
   // AI Providers
   DEFAULT_AI_PROVIDER: z.enum(['gemini', 'grok', 'mistral']).default('mistral'),
   GROK_API_KEY: z.string().optional(),

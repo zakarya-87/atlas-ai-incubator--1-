@@ -22,7 +22,7 @@ cd C:\Users\zboud\ATLAS AI Incubator
 docker build -t atlas-frontend --build-arg VITE_BACKEND_URL=https://atlas-ai-backend-app.azurewebsites.net .
 
 # Tag for Azure Container Registry (if needed)
-docker tag atlas-frontend your-acr-name.azurecr.io/atlas-frontend:v1.0.0
+docker tag atlas-frontend atlasairegistry.azurecr.io/atlas-frontend:v1.0.0
 ```
 
 ### Backend Image
@@ -35,7 +35,7 @@ cd C:\Users\zboud\ATLAS AI Incubator\backend
 docker build -t atlas-backend .
 
 # Tag for Azure Container Registry (if needed)
-docker tag atlas-backend your-acr-name.azurecr.io/atlas-backend:v1.0.0
+docker tag atlas-backend atlasairegistry.azurecr.io/atlas-backend:v1.0.0
 ```
 
 ## Testing Locally
@@ -77,11 +77,11 @@ az group create --name atlas-ai-rg --location eastus
 3. **Push Images to Container Registry (if using ACR):**
 ```bash
 # Login to your Azure Container Registry
-az acr login --name your-acr-name
+az acr login --name atlasairegistry
 
 # Push images
-docker push your-acr-name.azurecr.io/atlas-frontend:v1.0.0
-docker push your-acr-name.azurecr.io/atlas-backend:v1.0.0
+docker push atlasairegistry.azurecr.io/atlas-frontend:v1.0.0
+docker push atlasairegistry.azurecr.io/atlas-backend:v1.0.0
 ```
 
 4. **Deploy Using ARM Template:**
@@ -154,4 +154,31 @@ az container restart --resource-group atlas-ai-rg --name atlas-ai-container-grou
 
 # List container groups
 az container list --resource-group atlas-ai-rg
+```
+
+## Maintenance & Cleanup
+
+To keep the Azure Container Registry clean and resolve stale image issues, use the provided maintenance script:
+
+```bash
+# Navigate to scripts directory
+cd scripts/maintenance
+
+# Run a dry run to see what will happen
+./fix_atlasairegistry.sh --dry-run
+
+# Run the fix with force mode to skip confirmations
+./fix_atlasairegistry.sh --force
+```
+
+This script:
+1. Rebuilds the stale `postgres` repository.
+2. Cleans up untagged manifests older than 30 days (saves ~600MB).
+3. Rebuilds the `atlas-frontend` repository.
+4. Verifies the status of all repositories.
+
+You can also set up an automatic retention policy in Azure:
+
+```bash
+az acr config retention update --registry atlasairegistry --days 30 --enabled true
 ```
