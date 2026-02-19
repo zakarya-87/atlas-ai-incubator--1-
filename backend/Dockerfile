@@ -11,13 +11,13 @@ RUN apk add --no-cache python3 make g++
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies (single attempt with reasonable timeout)
+# Install all dependencies (npm ci is faster than npm install)
 RUN npm config set fetch-timeout 120000 && \
     npm config set fetch-retries 2 && \
     npm config set progress false && \
     npm config set audit false && \
     npm config set fund false && \
-    npm install --legacy-peer-deps --no-audit --no-fund
+    npm ci --legacy-peer-deps --no-audit --no-fund
 
 # Copy source and prisma configuration
 COPY . ./
@@ -40,17 +40,12 @@ RUN apk add --no-cache postgresql-client curl
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Copy package files and install production deps
+# Copy package files
 COPY package*.json ./
-RUN npm config set fetch-timeout 120000 && \
-    npm config set progress false && \
-    npm config set audit false && \
-    npm config set fund false && \
-    npm install --omit=dev --legacy-peer-deps --no-audit --no-fund
 
-# Copy build artifacts
+# Copy build artifacts and production node_modules from build stage
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/prisma ./prisma
 
 # Copy startup script
