@@ -53,7 +53,7 @@ export class ResearchAgent extends BaseAgent {
     }
 
     const searchResponse = await this.executeGeminiCall(
-      'gemini-2.0-flash-lite',
+      '',
       searchPrompt,
       null, // No schema for research pass
       systemInstruction || 'You are the ATLAS AI Engine. Conduct comprehensive market research.',
@@ -99,7 +99,7 @@ export class ResearchAgent extends BaseAgent {
     `;
 
     const formattedResponse = await this.executeGeminiCall(
-      'gemini-2.0-flash-lite',
+      '',
       formattingPrompt,
       schema || null,
       'You are a strict JSON formatting engine.'

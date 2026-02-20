@@ -166,6 +166,23 @@ const FundraisingRoadmapDisplay: React.FC<{ data: FundraisingRoadmapData }> = ({
 }) => {
   const { t } = useLanguage();
 
+  // Handle undefined, null, non-object, or array data gracefully
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('phases' in data)) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No fundraising roadmap data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       variants={containerVariants}

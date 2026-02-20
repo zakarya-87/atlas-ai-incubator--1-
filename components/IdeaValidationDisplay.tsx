@@ -147,6 +147,23 @@ const IdeaValidationDisplay: React.FC<IdeaValidationDisplayProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  // Handle undefined, null, non-object, or array data gracefully
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('summary' in data)) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No idea validation data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        </div>
+      </motion.div>
+    );
+  }
+
   const sections: {
     key: keyof Omit<IdeaValidationData, 'summary'>;
     titleKey: TranslationKey;

@@ -123,17 +123,20 @@ const ProblemValidationDisplay: React.FC<ProblemValidationDisplayProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  // Handle case where data is undefined/null
-  if (!data) {
+  // Handle undefined, null, non-object, or array data gracefully
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('marketSize' in data)) {
     return (
-      <div className="w-full space-y-4">
-        <div className="rounded-lg p-4 bg-brand-secondary/30">
-          <h3 className="text-xl font-bold text-brand-teal mb-3">
-            {t('problemValidationMarketSize')}
-          </h3>
-          <p className="text-gray-400">No data available</p>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No problem validation data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 

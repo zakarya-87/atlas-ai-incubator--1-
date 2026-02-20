@@ -23,7 +23,7 @@ export class DefaultAgent extends BaseAgent {
     const fullPrompt = `${prompt}\n${context}`;
 
     return this.executeGeminiCall(
-      'gemini-2.0-flash-lite',
+      '',
       fullPrompt,
       schema || null,
       systemInstruction,

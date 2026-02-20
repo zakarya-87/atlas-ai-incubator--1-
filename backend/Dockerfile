@@ -33,8 +33,12 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install runtime dependencies
-RUN apk add --no-cache postgresql-client curl
+# Install runtime dependencies (including Chromium for PDF generation)
+RUN apk add --no-cache postgresql-client curl chromium nss freetype harfbuzz ca-certificates ttf-freefont
+
+# Tell Puppeteer to use the system Chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \

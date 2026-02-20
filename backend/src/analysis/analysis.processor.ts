@@ -1,7 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
+import { Logger } from '@nestjs/common';
 import { AnalysisService } from './analysis.service';
-import { PrismaService } from '../prisma/prisma.service';
 import { EventsGateway } from '../events/events.gateway';
 import { setJob } from './job-store';
 
@@ -15,9 +15,10 @@ export interface AnalysisJobData {
 
 @Processor('analysis-queue')
 export class AnalysisProcessor extends WorkerHost {
+  private readonly logger = new Logger(AnalysisProcessor.name);
+
   constructor(
     private analysisService: AnalysisService,
-    private prisma: PrismaService,
     private eventsGateway: EventsGateway
   ) {
     super();
@@ -28,21 +29,15 @@ export class AnalysisProcessor extends WorkerHost {
     if (!job.id) {
       throw new Error('Job ID is missing');
     }
-    const jobId = job.id.toString();
+    const jobId = job.data.originalJobId;
 
     try {
-      // Update local job store
-      setJob(job.data.originalJobId, {
-        jobId: job.data.originalJobId,
+      // Update in-memory job store → active
+      setJob(jobId, {
+        jobId,
         status: 'active',
         progress: 10,
         createdAt: Date.now(),
-      });
-
-      // Update job status in DB
-      await this.prisma.job.update({
-        where: { id: jobId },
-        data: { status: 'processing', startedAt: new Date() },
       });
 
       // Emit WebSocket event for progress
@@ -55,12 +50,12 @@ export class AnalysisProcessor extends WorkerHost {
         });
       }
 
-      // Call the actual analysis service
+      // Run the actual analysis (persists to Analysis table internally)
       const result = await this.analysisService.generateAnalysis(dto, userId);
 
-      // Update local job store to completed
-      setJob(job.data.originalJobId, {
-        jobId: job.data.originalJobId,
+      // Update in-memory job store → completed
+      setJob(jobId, {
+        jobId,
         status: 'completed',
         progress: 100,
         result,
@@ -68,26 +63,12 @@ export class AnalysisProcessor extends WorkerHost {
         finishedAt: Date.now(),
       });
 
-      // Emit analysis result event
+      // Emit analysis result event via WebSocket
       if (dto.ventureId) {
         this.eventsGateway.emitAnalysisResult(dto.ventureId, {
-          jobId: job.data.originalJobId,
+          jobId,
           result,
         });
-      }
-
-      // Update job status in DB
-      await this.prisma.job.update({
-        where: { id: job.id.toString() },
-        data: {
-          status: 'completed',
-          result: JSON.stringify(result),
-          completedAt: new Date(),
-        },
-      });
-
-      // Emit completion event
-      if (dto.ventureId) {
         this.eventsGateway.emitLog(dto.ventureId, {
           id: `job-${jobId}-completed`,
           agent: 'Systems Architect',
@@ -96,26 +77,19 @@ export class AnalysisProcessor extends WorkerHost {
         });
       }
 
+      this.logger.log(`Job ${jobId} completed successfully`);
       return result;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      // Update local job store to failed
-      setJob(job.data.originalJobId, {
-        jobId: job.data.originalJobId,
+      this.logger.error(`Job ${jobId} failed: ${errorMessage}`);
+
+      // Update in-memory job store → failed
+      setJob(jobId, {
+        jobId,
         status: 'failed',
         error: errorMessage,
         createdAt: Date.now(),
         finishedAt: Date.now(),
-      });
-
-      // Update job status in DB
-      await this.prisma.job.update({
-        where: { id: job.id.toString() },
-        data: {
-          status: 'failed',
-          error: errorMessage,
-          completedAt: new Date(),
-        },
       });
 
       if (dto.ventureId) {

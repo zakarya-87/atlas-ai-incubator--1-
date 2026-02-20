@@ -39,7 +39,7 @@ export class DesignAgent extends BaseAgent {
       `;
 
       const response = await this.executeGeminiCall(
-        'gemini-2.0-flash-lite',
+        '',
         brandPrompt,
         schema || null,
         'You are a creative director and brand strategist specializing in startup branding.'

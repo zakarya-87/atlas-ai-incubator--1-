@@ -149,6 +149,23 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
   data,
 }) => {
   const { language, t } = useLanguage();
+
+  // Handle undefined, null, non-object, or array data gracefully
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('scenarios' in data)) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No budget data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        </div>
+      </motion.div>
+    );
+  }
   const realisticScenario =
     (data?.scenarios || []).find((s) => s.scenarioName === 'Realistic') ||
     (data?.scenarios || [])[0];

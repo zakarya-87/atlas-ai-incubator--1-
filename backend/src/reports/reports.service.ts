@@ -13,7 +13,7 @@ import { Analysis, Venture } from '@prisma/client';
 @Injectable()
 export class ReportsService {
   private readonly logger = new Logger(ReportsService.name);
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   private reportCache = new Map<string, Analysis & { pdf?: Buffer; html?: string }>();
 
@@ -51,7 +51,8 @@ export class ReportsService {
     try {
       browser = await puppeteer.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
       });
       const page = await browser.newPage();
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });

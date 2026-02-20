@@ -105,6 +105,23 @@ const CompetitorAnalysisDisplay: React.FC<{ data: CompetitorAnalysisData }> = ({
 }) => {
   const { t } = useLanguage();
 
+  // Handle undefined, null, non-object, or array data gracefully
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('competitors' in data)) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No competitor analysis data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        </div>
+      </motion.div>
+    );
+  }
+
   const getBadgeClass = (type: 'Direct' | 'Indirect' | 'Substitute') => {
     switch (type) {
       case 'Direct':
@@ -186,21 +203,21 @@ const CompetitorAnalysisDisplay: React.FC<{ data: CompetitorAnalysisData }> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <SectionCard
           title={t('competitorAnalysisGaps')}
-          points={data.gaps}
+          points={data.gaps || []}
           icon={icons.gaps}
           bgColorClass="bg-blue-500/5"
           textColorClass="text-blue-400"
         />
         <SectionCard
           title={t('competitorAnalysisDifferentiators')}
-          points={data.differentiators}
+          points={data.differentiators || []}
           icon={icons.differentiators}
           bgColorClass="bg-green-500/5"
           textColorClass="text-green-400"
         />
         <SectionCard
           title={t('competitorAnalysisRisks')}
-          points={data.risks}
+          points={data.risks || []}
           icon={icons.risks}
           bgColorClass="bg-red-500/5"
           textColorClass="text-red-400"
