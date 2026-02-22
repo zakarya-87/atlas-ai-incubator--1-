@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
 
   postgres:
-    image: postgres:15-alpine
+    image: ankane/pgvector:v0.5.1
     ports:
       - '5432:5432'
     environment:

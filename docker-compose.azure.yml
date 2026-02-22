@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   atlas-backend:
+    image: atlasairegistry.azurecr.io/atlas-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -18,7 +19,7 @@ services:
     depends_on:
       - postgres
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -27,11 +28,12 @@ services:
       - atlas-network
 
   atlas-frontend:
+    image: atlasairegistry.azurecr.io/atlas-frontend:latest
     build:
       context: .
       dockerfile: Dockerfile
     expose:
-      - "80"
+      - "8080"
     depends_on:
       - atlas-backend
     healthcheck:
@@ -44,7 +46,7 @@ services:
       - atlas-network
 
   postgres:
-    image: postgres:16-alpine
+    image: atlasairegistry.azurecr.io/postgres:16-alpine
     environment:
       POSTGRES_USER: atlas_user
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -61,7 +63,7 @@ services:
       - atlas-network
 
   redis:
-    image: redis:alpine
+    image: atlasairegistry.azurecr.io/redis:alpine
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
