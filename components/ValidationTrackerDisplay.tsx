@@ -145,7 +145,7 @@ const ValidationTrackerDisplay: React.FC<{ data: ValidationTrackerData }> = ({
           {t('validationTrackerKeyMetrics')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {data.keyMetrics.map((metric, index) => (
+          {(data.keyMetrics || []).map((metric, index) => (
             <MetricCard key={index} metric={metric} />
           ))}
         </div>
@@ -159,7 +159,7 @@ const ValidationTrackerDisplay: React.FC<{ data: ValidationTrackerData }> = ({
             {t('validationTrackerCompetitorActivity')}
           </h3>
           <div className="space-y-3">
-            {data.recentCompetitorActivity.map((item, index) => (
+            {(data.recentCompetitorActivity || []).map((item, index) => (
               <div key={index} className="p-3 rounded-lg bg-brand-secondary/40">
                 <div className="flex justify-between items-start">
                   <p className="font-bold text-brand-text/95 text-sm">
@@ -182,7 +182,7 @@ const ValidationTrackerDisplay: React.FC<{ data: ValidationTrackerData }> = ({
             {t('validationTrackerEmergingTrends')}
           </h3>
           <div className="space-y-3">
-            {data.emergingTrends.map((item, index) => (
+            {(data.emergingTrends || []).map((item, index) => (
               <div key={index} className="p-3 rounded-lg bg-brand-secondary/40">
                 <div className="flex justify-between items-start">
                   <p className="font-bold text-brand-text/95 text-sm">
@@ -203,7 +203,7 @@ const ValidationTrackerDisplay: React.FC<{ data: ValidationTrackerData }> = ({
             {t('validationTrackerFundingInsights')}
           </h3>
           <div className="space-y-3">
-            {data.fundingInsights.map((item, index) => (
+            {(data.fundingInsights || []).map((item, index) => (
               <div key={index} className="p-3 rounded-lg bg-brand-secondary/40">
                 <p className="font-bold text-brand-text/95 text-sm">
                   {item.insight}

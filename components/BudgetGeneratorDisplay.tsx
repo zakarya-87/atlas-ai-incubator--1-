@@ -55,7 +55,7 @@ const ScenarioTable: React.FC<{
           </tr>
         </thead>
         <tbody>
-          {scenarios.map((s) => (
+          {(scenarios || []).map((s) => (
             <tr
               key={s.scenarioName}
               className="border-b border-brand-accent/50 hover:bg-brand-accent/20"
@@ -92,7 +92,7 @@ const BreakdownTable: React.FC<{
   const { t } = useLanguage();
   return (
     <div className="space-y-4">
-      {breakdown.map((category) => (
+      {(breakdown || []).map((category) => (
         <div
           key={category.categoryName}
           className="rounded-lg bg-brand-secondary/30 overflow-hidden"
@@ -119,7 +119,7 @@ const BreakdownTable: React.FC<{
                 </tr>
               </thead>
               <tbody>
-                {category.items.map((item, index) => (
+                {(category.items || []).map((item, index) => (
                   <tr key={index} className="border-t border-brand-accent/30">
                     <td className="px-6 py-3 font-medium text-brand-text/90">
                       {item.name}
@@ -185,7 +185,7 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
           <h4 className="text-lg font-bold text-brand-light mb-2">
             {t('budgetGeneratorScenarios')}
           </h4>
-          <ScenarioTable scenarios={data.scenarios} language={language} />
+          <ScenarioTable scenarios={data.scenarios || []} language={language} />
         </div>
       </motion.div>
 
@@ -196,7 +196,7 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
               {t('budgetGeneratorBreakdown')} (Realistic)
             </h3>
             <BreakdownTable
-              breakdown={realisticScenario.breakdown}
+              breakdown={realisticScenario?.breakdown || []}
               language={language}
             />
           </motion.div>

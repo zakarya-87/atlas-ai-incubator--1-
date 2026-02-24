@@ -53,7 +53,7 @@ const RoadmapDisplay: React.FC<RoadmapDisplayProps> = ({ data }) => {
         {/* Vertical Timeline Bar */}
         <div className="absolute top-0 bottom-0 left-0 rtl:left-auto rtl:right-0 w-1 bg-brand-accent/30 rounded-full"></div>
 
-        {data.phases.map((phase, phaseIndex) => (
+        {(data.phases || []).map((phase, phaseIndex) => (
           <motion.div
             key={phaseIndex}
             variants={phaseVariants}
@@ -68,7 +68,7 @@ const RoadmapDisplay: React.FC<RoadmapDisplayProps> = ({ data }) => {
                   {phase.phaseName}
                 </h3>
                 <ul className="space-y-3">
-                  {phase.milestones.map((milestone, milestoneIndex) => (
+                  {(phase.milestones || []).map((milestone, milestoneIndex) => (
                     <li
                       key={milestoneIndex}
                       className="flex items-start text-sm"

@@ -107,8 +107,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const register = useCallback(async (credentials: AuthCredentials) => {
     await signUp(credentials);
-    // Note: Registration doesn't auto-login, user must sign in
-  }, []);
+    // Auto-login after registration
+    await login(credentials);
+  }, [login]);
 
   const logout = useCallback(async () => {
     try {

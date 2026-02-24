@@ -17,6 +17,59 @@ const InvestorMatchingDisplay: React.FC<{ data: InvestorMatchingData }> = ({
 }) => {
   const { t } = useLanguage();
 
+  const [selectedInvestor, setSelectedInvestor] =
+    useState<InvestorProfile | null>(null);
+
+  // State for filters
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [stageFilter, setStageFilter] = useState<string>('all');
+  const [sectorFilter, setSectorFilter] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+
+  // Memoize filters and sorted results
+  const uniqueTypes = useMemo(
+    () => ['all', ...Array.from(new Set((data?.investors || []).map((i) => i.type)))],
+    [data?.investors]
+  );
+  const uniqueStages = useMemo(
+    () => [
+      'all',
+      ...Array.from(new Set((data?.investors || []).map((i) => i.investmentStage))),
+    ],
+    [data?.investors]
+  );
+
+  const filteredAndSortedInvestors = useMemo(() => {
+    let result = [...(data?.investors || [])];
+
+    if (typeFilter !== 'all') {
+      result = result.filter((i) => i.type === typeFilter);
+    }
+    if (stageFilter !== 'all') {
+      result = result.filter((i) => i.investmentStage === stageFilter);
+    }
+    if (sectorFilter.trim() !== '') {
+      const lowerSectorFilter = sectorFilter.toLowerCase();
+      result = result.filter((i) =>
+        i.sectorFocus?.some((s) => s.toLowerCase().includes(lowerSectorFilter))
+      );
+    }
+
+    result.sort((a, b) => {
+      return sortOrder === 'desc'
+        ? b.alignmentScore - a.alignmentScore
+        : a.alignmentScore - b.alignmentScore;
+    });
+
+    return result;
+  }, [data?.investors, typeFilter, stageFilter, sectorFilter, sortOrder]);
+
+  const handleCopyToClipboard = useCallback((text: string) => {
+    navigator.clipboard
+      .writeText(text)
+      .catch((err) => console.error('Failed to copy text: ', err));
+  }, []);
+
   // Handle undefined, null, non-object, or array data gracefully
   if (!data || typeof data !== 'object' || Array.isArray(data) || !('investors' in data)) {
     return (
@@ -33,58 +86,6 @@ const InvestorMatchingDisplay: React.FC<{ data: InvestorMatchingData }> = ({
       </motion.div>
     );
   }
-  const [selectedInvestor, setSelectedInvestor] =
-    useState<InvestorProfile | null>(null);
-
-  // State for filters
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [stageFilter, setStageFilter] = useState<string>('all');
-  const [sectorFilter, setSectorFilter] = useState<string>('');
-  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
-
-  // Memoize filters and sorted results
-  const uniqueTypes = useMemo(
-    () => ['all', ...Array.from(new Set(data.investors.map((i) => i.type)))],
-    [data.investors]
-  );
-  const uniqueStages = useMemo(
-    () => [
-      'all',
-      ...Array.from(new Set(data.investors.map((i) => i.investmentStage))),
-    ],
-    [data.investors]
-  );
-
-  const filteredAndSortedInvestors = useMemo(() => {
-    let result = [...data.investors];
-
-    if (typeFilter !== 'all') {
-      result = result.filter((i) => i.type === typeFilter);
-    }
-    if (stageFilter !== 'all') {
-      result = result.filter((i) => i.investmentStage === stageFilter);
-    }
-    if (sectorFilter.trim() !== '') {
-      const lowerSectorFilter = sectorFilter.toLowerCase();
-      result = result.filter((i) =>
-        i.sectorFocus.some((s) => s.toLowerCase().includes(lowerSectorFilter))
-      );
-    }
-
-    result.sort((a, b) => {
-      return sortOrder === 'desc'
-        ? b.alignmentScore - a.alignmentScore
-        : a.alignmentScore - b.alignmentScore;
-    });
-
-    return result;
-  }, [data.investors, typeFilter, stageFilter, sectorFilter, sortOrder]);
-
-  const handleCopyToClipboard = useCallback((text: string) => {
-    navigator.clipboard
-      .writeText(text)
-      .catch((err) => console.error('Failed to copy text: ', err));
-  }, []);
 
   return (
     <motion.div
@@ -180,7 +181,7 @@ const InvestorMatchingDisplay: React.FC<{ data: InvestorMatchingData }> = ({
                     {investor.ticketSize}
                   </p>
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {investor.sectorFocus.map((s) => (
+                    {(investor.sectorFocus || []).map((s) => (
                       <span
                         key={s}
                         className="bg-brand-teal/20 text-brand-teal text-xs font-semibold px-2 py-0.5 rounded-full"

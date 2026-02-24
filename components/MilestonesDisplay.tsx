@@ -64,10 +64,27 @@ const AlertCard: React.FC<{ alert: SmartAlert }> = ({ alert }) => {
 
 const MilestonesDisplay: React.FC<{ data: MilestonesData }> = ({ data }) => {
   const { t } = useLanguage();
+
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('milestones' in data)) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No milestone data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        </div>
+      </motion.div>
+    );
+  }
+
   const quarters = [1, 2, 3, 4];
   const milestonesByQuarter = quarters.map((q) => ({
     quarter: q,
-    milestones: data.milestones.filter((m) => m.quarter === q),
+    milestones: (data.milestones || []).filter((m) => m.quarter === q),
   }));
 
   return (
@@ -123,7 +140,7 @@ const MilestonesDisplay: React.FC<{ data: MilestonesData }> = ({ data }) => {
               {t('milestonesSmartAlerts')}
             </h3>
             <div className="space-y-4">
-              {data.smartAlerts.map((alert, index) => (
+              {(data.smartAlerts || []).map((alert, index) => (
                 <AlertCard key={index} alert={alert} />
               ))}
             </div>

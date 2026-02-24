@@ -278,7 +278,7 @@ const RiskFeasibilityDisplay: React.FC<{ data: RiskFeasibilityData }> = ({
               {t('riskFeasibilityResources')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {data.resourceEstimates.map((res, index) => (
+              {(data.resourceEstimates || []).map((res, index) => (
                 <ResourceCard
                   key={index}
                   resource={res}
@@ -293,21 +293,21 @@ const RiskFeasibilityDisplay: React.FC<{ data: RiskFeasibilityData }> = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <RiskCard
           title={t('riskFeasibilityRegulatory')}
-          points={data.regulatoryRisks}
+          points={data.regulatoryRisks || []}
           icon={icons.regulatory}
           bgColorClass="bg-yellow-500/5"
           textColorClass="text-yellow-400"
         />
         <RiskCard
           title={t('riskFeasibilityFinancial')}
-          points={data.financialRisks}
+          points={data.financialRisks || []}
           icon={icons.financial}
           bgColorClass="bg-red-500/5"
           textColorClass="text-red-400"
         />
         <RiskCard
           title={t('riskFeasibilityOperational')}
-          points={data.operationalRisks}
+          points={data.operationalRisks || []}
           icon={icons.operational}
           bgColorClass="bg-blue-500/5"
           textColorClass="text-blue-400"

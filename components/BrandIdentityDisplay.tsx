@@ -83,7 +83,7 @@ const BrandIdentityDisplay: React.FC<{ data: BrandIdentityData }> = ({
               Color Palette
             </h4>
             <div className="flex gap-2 justify-center md:justify-start">
-              {data.palette.map((color, index) => (
+              {(data.palette || []).map((color, index) => (
                 <div key={index} className="group relative">
                   <div
                     className="w-12 h-12 rounded-full border-2 border-white/10 shadow-md cursor-pointer transform hover:scale-110 transition-all"

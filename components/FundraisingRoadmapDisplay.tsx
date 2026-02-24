@@ -203,14 +203,14 @@ const FundraisingRoadmapDisplay: React.FC<{ data: FundraisingRoadmapData }> = ({
             </h3>
             <div className="space-y-6 relative pl-4 rtl:pl-0 rtl:pr-4">
               <div className="absolute top-0 bottom-0 left-0 rtl:left-auto rtl:right-0 w-1 bg-brand-accent/30 rounded-full"></div>
-              {data.phases.map((phase) => (
+              {(data.phases || []).map((phase) => (
                 <div key={phase.phaseName} className="relative">
                   <div className="absolute -left-6 rtl:-left-auto rtl:-right-6 top-1 h-4 w-4 bg-brand-teal rounded-full border-4 border-brand-primary"></div>
                   <h4 className="text-lg font-bold text-brand-teal mb-3">
                     {phase.phaseName}
                   </h4>
                   <div className="space-y-3">
-                    {phase.tasks.map((task, index) => (
+                    {(phase.tasks || []).map((task, index) => (
                       <TaskCard key={index} task={task} />
                     ))}
                   </div>
@@ -225,7 +225,7 @@ const FundraisingRoadmapDisplay: React.FC<{ data: FundraisingRoadmapData }> = ({
               {t('fundraisingRoadmapAlerts')}
             </h3>
             <div className="space-y-4">
-              {data.smartAlerts.map((alert, index) => (
+              {(data.smartAlerts || []).map((alert, index) => (
                 <AlertCard key={index} alert={alert} />
               ))}
             </div>
@@ -235,7 +235,7 @@ const FundraisingRoadmapDisplay: React.FC<{ data: FundraisingRoadmapData }> = ({
               {t('fundraisingRoadmapAlternatives')}
             </h3>
             <div className="space-y-3">
-              {data.alternativeFunding.map((item, index) => (
+              {(data.alternativeFunding || []).map((item, index) => (
                 <div
                   key={index}
                   className="rounded-lg p-4 bg-brand-secondary/40"

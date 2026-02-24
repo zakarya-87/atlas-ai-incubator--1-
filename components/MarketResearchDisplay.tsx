@@ -115,6 +115,22 @@ const MarketResearchDisplay: React.FC<MarketResearchDisplayProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('marketDrivers' in data)) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No market research data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        </div>
+      </motion.div>
+    );
+  }
+
   const sections: {
     key: keyof MarketResearchData;
     titleKey: TranslationKey;
@@ -153,7 +169,7 @@ const MarketResearchDisplay: React.FC<MarketResearchDisplayProps> = ({
           <SectionCard
             key={sec.key}
             title={t(sec.titleKey)}
-            points={data[sec.key]}
+            points={data[sec.key] || []}
             icon={sec.icon}
             bgColorClass={sec.colors[0]}
             textColorClass={sec.colors[1]}

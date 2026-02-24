@@ -145,7 +145,7 @@ const KpiDashboardDisplay: React.FC<{ data: KpiDashboardData }> = ({
 
       <motion.div variants={containerVariants}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.kpis.map((kpi, index) => (
+          {(data.kpis || []).map((kpi, index) => (
             <KpiCard key={index} kpi={kpi} />
           ))}
         </div>

@@ -155,7 +155,7 @@ const SlideCard: React.FC<{ slide: PitchDeckSlide; index: number }> = ({
       </div>
 
       <ul className="space-y-3 text-brand-text/90 flex-grow mb-4">
-        {slide.content.map((item, i) => (
+        {(slide.content || []).map((item, i) => (
           <li key={i} className="flex items-start text-sm">
             <svg
               className="w-4 h-4 text-green-400 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0 mt-1"
@@ -247,7 +247,7 @@ const PitchDeckDisplay: React.FC<{ data: PitchDeckData }> = ({ data }) => {
         </h3>
       </motion.div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {data.slides.map((slide, index) => (
+        {(data.slides || []).map((slide, index) => (
           <SlideCard key={index} slide={slide} index={index} />
         ))}
       </div>

@@ -1,23 +1,42 @@
 version: '3.8'
 
 services:
+  atlas-frontend:
+    image: atlasairegistry.azurecr.io/atlas-frontend:latest
+    ports:
+      - "80:8080"
+    depends_on:
+      - atlas-backend
+    links:
+      - atlas-backend
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - atlas-network
+
   atlas-backend:
     image: atlasairegistry.azurecr.io/atlas-backend:latest
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
     expose:
       - "3000"
     environment:
-      - DATABASE_URL=postgresql://atlas_user:${POSTGRES_PASSWORD}@postgres:5432/atlas_prod_db
-      - API_KEY=${API_KEY}
-      - JWT_SECRET=${JWT_SECRET}
-      - NODE_ENV=production
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:8080}
+      DATABASE_URL: postgresql://atlas_user:atlas_password@postgres:5432/atlas_prod_db
+      GEMINI_API_KEY: AIzaSyCsOdTsRxaZRfMS2b5pSlnyCAACUPmiZFY
+      JWT_SECRET: a_very_secure_production_secret_key_that_is_long_and_random
+      NODE_ENV: production
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_TLS: "false"
+      FRONTEND_URL: https://atlas-ai-webapp.azurewebsites.net
     depends_on:
       - postgres
+      - redis
+    links:
+      - postgres
+      - redis
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
       interval: 30s
@@ -27,32 +46,14 @@ services:
     networks:
       - atlas-network
 
-  atlas-frontend:
-    image: atlasairegistry.azurecr.io/atlas-frontend:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-    expose:
-      - "8080"
-    depends_on:
-      - atlas-backend
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost']
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
-    networks:
-      - atlas-network
-
   postgres:
-    image: atlasairegistry.azurecr.io/postgres:16-alpine
+    image: atlasairegistry.azurecr.io/atlas-postgres:16-alpine
     environment:
       POSTGRES_USER: atlas_user
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: atlas_password
       POSTGRES_DB: atlas_prod_db
     volumes:
-      - postgres_prod_data:/var/lib/postgresql/data
+      - postgres_prod_data_v5:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U atlas_user -d atlas_prod_db']
       interval: 10s
@@ -63,7 +64,7 @@ services:
       - atlas-network
 
   redis:
-    image: atlasairegistry.azurecr.io/redis:alpine
+    image: atlasairegistry.azurecr.io/atlas-redis:alpine
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
@@ -74,7 +75,7 @@ services:
       - atlas-network
 
 volumes:
-  postgres_prod_data:
+  postgres_prod_data_v5:
 
 networks:
   atlas-network:

@@ -113,6 +113,22 @@ const ExpansionStrategyDisplay: React.FC<{ data: ExpansionStrategyData }> = ({
 }) => {
   const { t } = useLanguage();
 
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('recommendedStrategy' in data)) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No expansion strategy data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        </div>
+      </motion.div>
+    );
+  }
+
   const sections = [
     {
       key: 'marketExpansionSuggestions',
@@ -166,7 +182,7 @@ const ExpansionStrategyDisplay: React.FC<{ data: ExpansionStrategyData }> = ({
           <SectionCard
             key={sec.key}
             title={t(sec.titleKey as any)}
-            points={data[sec.key as keyof typeof data] as AnalysisPoint[]}
+            points={(data[sec.key as keyof typeof data] as AnalysisPoint[]) || []}
             icon={sec.icon}
             bgColorClass={sec.colors[0]}
             textColorClass={sec.colors[1]}

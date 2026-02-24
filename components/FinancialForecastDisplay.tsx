@@ -83,23 +83,6 @@ const FinancialForecastDisplay: React.FC<{
 }> = ({ data, originalRecord, onSaveVersion }) => {
   const { language, t } = useLanguage();
 
-  // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('forecast' in data)) {
-    return (
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="w-full p-8 text-center"
-      >
-        <div className="text-brand-text/60">
-          <p>No financial forecast data available.</p>
-          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
-        </div>
-      </motion.div>
-    );
-  }
-
   const [liveForecast, setLiveForecast] = useState(data);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -107,7 +90,7 @@ const FinancialForecastDisplay: React.FC<{
   const initialGrowthRate = useMemo(
     () =>
       parseFloat(
-        data.assumptions
+        (data?.assumptions || [])
           .find((a) => a.point.includes('Growth'))
           ?.explanation.match(/(\d+(\.\d+)?)%/)?.[1] || '100'
       ) / 100,
@@ -116,7 +99,7 @@ const FinancialForecastDisplay: React.FC<{
   const initialCogsMargin = useMemo(
     () =>
       parseFloat(
-        data.assumptions
+        (data?.assumptions || [])
           .find((a) => a.point.includes('COGS'))
           ?.explanation.match(/(\d+(\.\d+)?)%/)?.[1] || '30'
       ) / 100,
@@ -125,7 +108,7 @@ const FinancialForecastDisplay: React.FC<{
   const initialOpexScaling = useMemo(
     () =>
       parseFloat(
-        data.assumptions
+        (data?.assumptions || [])
           .find((a) => a.point.includes('OPEX'))
           ?.explanation.match(/(\d+(\.\d+)?)%/)?.[1] || '50'
       ) / 100,
@@ -147,7 +130,7 @@ const FinancialForecastDisplay: React.FC<{
 
   useEffect(() => {
     const recalculateForecast = () => {
-      const newForecast = [...data.forecast]; // Start from the original year 1
+      const newForecast = [...(data?.forecast || [])]; // Start from the original year 1
       for (let i = 1; i < newForecast.length; i++) {
         newForecast[i].revenue = newForecast[i - 1].revenue * (1 + growthRate);
         newForecast[i].cogs = newForecast[i].revenue * cogsMargin;
@@ -178,7 +161,24 @@ const FinancialForecastDisplay: React.FC<{
     };
 
     recalculateForecast();
-  }, [growthRate, cogsMargin, opexScaling, data.forecast]);
+  }, [growthRate, cogsMargin, opexScaling, data?.forecast]);
+
+  // Handle undefined, null, non-object, or array data gracefully
+  if (!data || typeof data !== 'object' || Array.isArray(data) || !('forecast' in data)) {
+    return (
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="w-full p-8 text-center"
+      >
+        <div className="text-brand-text/60">
+          <p>No financial forecast data available.</p>
+          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        </div>
+      </motion.div>
+    );
+  }
 
   const handleReset = () => {
     setGrowthRate(initialGrowthRate);
@@ -198,7 +198,7 @@ const FinancialForecastDisplay: React.FC<{
   };
 
   const maxRevenue = Math.max(
-    ...liveForecast.forecast.map((y) => y.revenue),
+    ...(liveForecast.forecast || []).map((y) => y.revenue),
     1
   ); // Avoid division by zero
 
@@ -268,7 +268,7 @@ const FinancialForecastDisplay: React.FC<{
                   </tr>
                 </thead>
                 <tbody>
-                  {liveForecast.forecast.map((yearData) => (
+                  {(liveForecast.forecast || []).map((yearData) => (
                     <tr
                       key={yearData.year}
                       className="border-b border-brand-accent/50 hover:bg-brand-accent/20"
@@ -307,7 +307,7 @@ const FinancialForecastDisplay: React.FC<{
               Visual Projections
             </h4>
             <div className="flex justify-around items-end h-48 p-4 space-x-2 rtl:space-x-reverse">
-              {liveForecast.forecast.map((yearData) => (
+              {(liveForecast.forecast || []).map((yearData) => (
                 <div
                   key={yearData.year}
                   className="flex flex-col items-center flex-1 h-full justify-end"

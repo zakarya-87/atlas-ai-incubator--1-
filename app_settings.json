@@ -1,0 +1,87 @@
+[
+  {
+    "name": "DOCKER_REGISTRY_SERVER_URL",
+    "slotSetting": false,
+    "value": "https://atlasairegistry.azurecr.io"
+  },
+  {
+    "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+    "slotSetting": false,
+    "value": "atlasairegistry"
+  },
+  {
+    "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+    "slotSetting": false,
+    "value": null
+  },
+  {
+    "name": "POSTGRES_PASSWORD",
+    "slotSetting": false,
+    "value": "atlas_password"
+  },
+  {
+    "name": "DATABASE_URL",
+    "slotSetting": false,
+    "value": "postgresql://atlas_user:atlas_password@postgres:5432/atlas_prod_db"
+  },
+  {
+    "name": "JWT_SECRET",
+    "slotSetting": false,
+    "value": "a_very_secure_production_secret_key_that_is_long_and_random"
+  },
+  {
+    "name": "API_KEY",
+    "slotSetting": false,
+    "value": "AIzaSyCsOdTsRxaZRfMS2b5pSlnyCAACUPmiZFY"
+  },
+  {
+    "name": "NODE_ENV",
+    "slotSetting": false,
+    "value": "production"
+  },
+  {
+    "name": "FRONTEND_URL",
+    "slotSetting": false,
+    "value": "https://atlas-ai-webapp.azurewebsites.net"
+  },
+  {
+    "name": "REDIS_HOST",
+    "slotSetting": false,
+    "value": "atlas-redis-202602070131.redis.cache.windows.net"
+  },
+  {
+    "name": "REDIS_PORT",
+    "slotSetting": false,
+    "value": "6380"
+  },
+  {
+    "name": "REDIS_PASSWORD",
+    "slotSetting": false,
+    "value": "75gRN7xBbkFQfFc4Hl3GOfSTd5yXcSP4GAzCaCPjPNQ="
+  },
+  {
+    "name": "REDIS_TLS",
+    "slotSetting": false,
+    "value": "true"
+  },
+  {
+    "name": "DEFAULT_AI_PROVIDER",
+    "slotSetting": false,
+    "value": "mistral"
+  },
+  {
+    "name": "MISTRAL_API_KEY",
+    "slotSetting": false,
+    "value": "KdHCoH9EObE6IkQVcDx74B9paobzCKNj"
+  },
+  {
+    "name": "GEMINI_API_KEY",
+    "slotSetting": false,
+    "value": "AIzaSyCsOdTsRxaZRfMS2b5pSlnyCAACUPmiZFY"
+  },
+  {
+    "name": "TEST_SETTING",
+    "slotSetting": false,
+    "value": "hello"
+  }
+]

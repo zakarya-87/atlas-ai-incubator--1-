@@ -164,7 +164,7 @@ const OkrWorkflowDisplay: React.FC<{ data: OkrWorkflowData }> = ({ data }) => {
           {t('okrWorkflowStrategicGoals')}
         </h3>
         <div className="space-y-4">
-          {data.strategicGoals.map((goal, gIndex) => (
+          {(data.strategicGoals || []).map((goal, gIndex) => (
             <motion.div
               key={gIndex}
               variants={itemVariants}
@@ -175,14 +175,14 @@ const OkrWorkflowDisplay: React.FC<{ data: OkrWorkflowData }> = ({ data }) => {
                 {goal.goal}
               </h4>
               <div className="mt-4 space-y-4 pl-4 border-l-2 border-brand-accent/50 rtl:pl-0 rtl:pr-4 rtl:border-l-0 rtl:border-r-2">
-                {goal.objectives.map((obj, oIndex) => (
+                {(goal.objectives || []).map((obj, oIndex) => (
                   <div key={oIndex}>
                     <h5 className="font-semibold text-md text-brand-text/95">
                       <span className="text-brand-accent/80">Objective: </span>
                       {obj.objective}
                     </h5>
                     <ul className="mt-2 space-y-2 pl-6 rtl:pl-0 rtl:pr-6">
-                      {obj.keyResults.map((kr, krIndex) => (
+                      {(obj.keyResults || []).map((kr, krIndex) => (
                         <li key={krIndex} className="text-sm">
                           <div className="flex items-start">
                             <svg
@@ -220,21 +220,21 @@ const OkrWorkflowDisplay: React.FC<{ data: OkrWorkflowData }> = ({ data }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <SectionCard
           title={t('okrWorkflowCascadingAlignment')}
-          points={data.cascadingAlignment}
+          points={data.cascadingAlignment || []}
           icon={icons.alignment}
           bgColorClass="bg-blue-500/5"
           textColorClass="text-blue-400"
         />
         <SectionCard
           title={t('okrWorkflowTracking')}
-          points={data.trackingAndReview}
+          points={data.trackingAndReview || []}
           icon={icons.tracking}
           bgColorClass="bg-yellow-500/5"
           textColorClass="text-yellow-400"
         />
         <SectionCard
           title={t('okrWorkflowReflection')}
-          points={data.reflectionAndNextCycle}
+          points={data.reflectionAndNextCycle || []}
           icon={icons.reflection}
           bgColorClass="bg-purple-500/5"
           textColorClass="text-purple-400"
