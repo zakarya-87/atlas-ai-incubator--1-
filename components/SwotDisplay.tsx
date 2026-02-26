@@ -306,8 +306,11 @@ const containerVariants = {
   },
 };
 
-const SwotDisplay: React.FC<SwotDisplayProps> = ({ data, onUpdate }) => {
+const SwotDisplay: React.FC<SwotDisplayProps> = ({ data: initialData, onUpdate }) => {
   const { t } = useLanguage();
+
+  // Handle nested swot_analysis key if present
+  const data = (initialData as any)?.swot_analysis || initialData;
 
   // Handle undefined, null, non-object, or array data gracefully
   if (!data || typeof data !== 'object' || Array.isArray(data) || !('strengths' in data)) {

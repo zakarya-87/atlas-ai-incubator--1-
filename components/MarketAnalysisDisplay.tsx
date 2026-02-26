@@ -110,9 +110,12 @@ const containerVariants = {
 };
 
 const MarketAnalysisDisplay: React.FC<MarketAnalysisDisplayProps> = ({
-  data,
+  data: initialData,
 }) => {
   const { t } = useLanguage();
+
+  // Handle nested market_analysis key if present
+  const data = (initialData as any)?.market_analysis || initialData;
 
   // Handle undefined, null, non-object, or array data gracefully
   if (!data || typeof data !== 'object' || Array.isArray(data) || !('targetAudience' in data)) {
