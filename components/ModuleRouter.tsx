@@ -152,6 +152,7 @@ const ModuleRouter = (props: ModuleRouterProps) => {
     onViewHistory,
     onDeleteHistory,
     onNavigate,
+    onAnalysisResult,
   } = props;
 
   // --- 0. Debug Logging ---
