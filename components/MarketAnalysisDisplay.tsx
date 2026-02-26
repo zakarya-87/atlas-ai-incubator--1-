@@ -121,11 +121,14 @@ const MarketAnalysisDisplay: React.FC<MarketAnalysisDisplayProps> = ({
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full p-8 text-center"
+        className="w-full p-12 text-center bg-brand-secondary/30 rounded-xl border border-dashed border-brand-accent/30"
       >
-        <div className="text-brand-text/60">
-          <p>No market analysis data available.</p>
-          <p className="text-sm mt-2">Please generate an analysis to see results.</p>
+        <div className="text-brand-text/60 max-w-sm mx-auto">
+          <svg className="w-12 h-12 mx-auto mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-lg font-medium">No Market Analysis Data</p>
+          <p className="text-sm mt-2">We couldn't find structured market segments for this description. Try refining your input.</p>
         </div>
       </motion.div>
     );

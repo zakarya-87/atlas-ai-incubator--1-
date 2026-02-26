@@ -152,8 +152,18 @@ const ModuleRouter = (props: ModuleRouterProps) => {
     onViewHistory,
     onDeleteHistory,
     onNavigate,
-    onAnalysisResult,
   } = props;
+
+  // --- 0. Debug Logging ---
+  React.useEffect(() => {
+    if (currentAnalysis) {
+      console.log(`[ModuleRouter] Data arrived for ${activeModule}/${activeTool}:`, {
+        hasData: !!currentAnalysis,
+        keys: Object.keys(currentAnalysis),
+        id: (currentAnalysis as any).id
+      });
+    }
+  }, [currentAnalysis, activeModule, activeTool]);
 
   // --- 1. Sub Navigation Rendering ---
   const renderSubNav = () => {

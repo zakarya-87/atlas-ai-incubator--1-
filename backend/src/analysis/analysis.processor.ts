@@ -53,6 +53,11 @@ export class AnalysisProcessor extends WorkerHost {
       // Run the actual analysis (persists to Analysis table internally)
       const result = await this.analysisService.generateAnalysis(dto, userId);
 
+      // Explicit validation of the result
+      if (!result || typeof result !== 'object' || Object.keys(result).length === 0) {
+        throw new Error('AI analysis generated an empty or invalid result set.');
+      }
+
       // Update in-memory job store → completed
       setJob(jobId, {
         jobId,

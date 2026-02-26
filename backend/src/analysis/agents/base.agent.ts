@@ -258,7 +258,8 @@ export abstract class BaseAgent implements AiAgent {
       return this.attemptFallback(prompt, schema, systemInstruction, images);
     }
 
-    return null;
+    // Throw for non-rate-limit errors (like invalid model name, safety filters, etc.)
+    throw error;
   }
 
   private async attemptFallback(
