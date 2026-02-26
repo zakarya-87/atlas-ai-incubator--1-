@@ -2,12 +2,12 @@ name: Backend Unit Tests
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, dev]
     paths:
       - 'backend/**'
       - '!backend/README.md'
   pull_request:
-    branches: [main, develop]
+    branches: [main, dev]
     paths:
       - 'backend/**'
       - '!backend/README.md'

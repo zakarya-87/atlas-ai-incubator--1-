@@ -2,7 +2,7 @@ name: Frontend Unit Tests
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, dev]
     paths:
       - 'hooks/**'
       - 'components/**'
@@ -12,7 +12,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
   pull_request:
-    branches: [main, develop]
+    branches: [main, dev]
     paths:
       - 'hooks/**'
       - 'components/**'
