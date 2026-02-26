@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -21,6 +22,19 @@ import { validateEnv } from './config/env.validation';
       isGlobal: true,
       validate: (config) => validateEnv(config),
     }),
+    // Rate Limiting — global defaults + named 'auth' limit for login/register
+    ThrottlerModule.forRoot([
+      {
+        name: 'global',
+        ttl: 60000,    // 1 minute window
+        limit: 100,    // max 100 requests per IP per minute (global)
+      },
+      {
+        name: 'auth',
+        ttl: 60000,    // 1 minute window
+        limit: 5,      // max 5 auth requests per IP per minute
+      },
+    ]),
     // Global BullMQ Redis connection — shared by all queues
     BullModule.forRootAsync({
       inject: [ConfigService],

@@ -1,4 +1,5 @@
 import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
@@ -23,6 +24,7 @@ export class AuthController {
   // ── Canonical endpoints ───────────────────────────────────────────────────
 
   @Post('/register')
+  @Throttle({ auth: { ttl: 60000, limit: 5 } })
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User successfully registered' })
   @ApiResponse({ status: 409, description: 'User already exists' })
@@ -36,6 +38,7 @@ export class AuthController {
   }
 
   @Post('/login')
+  @Throttle({ auth: { ttl: 60000, limit: 5 } })
   @ApiOperation({ summary: 'Login with credentials' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
@@ -67,6 +70,7 @@ export class AuthController {
 
   /** @deprecated Use POST /auth/register */
   @Post('/signup')
+  @Throttle({ auth: { ttl: 60000, limit: 5 } })
   @ApiOperation({ summary: 'Register a new user (legacy alias for /register)' })
   async signUp(
     @Body() registerDto: RegisterDto,
@@ -77,6 +81,7 @@ export class AuthController {
 
   /** @deprecated Use POST /auth/login */
   @Post('/signin')
+  @Throttle({ auth: { ttl: 60000, limit: 5 } })
   @ApiOperation({ summary: 'Sign in (legacy alias for /login)' })
   async signIn(
     @Body() authCredentialsDto: AuthCredentialsDto,

@@ -20,7 +20,27 @@ async function bootstrap(): Promise<void> {
     app.use(cookieParser());
 
     // --- SECURITY HEADERS (Helmet) ---
-    app.use(helmet());
+    // Explicit config ensures headers are set even if nginx strips them via Azure proxy
+    app.use(
+      helmet({
+        contentSecurityPolicy: {
+          directives: {
+            defaultSrc: ["'self'"],
+            connectSrc: ["'self'", 'http:', 'https:'],
+            imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+            styleSrc: ["'self'", "'unsafe-inline'", 'https:'],
+            fontSrc: ["'self'", 'data:', 'https:'],
+          },
+        },
+        frameguard: { action: 'sameorigin' },
+        referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+        hsts: { maxAge: 31536000, includeSubDomains: true },
+        xContentTypeOptions: true,
+        xssFilter: true,
+        permittedCrossDomainPolicies: { permittedPolicies: 'none' },
+      })
+    );
 
     // --- CORS ---
     app.enableCors({
