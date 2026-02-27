@@ -1,0 +1,42 @@
+[
+  {
+    "name": "DATABASE_URL",
+    "value": "@Microsoft.KeyVault(VaultName=atlas-ai-kv-001;SecretName=DATABASE-URL)",
+    "slotSetting": false
+  },
+  {
+    "name": "JWT_SECRET",
+    "value": "@Microsoft.KeyVault(VaultName=atlas-ai-kv-001;SecretName=JWT-SECRET)",
+    "slotSetting": false
+  },
+  {
+    "name": "API_KEY",
+    "value": "@Microsoft.KeyVault(VaultName=atlas-ai-kv-001;SecretName=API-KEY)",
+    "slotSetting": false
+  },
+  {
+    "name": "REDIS_HOST",
+    "value": "@Microsoft.KeyVault(VaultName=atlas-ai-kv-001;SecretName=REDIS-HOST)",
+    "slotSetting": false
+  },
+  {
+    "name": "REDIS_PORT",
+    "value": "@Microsoft.KeyVault(VaultName=atlas-ai-kv-001;SecretName=REDIS-PORT)",
+    "slotSetting": false
+  },
+  {
+    "name": "REDIS_PASSWORD",
+    "value": "@Microsoft.KeyVault(VaultName=atlas-ai-kv-001;SecretName=REDIS-PASSWORD)",
+    "slotSetting": false
+  },
+  {
+    "name": "REDIS_TLS",
+    "value": "@Microsoft.KeyVault(VaultName=atlas-ai-kv-001;SecretName=REDIS-TLS)",
+    "slotSetting": false
+  },
+  {
+    "name": "NODE_ENV",
+    "value": "production",
+    "slotSetting": false
+  }
+]

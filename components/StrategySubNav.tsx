@@ -7,7 +7,10 @@ interface StrategySubNavProps {
   onToolChange: (tool: StrategyTool) => void;
 }
 
-const StrategySubNav: React.FC<StrategySubNavProps> = ({ activeTool, onToolChange }) => {
+const StrategySubNav: React.FC<StrategySubNavProps> = ({
+  activeTool,
+  onToolChange,
+}) => {
   const { t } = useLanguage();
 
   const navItems: { key: StrategyTool; label: string }[] = [

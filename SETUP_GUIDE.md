@@ -3,8 +3,9 @@
 ## Current Environment Status ✅
 
 ### ✅ What's Ready
+
 - **Frontend**: Vite + React configured, all dependencies installed
-- **Backend**: NestJS configured, all dependencies installed  
+- **Backend**: NestJS configured, all dependencies installed
 - **Database**: Prisma ORM with SQLite schema in place
 - **Authentication**: JWT configured
 - **API Docs**: Swagger documentation configured
@@ -13,6 +14,7 @@
 - **Build**: Production build successful (dist/)
 
 ### ⚠️ Action Items
+
 1. **Frontend GEMINI_API_KEY**: Update `.env.local` with real API key from https://aistudio.google.com/app/apikey
 2. **Database**: SQLite will auto-create `dev.db` on first run
 3. **Optional**: PostgreSQL via `docker-compose up -d` (currently configured for SQLite)
@@ -22,6 +24,7 @@
 ## Quick Start (Development Mode)
 
 ### Prerequisites
+
 - Node.js 18+
 - Docker (optional, for PostgreSQL/Redis)
 - npm or pnpm
@@ -76,6 +79,7 @@ npm run dev
 ## Environment Variables
 
 ### Frontend (.env.local)
+
 ```dotenv
 GEMINI_API_KEY=your_actual_api_key_from_aistudio
 ```
@@ -83,6 +87,7 @@ GEMINI_API_KEY=your_actual_api_key_from_aistudio
 Get your key from: https://aistudio.google.com/app/apikey
 
 ### Backend (backend/.env)
+
 ```dotenv
 # Database
 DATABASE_URL="file:./dev.db"                    # SQLite (local)
@@ -114,6 +119,7 @@ REDIS_PORT=6379
 ## Available Commands
 
 ### Frontend
+
 ```powershell
 npm run dev           # Start dev server (http://localhost:5173)
 npm run build         # Build for production
@@ -123,6 +129,7 @@ npm run lint          # Lint code
 ```
 
 ### Backend
+
 ```powershell
 cd backend
 
@@ -142,11 +149,13 @@ npx prisma generate # Generate Prisma client
 ## Test Status
 
 ### Unit Tests ✅
+
 - **Frontend**: 15 tests passing
 - **Backend**: Integration tests passing
 - Run: `npm run test:unit`
 
 ### E2E Tests
+
 - **Backend**: 3 API tests passing
 - **Frontend**: Playwright tests available (requires running servers)
 - Run: `npm run test:e2e`
@@ -156,6 +165,7 @@ npx prisma generate # Generate Prisma client
 ## API Documentation
 
 Once backend is running:
+
 - **Swagger Docs**: http://localhost:3000/api/docs
 - **Health Check**: http://localhost:3000/health
 - **Analysis**: POST http://localhost:3000/analysis/generate
@@ -165,6 +175,7 @@ Once backend is running:
 ## Troubleshooting
 
 ### Port Already in Use
+
 ```powershell
 # Kill process on port 5173 (frontend)
 Get-Process -Id (Get-NetTCPConnection -LocalPort 5173).OwningProcess | Stop-Process
@@ -174,6 +185,7 @@ Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess | Stop-Proc
 ```
 
 ### Database Issues
+
 ```powershell
 # Reset SQLite database
 cd backend
@@ -182,6 +194,7 @@ npx prisma db push
 ```
 
 ### PostgreSQL Connection Issues
+
 ```powershell
 # Check if containers are running
 docker ps
@@ -194,6 +207,7 @@ docker-compose logs postgres
 ```
 
 ### GEMINI API Errors
+
 - Verify API key is valid: https://aistudio.google.com/app/apikey
 - Check API quota in Google Cloud Console
 - Update `.env.local` with correct key
@@ -238,4 +252,3 @@ Frontend (React 18 + Vite)      Backend (NestJS)        Database
 - **Database Schema**: backend/prisma/schema.prisma
 - **Deployment**: See DEPLOYMENT.md
 - **Architecture**: See AGENTIC_WORKFLOW.md
-

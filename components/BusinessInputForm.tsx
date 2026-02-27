@@ -14,7 +14,14 @@ interface BusinessInputFormProps {
   extraFields?: React.ReactNode;
 }
 
-const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, onSubmit, isLoading, activeTool, extraFields }) => {
+const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
+  value,
+  onChange,
+  onSubmit,
+  isLoading,
+  activeTool,
+  extraFields,
+}) => {
   const { t } = useLanguage();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,30 +57,60 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" role="form" aria-label={activeTool === 'swot' ? "SWOT Analysis Input Form" : "Competitor Analysis Input Form"}>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+      role="form"
+      aria-label={
+        activeTool === 'swot'
+          ? 'SWOT Analysis Input Form'
+          : 'Competitor Analysis Input Form'
+      }
+    >
       <div>
-        <label htmlFor="business-description" className="block text-lg font-semibold text-brand-light mb-2">
-          {activeTool === 'swot' ? t('businessDescriptionLabel') : t('competitorInfoLabel')}
+        <label
+          htmlFor="business-description"
+          className="block text-lg font-semibold text-brand-light mb-2"
+        >
+          {activeTool === 'swot'
+            ? t('businessDescriptionLabel')
+            : t('competitorInfoLabel')}
         </label>
         <div className="relative">
           <textarea
             id="business-description"
-            aria-label={activeTool === 'swot' ? t('businessDescriptionLabel') : t('competitorInfoLabel')}
+            aria-label={
+              activeTool === 'swot'
+                ? t('businessDescriptionLabel')
+                : t('competitorInfoLabel')
+            }
             aria-describedby="char-count"
             className="w-full h-40 p-4 bg-brand-primary/50 border-2 border-brand-accent rounded-xl focus:ring-2 focus:ring-brand-teal focus:outline-none transition-all duration-300 resize-y text-brand-text placeholder-brand-accent/60 leading-relaxed font-sans"
             placeholder={t('businessDescriptionPlaceholder')}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={(e) => {
-              if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !isLoading && value.trim().length >= 10) {
+              if (
+                (e.ctrlKey || e.metaKey) &&
+                e.key === 'Enter' &&
+                !isLoading &&
+                value.trim().length >= 10
+              ) {
                 onSubmit(imagePreview || undefined);
               }
             }}
             disabled={isLoading}
             rows={5}
           />
-          <div id="char-count" aria-live="polite" role={isLoading ? undefined : "status"} className="text-sm text-brand-light/50 absolute bottom-2 right-2">
-            {getInputQuality() && <span className="mr-2">{getInputQuality()}</span>}
+          <div
+            id="char-count"
+            aria-live="polite"
+            role={isLoading ? undefined : 'status'}
+            className="text-sm text-brand-light/50 absolute bottom-2 right-2"
+          >
+            {getInputQuality() && (
+              <span className="mr-2">{getInputQuality()}</span>
+            )}
             {value.length} / 2000
           </div>
         </div>
@@ -81,7 +118,10 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
 
       {activeTool === 'competitorAnalysis' && (
         <div className="p-4 bg-brand-secondary/30 rounded-lg border border-dashed border-brand-accent/50">
-          <label htmlFor="image-upload" className="block text-sm font-semibold text-brand-light mb-2">
+          <label
+            htmlFor="image-upload"
+            className="block text-sm font-semibold text-brand-light mb-2"
+          >
             <FaUpload className="inline-block mr-2" />
             {t('uploadScreenshotLabel')}
           </label>
@@ -95,12 +135,19 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
             aria-describedby="image-upload-description"
             disabled={isLoading}
           />
-          <p id="image-upload-description" className="text-xs text-brand-light/50 mt-1">
+          <p
+            id="image-upload-description"
+            className="text-xs text-brand-light/50 mt-1"
+          >
             {t('uploadScreenshotDescription')}
           </p>
           {imagePreview && (
             <div className="mt-4 relative">
-              <img src={imagePreview} alt="Uploaded screenshot preview" className="max-w-full h-auto rounded-lg" />
+              <img
+                src={imagePreview}
+                alt="Uploaded screenshot preview"
+                className="max-w-full h-auto rounded-lg"
+              />
               <button
                 onClick={() => setImagePreview(null)}
                 className="absolute top-2 right-2 bg-black/50 rounded-full p-1 text-white"
@@ -116,8 +163,19 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({ value, onChange, 
       {extraFields}
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
-        <p className="text-sm text-brand-light text-center sm:text-left order-2 sm:order-1" role="note">
-          {t('inputHintPrefix')} <kbd className="font-sans px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Ctrl</kbd> + <kbd className="font-sans px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">Enter</kbd> {t('inputHintSuffix')}
+        <p
+          className="text-sm text-brand-light text-center sm:text-left order-2 sm:order-1"
+          role="note"
+        >
+          {t('inputHintPrefix')}{' '}
+          <kbd className="font-sans px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">
+            Ctrl
+          </kbd>{' '}
+          +{' '}
+          <kbd className="font-sans px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">
+            Enter
+          </kbd>{' '}
+          {t('inputHintSuffix')}
         </p>
         <motion.button
           type="submit"

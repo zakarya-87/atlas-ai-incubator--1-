@@ -34,7 +34,7 @@ git push origin main
 2. Click on the **Actions** tab
 3. You should see 3 workflows:
    - ✅ CI - All Unit Tests
-   - ✅ Frontend Unit Tests  
+   - ✅ Frontend Unit Tests
    - ✅ Backend Unit Tests
 
 4. The workflows will automatically run on your next push
@@ -42,16 +42,19 @@ git push origin main
 ### Step 3: Update Status Badges
 
 In `README.md`, replace:
+
 ```
 YOUR_USERNAME/YOUR_REPO
 ```
 
 With your actual values, for example:
+
 ```
 zboud/atlas-ai-incubator
 ```
 
 Then commit and push:
+
 ```bash
 git add README.md
 git commit -m "docs: Update CI/CD status badge URLs"
@@ -63,6 +66,7 @@ git push origin main
 ## Workflow Behavior
 
 ### On Every Push to `main` or `develop`:
+
 ```
 ┌─────────────────────────────────────┐
 │  You push code to GitHub            │
@@ -93,6 +97,7 @@ git push origin main
 ```
 
 ### On Pull Requests:
+
 - Workflows run automatically
 - Status checks appear on the PR
 - Can't merge until tests pass (if branch protection enabled)
@@ -102,12 +107,14 @@ git push origin main
 ## Viewing Test Results
 
 ### Option 1: GitHub Actions Tab
+
 1. Go to repository → **Actions**
 2. Click on a workflow run
 3. View logs for each job
 4. Download coverage artifacts
 
 ### Option 2: Pull Request Checks
+
 1. Open any PR
 2. Scroll to "Checks" section
 3. See ✅ or ❌ status for each workflow
@@ -147,18 +154,22 @@ Now PRs must pass all tests before merging! 🛡️
 ## Troubleshooting
 
 ### ❌ Workflows don't appear
+
 - **Check:** Did you push to GitHub?
 - **Solution:** `git push origin main`
 
 ### ❌ Tests fail in CI but pass locally
+
 - **Check:** Are you using exact dependency versions?
 - **Solution:** Run `npm ci` instead of `npm install` locally
 
 ### ❌ Status badges show "unknown"
+
 - **Check:** Have workflows run at least once?
 - **Solution:** Push a commit to trigger workflows
 
 ### ❌ Workflow takes too long
+
 - **Check:** Is npm cache working?
 - **Solution:** Verify `cache: 'npm'` in workflow files
 
@@ -173,6 +184,7 @@ Now PRs must pass all tests before merging! 🛡️
    - Shows test coverage % in README
 
 2. **Add Slack Notifications**
+
    ```yaml
    - name: Notify Slack
      if: failure()
@@ -180,6 +192,7 @@ Now PRs must pass all tests before merging! 🛡️
    ```
 
 3. **Auto-Deploy on Success**
+
    ```yaml
    - name: Deploy to production
      if: github.ref == 'refs/heads/main'
@@ -200,7 +213,7 @@ Now PRs must pass all tests before merging! 🛡️
 ✅ **Tests Covered:** 51/51 (100%)  
 ✅ **Node Versions:** 18.x, 20.x  
 ✅ **Coverage Upload:** Enabled  
-✅ **Documentation:** Complete  
+✅ **Documentation:** Complete
 
 **Ready to deploy:** YES! 🚀
 
@@ -225,6 +238,7 @@ gh run rerun <run-id>
 ---
 
 **Need Help?**
+
 - 📖 Read `.github/workflows/README.md`
 - 📄 Check `.gemini/CICD_DEPLOYMENT.md`
 - 🔗 Visit [GitHub Actions Docs](https://docs.github.com/actions)

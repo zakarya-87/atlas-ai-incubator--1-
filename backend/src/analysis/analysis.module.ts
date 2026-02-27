@@ -11,8 +11,14 @@ import { UsersModule } from '../users/users.module';
 import { EventsModule } from '../events/events.module';
 import { JobsController } from './jobs.controller';
 import { JobsService } from './jobs.service';
+import { AnalysisProcessor } from './analysis.processor';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule } from '@nestjs/config';
+import { GrokProvider } from './providers/grok.provider';
+import { MistralProvider } from './providers/mistral.provider';
+import { OpenAIProvider } from './providers/openai.provider';
+import { AIProviderFactory } from './providers/ai-provider.factory';
+
 
 @Module({
   imports: [
@@ -21,23 +27,23 @@ import { ConfigModule } from '@nestjs/config';
     HistoryModule,
     UsersModule,
     EventsModule,
-    BullModule.registerQueue({
-      name: 'analysis',
-      connection: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-      },
-    }),
+    // Connection is inherited from BullModule.forRootAsync() in AppModule
+    BullModule.registerQueue({ name: 'analysis-queue' }),
   ],
   controllers: [AnalysisController, JobsController],
   providers: [
     AnalysisService,
     JobsService,
+    AnalysisProcessor,
     AnalysisAgentFactory,
     DefaultAgent,
     ResearchAgent,
     DesignAgent,
+    GrokProvider,
+    MistralProvider,
+    OpenAIProvider,
+    AIProviderFactory,
   ],
-  exports: [AnalysisService],
+  exports: [AnalysisService, AIProviderFactory],
 })
-export class AnalysisModule {}
+export class AnalysisModule { }

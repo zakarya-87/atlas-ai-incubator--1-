@@ -1,4 +1,3 @@
-
 export const en = {
   // Auth Modal
   signIn: 'Sign In',
@@ -21,7 +20,6 @@ export const en = {
   signUpFailed: 'Sign up failed. Please try again.',
 
   // Header
-  headerTitle: 'ATLAS AI Incubator',
   headerSubtitle: 'Strategic Planning Module',
   headerShare: 'Share',
   tourStart: 'Start Tour',
@@ -74,27 +72,38 @@ export const en = {
 
   // Hero Section
   strategyHeroTitle: 'AI-Powered Strategic Planning',
-  strategyHeroSubtitle: 'Generate a comprehensive analysis of your business idea. Understand your internal strengths and the external market to build a resilient strategy.',
+  strategyHeroSubtitle:
+    'Generate a comprehensive analysis of your business idea. Understand your internal strengths and the external market to build a resilient strategy.',
   marketAnalysisHeroTitle: 'AI-Powered Market Analysis',
-  marketAnalysisHeroSubtitle: 'Gain deep insights into your target market, understand customer behavior, and identify competitive advantages with AI-driven research.',
+  marketAnalysisHeroSubtitle:
+    'Gain deep insights into your target market, understand customer behavior, and identify competitive advantages with AI-driven research.',
   fundamentalsHeroTitle: 'AI-Guided Idea Validation',
-  fundamentalsHeroSubtitle: 'Transform your raw concept into a structured, validated idea. Clarify the problem, solution, and value proposition with our AI workflow.',
+  fundamentalsHeroSubtitle:
+    'Transform your raw concept into a structured, validated idea. Clarify the problem, solution, and value proposition with our AI workflow.',
   financeHeroTitle: 'AI-Powered Financial Planning',
-  financeHeroSubtitle: 'Generate budgets, forecast cash flow, and track key performance indicators on our financial dashboard.',
+  financeHeroSubtitle:
+    'Generate budgets, forecast cash flow, and track key performance indicators on our financial dashboard.',
   growthHeroTitle: 'AI-Powered Growth Planning',
-  growthHeroSubtitle: 'Set milestones, get smart alerts on your progress, and explore strategies for sustainable expansion.',
+  growthHeroSubtitle:
+    'Set milestones, get smart alerts on your progress, and explore strategies for sustainable expansion.',
   fundingHeroTitle: 'AI-Powered Funding Accelerator',
-  fundingHeroSubtitle: 'Generate a professional pitch deck, access our (simulated) investor database, and create a clear fundraising roadmap.',
+  fundingHeroSubtitle:
+    'Generate a professional pitch deck, access our (simulated) investor database, and create a clear fundraising roadmap.',
   architectureHeroTitle: 'Platform System Architecture',
-  architectureHeroSubtitle: 'Explore the technical blueprint of the ATLAS AI Incubator, from frontend components to backend services and the AI Agent Layer.',
+  architectureHeroSubtitle:
+    'Explore the technical blueprint of the ATLAS AI Incubator, from frontend components to backend services and the AI Agent Layer.',
   auditHeroTitle: 'Audit Trail & Version History',
-  auditHeroSubtitle: 'Review, compare, and restore every AI analysis generated. Your entire strategic journey, versioned and accessible.',
+  auditHeroSubtitle:
+    'Review, compare, and restore every AI analysis generated. Your entire strategic journey, versioned and accessible.',
   integrationsHeroTitle: 'Data Integrations & Connectors',
-  integrationsHeroSubtitle: 'Connect your live data sources to power the Adaptive Program Engine and gain real-time insights for your venture.',
+  integrationsHeroSubtitle:
+    'Connect your live data sources to power the Adaptive Program Engine and gain real-time insights for your venture.',
   productivityHeroTitle: 'Productivity & Tasks',
-  productivityHeroSubtitle: 'Manage your startup to-do list and track your progress with simple, effective tools.',
+  productivityHeroSubtitle:
+    'Manage your startup to-do list and track your progress with simple, effective tools.',
   dashboardHeroTitle: 'Venture Command Center',
-  dashboardHeroSubtitle: 'Your central hub for managing your startup\'s progress, accessing AI agents, and reviewing key metrics.',
+  dashboardHeroSubtitle:
+    "Your central hub for managing your startup's progress, accessing AI agents, and reviewing key metrics.",
 
   // SubNavs
   strategyNavSwot: 'SWOT Analysis',
@@ -149,58 +158,93 @@ export const en = {
   dashboardModuleTitle: 'Dashboard',
   dashboardModuleDescription: 'Your venture overview.',
 
-
   // Business Input Form
   inputLabelSwot: 'Describe Your Business for SWOT Analysis',
-  inputPlaceholderSwot: 'e.g., A subscription box service for eco-friendly pet toys, targeting millennial dog owners in urban areas.',
+  inputPlaceholderSwot:
+    'e.g., A subscription box service for eco-friendly pet toys, targeting millennial dog owners in urban areas.',
   inputLabelPestel: 'Describe Your Business for PESTEL Analysis',
-  inputPlaceholderPestel: 'e.g., A fintech startup offering micro-loans in Southeast Asia.',
+  inputPlaceholderPestel:
+    'e.g., A fintech startup offering micro-loans in Southeast Asia.',
   inputLabelMarket: 'Describe Your Business for Market Analysis',
-  inputPlaceholderMarket: 'e.g., A direct-to-consumer brand for personalized vitamins.',
+  inputPlaceholderMarket:
+    'e.g., A direct-to-consumer brand for personalized vitamins.',
   inputLabelMarketResearch: 'Describe Your Business for In-depth Research',
-  inputPlaceholderMarketResearch: 'e.g., A subscription box service for eco-friendly pet toys.',
+  inputPlaceholderMarketResearch:
+    'e.g., A subscription box service for eco-friendly pet toys.',
   inputLabelRoadmap: 'Describe Your Business to Build a Roadmap',
-  inputPlaceholderRoadmap: 'e.g., A mobile app for local community gardening, connecting gardeners with available land.',
+  inputPlaceholderRoadmap:
+    'e.g., A mobile app for local community gardening, connecting gardeners with available land.',
   inputLabelLeanCanvas: 'Describe Your Business for a Lean Canvas',
-  inputPlaceholderLeanCanvas: 'e.g., A platform that connects amateur chefs with foodies for unique dining experiences.',
+  inputPlaceholderLeanCanvas:
+    'e.g., A platform that connects amateur chefs with foodies for unique dining experiences.',
   inputLabelOkrWorkflow: 'Describe Your Business for an OKR Workflow',
-  inputPlaceholderOkrWorkflow: 'e.g., A B2B SaaS company aiming to expand into the European market this year.',
+  inputPlaceholderOkrWorkflow:
+    'e.g., A B2B SaaS company aiming to expand into the European market this year.',
   inputLabelIdeaValidation: 'Describe Your Raw Business Idea for Validation',
-  inputPlaceholderIdeaValidation: 'e.g., What if we made an app that connects local bakers with people who want fresh, homemade bread delivered daily?',
-  inputLabelProblemValidation: 'Describe Your Validated Idea for Market Analysis',
-  inputPlaceholderProblemValidation: 'e.g., An app that connects local bakers with people who want fresh, homemade bread delivered daily.',
-  inputLabelCompetitorAnalysis: 'Describe Your Business for Competitor Analysis',
-  inputPlaceholderCompetitorAnalysis: 'e.g., A new project management tool for remote software teams.',
-  inputLabelCustomerValidation: 'Describe Your Idea & Target Audience for Validation Testing',
-  inputPlaceholderCustomerValidation: 'e.g., An app connecting bakers with bread lovers. Target audience: Urban foodies, age 25-40, who value fresh, artisanal products and convenience.',
-  inputLabelRiskFeasibility: 'Describe Your Business for Risk & Feasibility Analysis',
-  inputPlaceholderRiskFeasibility: 'e.g., A drone delivery service for medical supplies in remote areas.',
+  inputPlaceholderIdeaValidation:
+    'e.g., What if we made an app that connects local bakers with people who want fresh, homemade bread delivered daily?',
+  inputLabelProblemValidation:
+    'Describe Your Validated Idea for Market Analysis',
+  inputPlaceholderProblemValidation:
+    'e.g., An app that connects local bakers with people who want fresh, homemade bread delivered daily.',
+  inputLabelCompetitorAnalysis:
+    'Describe Your Business for Competitor Analysis',
+  inputPlaceholderCompetitorAnalysis:
+    'e.g., A new project management tool for remote software teams.',
+  inputLabelCustomerValidation:
+    'Describe Your Idea & Target Audience for Validation Testing',
+  inputPlaceholderCustomerValidation:
+    'e.g., An app connecting bakers with bread lovers. Target audience: Urban foodies, age 25-40, who value fresh, artisanal products and convenience.',
+  inputLabelRiskFeasibility:
+    'Describe Your Business for Risk & Feasibility Analysis',
+  inputPlaceholderRiskFeasibility:
+    'e.g., A drone delivery service for medical supplies in remote areas.',
   inputLabelValidationTracker: 'Describe Your Business for Continuous Tracking',
-  inputPlaceholderValidationTracker: 'e.g., A SaaS platform for small businesses to manage their carbon footprint.',
+  inputPlaceholderValidationTracker:
+    'e.g., A SaaS platform for small businesses to manage their carbon footprint.',
   inputLabelBrandIdentity: 'Describe Your Business Vibe & Style',
-  inputPlaceholderBrandIdentity: 'e.g., A minimalist, high-end fashion brand focused on sustainability. We like earth tones and geometric shapes.',
+  inputPlaceholderBrandIdentity:
+    'e.g., A minimalist, high-end fashion brand focused on sustainability. We like earth tones and geometric shapes.',
   inputLabelBudgetGenerator: 'Describe Your Business for Budget Generation',
-  inputPlaceholderBudgetGenerator: 'e.g., A direct-to-consumer sustainable fashion brand selling online.',
-  inputLabelFinancialForecast: 'Describe Your Business for Financial Forecasting',
-  inputPlaceholderFinancialForecast: 'e.g., A SaaS startup with a subscription model, aiming for 1000 customers in Year 1.',
-  inputLabelCashFlowForecast: 'Describe Your Business & Current Cash for a Forecast',
-  inputPlaceholderCashFlowForecast: 'e.g., A SaaS startup with a subscription model, aiming for 1000 customers in Year 1. We currently have $50,000 in the bank.',
-  inputLabelKpiDashboards: 'Describe Your Business Performance for a KPI Dashboard',
-  inputPlaceholderKpiDashboards: 'e.g., A SaaS startup with $5k MRR, 20% monthly growth, a CAC of $120, and an LTV of $650. Our burn rate is $18k/month.',
+  inputPlaceholderBudgetGenerator:
+    'e.g., A direct-to-consumer sustainable fashion brand selling online.',
+  inputLabelFinancialForecast:
+    'Describe Your Business for Financial Forecasting',
+  inputPlaceholderFinancialForecast:
+    'e.g., A SaaS startup with a subscription model, aiming for 1000 customers in Year 1.',
+  inputLabelCashFlowForecast:
+    'Describe Your Business & Current Cash for a Forecast',
+  inputPlaceholderCashFlowForecast:
+    'e.g., A SaaS startup with a subscription model, aiming for 1000 customers in Year 1. We currently have $50,000 in the bank.',
+  inputLabelKpiDashboards:
+    'Describe Your Business Performance for a KPI Dashboard',
+  inputPlaceholderKpiDashboards:
+    'e.g., A SaaS startup with $5k MRR, 20% monthly growth, a CAC of $120, and an LTV of $650. Our burn rate is $18k/month.',
   inputLabelMilestones: 'Describe Your Business for a Growth Plan',
-  inputPlaceholderMilestones: 'e.g., A SaaS platform for small businesses to manage their carbon footprint. We are post-MVP and have 100 beta users.',
-  inputLabelExpansionStrategy: 'Describe Your Business for Expansion Strategy Insights',
-  inputPlaceholderExpansionStrategy: 'e.g., A profitable B2B SaaS for project management in the construction industry, looking for the next growth vector.',
-  inputLabelPitchDeckGenerator: 'Describe Your Business to Generate a Pitch Deck',
-  inputPlaceholderPitchDeckGenerator: 'e.g., A SaaS platform for small businesses to manage their carbon footprint. We are post-MVP, have 100 beta users, and are seeking a $500k seed round.',
-  inputLabelInvestorDatabase: 'Describe Your Business to Find Best-Fit Investors',
-  inputPlaceholderInvestorDatabase: 'e.g., A pre-seed HealthTech startup building an AI diagnostic tool for dermatologists. We have a working prototype and are seeking a $250k investment to complete clinical trials.',
-  inputLabelFundraisingRoadmap: 'Describe Your Business for a Fundraising Roadmap',
-  inputPlaceholderFundraisingRoadmap: 'e.g., A post-MVP SaaS startup with 100 beta users and a 12-month runway, seeking a $500k seed round.',
+  inputPlaceholderMilestones:
+    'e.g., A SaaS platform for small businesses to manage their carbon footprint. We are post-MVP and have 100 beta users.',
+  inputLabelExpansionStrategy:
+    'Describe Your Business for Expansion Strategy Insights',
+  inputPlaceholderExpansionStrategy:
+    'e.g., A profitable B2B SaaS for project management in the construction industry, looking for the next growth vector.',
+  inputLabelPitchDeckGenerator:
+    'Describe Your Business to Generate a Pitch Deck',
+  inputPlaceholderPitchDeckGenerator:
+    'e.g., A SaaS platform for small businesses to manage their carbon footprint. We are post-MVP, have 100 beta users, and are seeking a $500k seed round.',
+  inputLabelInvestorDatabase:
+    'Describe Your Business to Find Best-Fit Investors',
+  inputPlaceholderInvestorDatabase:
+    'e.g., A pre-seed HealthTech startup building an AI diagnostic tool for dermatologists. We have a working prototype and are seeking a $250k investment to complete clinical trials.',
+  inputLabelFundraisingRoadmap:
+    'Describe Your Business for a Fundraising Roadmap',
+  inputPlaceholderFundraisingRoadmap:
+    'e.g., A post-MVP SaaS startup with 100 beta users and a 12-month runway, seeking a $500k seed round.',
   inputLabelArchitecture: 'System Architecture Overview',
-  inputPlaceholderArchitecture: 'This module is informational and does not require input.',
+  inputPlaceholderArchitecture:
+    'This module is informational and does not require input.',
   inputLabelIntegrations: 'Data Integrations',
-  inputPlaceholderIntegrations: 'This module is informational and does not require input.',
+  inputPlaceholderIntegrations:
+    'This module is informational and does not require input.',
   inputHintPrefix: 'Press',
   inputHintSuffix: 'to submit.',
   buttonGenerate: 'Generate Analysis',
@@ -212,7 +256,8 @@ export const en = {
   competitorInfoLabel: 'Competitor Info',
   businessDescriptionPlaceholder: 'Describe your business idea...',
   uploadScreenshotLabel: 'Upload Competitor Screenshot',
-  uploadScreenshotDescription: 'Upload a screenshot of your competitor for analysis',
+  uploadScreenshotDescription:
+    'Upload a screenshot of your competitor for analysis',
 
   // Input Quality
   inputClear: 'Clear',
@@ -224,7 +269,8 @@ export const en = {
 
   // Refinement
   refineTitle: 'Refine with AI',
-  refinePlaceholder: 'e.g., Make the tone more professional, or expand on the threats...',
+  refinePlaceholder:
+    'e.g., Make the tone more professional, or expand on the threats...',
   refineButton: 'Refine',
 
   // Prompt Helpers
@@ -233,91 +279,138 @@ export const en = {
   promptHelperSolution: 'Solution',
   promptHelperRevenue: 'Revenue',
 
-  promptTemplateAudience: '**Target Audience:** [Who are you serving? e.g., Small Business Owners, Teens]',
+  promptTemplateAudience:
+    '**Target Audience:** [Who are you serving? e.g., Small Business Owners, Teens]',
   promptTemplateProblem: '**The Problem:** [What pain point are you solving?]',
   promptTemplateSolution: '**The Solution:** [How does your product solve it?]',
-  promptTemplateRevenue: '**Revenue Model:** [How do you make money? e.g., Subscription, Ads]',
+  promptTemplateRevenue:
+    '**Revenue Model:** [How do you make money? e.g., Subscription, Ads]',
 
   // Welcome Message
   welcomeTitleSwot: 'Ready for a SWOT Analysis?',
-  welcomeTextSwot: 'Describe your startup or business idea above. Our AI will generate a comprehensive SWOT analysis to help you identify key factors for success.',
+  welcomeTextSwot:
+    'Describe your startup or business idea above. Our AI will generate a comprehensive SWOT analysis to help you identify key factors for success.',
   welcomeTitlePestel: 'Ready for a PESTEL Analysis?',
-  welcomeTextPestel: 'Describe your business and its market. Our AI will analyze the Political, Economic, Social, Technological, Environmental, and Legal factors affecting it.',
+  welcomeTextPestel:
+    'Describe your business and its market. Our AI will analyze the Political, Economic, Social, Technological, Environmental, and Legal factors affecting it.',
   welcomeTitleMarket: 'Ready for a Market Analysis?',
-  welcomeTextMarket: 'Describe your business. Our AI will analyze your target audience, market size and trends, and the competitive landscape.',
+  welcomeTextMarket:
+    'Describe your business. Our AI will analyze your target audience, market size and trends, and the competitive landscape.',
   welcomeTitleMarketResearch: 'Ready for a Deep Dive?',
-  welcomeTextMarketResearch: 'Provide your business details, and optionally specify market segments and locations. Our AI will conduct in-depth research on market drivers, customer behavior, and barriers to entry.',
+  welcomeTextMarketResearch:
+    'Provide your business details, and optionally specify market segments and locations. Our AI will conduct in-depth research on market drivers, customer behavior, and barriers to entry.',
   welcomeTitleRoadmap: 'Ready to Build Your Roadmap?',
-  welcomeTextRoadmap: 'Describe your business goals. Our AI will generate a strategic roadmap with key phases and milestones to guide your journey.',
+  welcomeTextRoadmap:
+    'Describe your business goals. Our AI will generate a strategic roadmap with key phases and milestones to guide your journey.',
   welcomeTitleLeanCanvas: 'Ready to Draft a Lean Canvas?',
-  welcomeTextLeanCanvas: 'Describe your business idea. Our AI will generate a Lean Business Model Canvas to help you structure and validate your venture on a single page.',
+  welcomeTextLeanCanvas:
+    'Describe your business idea. Our AI will generate a Lean Business Model Canvas to help you structure and validate your venture on a single page.',
   welcomeTitleOkrWorkflow: 'Ready to Set Your Goals with OKRs?',
-  welcomeTextOkrWorkflow: 'Describe your business and its main ambitions. Our AI will generate a complete OKR (Objectives and Key Results) workflow, from a high-level vision down to actionable tasks.',
+  welcomeTextOkrWorkflow:
+    'Describe your business and its main ambitions. Our AI will generate a complete OKR (Objectives and Key Results) workflow, from a high-level vision down to actionable tasks.',
   welcomeTitleIdeaValidation: 'Ready to Validate Your Idea?',
-  welcomeTextIdeaValidation: 'Enter your raw business idea above. Our AI will clarify it, structure it into a problem/solution format, and highlight key assumptions to test.',
+  welcomeTextIdeaValidation:
+    'Enter your raw business idea above. Our AI will clarify it, structure it into a problem/solution format, and highlight key assumptions to test.',
   welcomeTitleProblemValidation: 'Ready for a Problem Validation Report?',
-  welcomeTextProblemValidation: 'Enter your clarified business idea. Our AI will estimate market size, identify customer segments, and analyze the problem\'s significance.',
+  welcomeTextProblemValidation:
+    "Enter your clarified business idea. Our AI will estimate market size, identify customer segments, and analyze the problem's significance.",
   welcomeTitleCompetitorAnalysis: 'Ready to Map the Competition?',
-  welcomeTextCompetitorAnalysis: 'Enter your business idea. Our AI will scan the landscape, build a competitor matrix, and highlight strategic opportunities and risks.',
+  welcomeTextCompetitorAnalysis:
+    'Enter your business idea. Our AI will scan the landscape, build a competitor matrix, and highlight strategic opportunities and risks.',
   welcomeTitleCustomerValidation: 'Ready to Test Your Idea with Customers?',
-  welcomeTextCustomerValidation: 'Describe your idea and target audience. Our AI will generate validation assets like landing page copy, survey questions, ad copy, and predict key validation metrics.',
+  welcomeTextCustomerValidation:
+    'Describe your idea and target audience. Our AI will generate validation assets like landing page copy, survey questions, ad copy, and predict key validation metrics.',
   welcomeTitleRiskFeasibility: 'Ready for a Risk & Feasibility Report?',
-  welcomeTextRiskFeasibility: 'Describe your business concept. Our AI will assess key risks, estimate required resources, and provide an overall feasibility score.',
+  welcomeTextRiskFeasibility:
+    'Describe your business concept. Our AI will assess key risks, estimate required resources, and provide an overall feasibility score.',
   welcomeTitleValidationTracker: 'Ready for a Dynamic Validation Tracker?',
-  welcomeTextValidationTracker: 'Describe your business. Our AI will generate a simulated intelligence dashboard with key metrics, competitor activity, emerging trends, and funding insights.',
+  welcomeTextValidationTracker:
+    'Describe your business. Our AI will generate a simulated intelligence dashboard with key metrics, competitor activity, emerging trends, and funding insights.',
   welcomeTitleBrandIdentity: 'Ready to Visualize Your Brand?',
-  welcomeTextBrandIdentity: 'Describe the vibe, style, and mission of your business. Our AI will generate a unique logo concept and a matching color palette to kickstart your visual identity.',
+  welcomeTextBrandIdentity:
+    'Describe the vibe, style, and mission of your business. Our AI will generate a unique logo concept and a matching color palette to kickstart your visual identity.',
   welcomeTitleBudgetGenerator: 'Ready to Build Your Budget?',
-  welcomeTextBudgetGenerator: 'Describe your business, and our AI will generate a detailed 12-month operating budget with conservative, realistic, and aggressive scenarios to guide your financial planning.',
+  welcomeTextBudgetGenerator:
+    'Describe your business, and our AI will generate a detailed 12-month operating budget with conservative, realistic, and aggressive scenarios to guide your financial planning.',
   welcomeTitleFinancialForecast: 'Ready to Forecast Your Financials?',
-  welcomeTextFinancialForecast: 'Describe your business model and initial goals. Our AI will generate a 5-year financial forecast, projecting your revenue, expenses, and profitability based on industry benchmarks.',
+  welcomeTextFinancialForecast:
+    'Describe your business model and initial goals. Our AI will generate a 5-year financial forecast, projecting your revenue, expenses, and profitability based on industry benchmarks.',
   welcomeTitleCashFlowForecast: 'Ready for a Cash Flow Forecast?',
-  welcomeTextCashFlowForecast: 'Describe your business and include your current cash balance. Our AI will generate a 12-month cash flow forecast, calculate your runway, and identify potential cash crunches.',
+  welcomeTextCashFlowForecast:
+    'Describe your business and include your current cash balance. Our AI will generate a 12-month cash flow forecast, calculate your runway, and identify potential cash crunches.',
   welcomeTitleKpiDashboards: 'Ready for a KPI Dashboard?',
-  welcomeTextKpiDashboards: 'Describe your current business performance. Our AI will generate a dashboard of key financial KPIs, benchmark them against industry standards, and provide actionable insights.',
+  welcomeTextKpiDashboards:
+    'Describe your current business performance. Our AI will generate a dashboard of key financial KPIs, benchmark them against industry standards, and provide actionable insights.',
   welcomeTitleMilestones: 'Ready to Plan Your Growth?',
-  welcomeTextMilestones: 'Describe your business and its current stage. Our AI will generate a 12-month milestone roadmap and a series of smart alerts to keep you on track.',
+  welcomeTextMilestones:
+    'Describe your business and its current stage. Our AI will generate a 12-month milestone roadmap and a series of smart alerts to keep you on track.',
   welcomeTitleExpansionStrategy: 'Ready to Plan Your Expansion?',
-  welcomeTextExpansionStrategy: 'Describe your business and its current position. Our AI will analyze growth curves, suggest expansion strategies, and provide predictive insights on scaling.',
+  welcomeTextExpansionStrategy:
+    'Describe your business and its current position. Our AI will analyze growth curves, suggest expansion strategies, and provide predictive insights on scaling.',
   welcomeTitlePitchDeckGenerator: 'Ready to Build Your Pitch Deck?',
-  welcomeTextPitchDeckGenerator: 'Describe your business, its current stage, and your funding goals. Our AI will generate a complete, investor-ready pitch deck based on best practices from top VCs.',
+  welcomeTextPitchDeckGenerator:
+    'Describe your business, its current stage, and your funding goals. Our AI will generate a complete, investor-ready pitch deck based on best practices from top VCs.',
   welcomeTitleInvestorDatabase: 'Ready to Find Your Investors?',
-  welcomeTextInvestorDatabase: 'Describe your business, stage, and funding needs. Our AI will generate a curated list of "best-fit" investors, ranked by alignment, and even suggest how to reach out.',
+  welcomeTextInvestorDatabase:
+    'Describe your business, stage, and funding needs. Our AI will generate a curated list of "best-fit" investors, ranked by alignment, and even suggest how to reach out.',
   welcomeTitleFundraisingRoadmap: 'Ready to Plan Your Fundraising Journey?',
-  welcomeTextFundraisingRoadmap: 'Describe your business, current traction, and funding goals. Our AI will generate a step-by-step fundraising roadmap, prioritize tasks, and provide smart alerts.',
+  welcomeTextFundraisingRoadmap:
+    'Describe your business, current traction, and funding goals. Our AI will generate a step-by-step fundraising roadmap, prioritize tasks, and provide smart alerts.',
   welcomeTitleArchitecture: 'System Architecture Overview',
-  welcomeTextArchitecture: 'This section provides a detailed look at the technical architecture, data flow, and technology stack of the ATLAS AI Incubator platform.',
+  welcomeTextArchitecture:
+    'This section provides a detailed look at the technical architecture, data flow, and technology stack of the ATLAS AI Incubator platform.',
   welcomeTitleIntegrations: 'Connect Your Data Sources',
-  welcomeTextIntegrations: 'Link your analytics and advertising platforms to enable real-time data ingestion for the Adaptive Program Engine.',
+  welcomeTextIntegrations:
+    'Link your analytics and advertising platforms to enable real-time data ingestion for the Adaptive Program Engine.',
   welcomeTitleExperimentBuilder: 'Welcome to the Experiment Builder',
-  welcomeTextExperimentBuilder: 'Visually organize your validation process. Add your riskiest hypotheses, define methods to test them, and track the key metrics that matter.',
+  welcomeTextExperimentBuilder:
+    'Visually organize your validation process. Add your riskiest hypotheses, define methods to test them, and track the key metrics that matter.',
   welcomeTitleTaskManager: 'Task Manager',
-  welcomeTextTaskManager: 'Organize your startup tasks. Add items to your list and mark them as complete to track your progress.',
+  welcomeTextTaskManager:
+    'Organize your startup tasks. Add items to your list and mark them as complete to track your progress.',
 
   // Prompts (Hidden from UI but used by Service)
-  geminiPromptSwot: 'Generate a detailed SWOT Analysis for the following business description: {businessDescription}.',
+  geminiPromptSwot:
+    'Generate a detailed SWOT Analysis for the following business description: {businessDescription}.',
   geminiPromptPestel: 'Generate a PESTEL Analysis for: {businessDescription}.',
-  geminiPromptMarket: 'Analyze the market for: {businessDescription}. Include target audience and market size.',
-  geminiPromptMarketResearch: 'Conduct in-depth market research for: {businessDescription}.',
+  geminiPromptMarket:
+    'Analyze the market for: {businessDescription}. Include target audience and market size.',
+  geminiPromptMarketResearch:
+    'Conduct in-depth market research for: {businessDescription}.',
   geminiPromptRoadmap: 'Create a strategic roadmap for: {businessDescription}.',
   geminiPromptLeanCanvas: 'Create a Lean Canvas for: {businessDescription}.',
   geminiPromptOkrWorkflow: 'Create an OKR workflow for: {businessDescription}.',
-  geminiPromptIdeaValidation: 'Validate this business idea: {businessDescription}.',
-  geminiPromptProblemValidation: 'Validate the problem statement for: {businessDescription}.',
-  geminiPromptCompetitorAnalysis: 'Analyze competitors for: {businessDescription}.',
-  geminiPromptCustomerValidation: 'Create customer validation assets for: {businessDescription}.',
-  geminiPromptRiskFeasibility: 'Assess risks and feasibility for: {businessDescription}.',
-  geminiPromptValidationTracker: 'Create a validation tracker for: {businessDescription}.',
-  geminiPromptBrandIdentity: 'Create a brand identity concept for: {businessDescription}.',
+  geminiPromptIdeaValidation:
+    'Validate this business idea: {businessDescription}.',
+  geminiPromptProblemValidation:
+    'Validate the problem statement for: {businessDescription}.',
+  geminiPromptCompetitorAnalysis:
+    'Analyze competitors for: {businessDescription}.',
+  geminiPromptCustomerValidation:
+    'Create customer validation assets for: {businessDescription}.',
+  geminiPromptRiskFeasibility:
+    'Assess risks and feasibility for: {businessDescription}.',
+  geminiPromptValidationTracker:
+    'Create a validation tracker for: {businessDescription}.',
+  geminiPromptBrandIdentity:
+    'Create a brand identity concept for: {businessDescription}.',
   geminiPromptBudgetGenerator: 'Generate a budget for: {businessDescription}.',
-  geminiPromptFinancialForecast: 'Create a financial forecast for: {businessDescription}.',
-  geminiPromptCashFlowForecast: 'Forecast cash flow for: {businessDescription}.',
-  geminiPromptKpiDashboard: 'Create a KPI dashboard for: {businessDescription}.',
-  geminiPromptMilestones: 'Define growth milestones for: {businessDescription}.',
-  geminiPromptExpansionStrategy: 'Develop an expansion strategy for: {businessDescription}.',
-  geminiPromptPitchDeckGenerator: 'Generate content for a pitch deck for: {businessDescription}.',
-  geminiPromptInvestorDatabase: 'Identify potential investors for: {businessDescription}.',
-  geminiPromptFundraisingRoadmap: 'Create a fundraising roadmap for: {businessDescription}.',
+  geminiPromptFinancialForecast:
+    'Create a financial forecast for: {businessDescription}.',
+  geminiPromptCashFlowForecast:
+    'Forecast cash flow for: {businessDescription}.',
+  geminiPromptKpiDashboard:
+    'Create a KPI dashboard for: {businessDescription}.',
+  geminiPromptMilestones:
+    'Define growth milestones for: {businessDescription}.',
+  geminiPromptExpansionStrategy:
+    'Develop an expansion strategy for: {businessDescription}.',
+  geminiPromptPitchDeckGenerator:
+    'Generate content for a pitch deck for: {businessDescription}.',
+  geminiPromptInvestorDatabase:
+    'Identify potential investors for: {businessDescription}.',
+  geminiPromptFundraisingRoadmap:
+    'Create a fundraising roadmap for: {businessDescription}.',
 
   // Displays
   swotStrengths: 'Strengths',
@@ -494,7 +587,8 @@ export const en = {
   auditTrailAllModules: 'All Modules',
   auditTrailViewButton: 'View',
   auditTrailDeleteButton: 'Delete Record',
-  errorRateLimit: 'Rate Limit Exceeded::You have made too many requests recently. Please wait a minute before trying again.',
+  errorRateLimit:
+    'Rate Limit Exceeded::You have made too many requests recently. Please wait a minute before trying again.',
 
   // Agent Personas
   agentBoardroomStatus: 'Agent Boardroom Status',
@@ -510,12 +604,16 @@ export const en = {
   // Agent Logs
   agentLogAnalyzingContext: 'Analyzing business context and user intent...',
   agentLogScanningMarket: 'Scanning market data for trends and competitors...',
-  agentLogIdentifyingFactors: 'Identifying internal strengths and external risks...',
-  agentLogSynthesizing: 'Synthesizing strategic insights into a coherent framework...',
+  agentLogIdentifyingFactors:
+    'Identifying internal strengths and external risks...',
+  agentLogSynthesizing:
+    'Synthesizing strategic insights into a coherent framework...',
   agentLogReviewingBenchmarks: 'Reviewing industry financial benchmarks...',
-  agentLogCalculatingProjections: 'Calculating 5-year growth projections based on market size...',
+  agentLogCalculatingProjections:
+    'Calculating 5-year growth projections based on market size...',
   agentLogOptimizingMargins: 'Optimizing cost structure for profitability...',
-  agentLogEvaluatingThesis: 'Evaluating investment thesis and potential returns...',
+  agentLogEvaluatingThesis:
+    'Evaluating investment thesis and potential returns...',
   agentLogCheckingUnitEconomics: 'Validating unit economics (CAC vs LTV)...',
   agentLogDraftingNarrative: 'Drafting compelling investor narrative...',
   agentLogProcessingData: 'Processing data points...',
@@ -528,19 +626,28 @@ export const en = {
 
   // Error Message
   errorTitle: 'Oops! Something went wrong.',
-  errorEmptyDescription: 'Input Required::Please enter a business description to generate an analysis.',
-  errorApiFailure: 'Analysis Failed::The AI model failed to generate a complete analysis. Please try modifying your input or try again.',
-  errorApiGeneric: 'Service Unavailable::The AI service seems to be temporarily unavailable. Please try again in a moment.',
-  errorInvalidData: 'Unexpected Response::The AI service returned an unexpected response. Please try again. If the issue persists, contact support.',
-  errorModuleUnavailable: 'Module Unavailable::This module is currently under development. Please check back later!',
-  errorApiKeyInvalid: 'Configuration Error::There is a problem with the application configuration. This is not an issue on your end. Please contact support for assistance.',
-  errorApiServerError: 'Server Error::The AI model\'s server encountered an issue. Please try again in a few moments.',
-  errorNetwork: 'Network Error::Could not connect to the AI service. Please check your internet connection.',
+  errorEmptyDescription:
+    'Input Required::Please enter a business description to generate an analysis.',
+  errorApiFailure:
+    'Analysis Failed::The AI model failed to generate a complete analysis. Please try modifying your input or try again.',
+  errorApiGeneric:
+    'Service Unavailable::The AI service seems to be temporarily unavailable. Please try again in a moment.',
+  errorInvalidData:
+    'Unexpected Response::The AI service returned an unexpected response. Please try again. If the issue persists, contact support.',
+  errorModuleUnavailable:
+    'Module Unavailable::This module is currently under development. Please check back later!',
+  errorApiKeyInvalid:
+    'Configuration Error::There is a problem with the application configuration. This is not an issue on your end. Please contact support for assistance.',
+  errorApiServerError:
+    "Server Error::The AI model's server encountered an issue. Please try again in a few moments.",
+  errorNetwork:
+    'Network Error::Could not connect to the AI service. Please check your internet connection.',
   contactSupport: 'Contact Support',
 
   // Integrations
   integrationsTitle: 'Integrations',
-  integrationsDescription: 'Connect your favorite tools to supercharge your workflow.',
+  integrationsDescription:
+    'Connect your favorite tools to supercharge your workflow.',
   integrationsConnect: 'Connect',
   integrationsGA: 'Google Analytics',
   integrationsGADesc: 'Connect Google Analytics to track your website traffic.',
@@ -559,13 +666,16 @@ export const en = {
 
   // Tour
   tourWelcomeTitle: 'Welcome to ATLAS AI',
-  tourWelcomeContent: 'This is your AI-powered venture incubator. Let us show you around.',
+  tourWelcomeContent:
+    'This is your AI-powered venture incubator. Let us show you around.',
   tourSidebarTitle: 'Navigation',
-  tourSidebarContent: 'Access different modules like Strategy, Finance, and Growth here.',
+  tourSidebarContent:
+    'Access different modules like Strategy, Finance, and Growth here.',
   tourSubNavTitle: 'Tools',
   tourSubNavContent: 'Switch between specific tools within the active module.',
   tourInputTitle: 'Input Context',
-  tourInputContent: 'Describe your business idea here. The more details, the better.',
+  tourInputContent:
+    'Describe your business idea here. The more details, the better.',
   tourGenerateTitle: 'Generate',
   tourGenerateContent: 'Click here to unleash the AI agents.',
   tourOutputTitle: 'Analysis Output',

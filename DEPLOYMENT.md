@@ -1,4 +1,3 @@
-
 # Deployment Guide
 
 This document outlines the steps to deploy the ATLAS AI Incubator to a production environment.
@@ -6,16 +5,17 @@ This document outlines the steps to deploy the ATLAS AI Incubator to a productio
 ## 🐳 Docker Architecture
 
 We use a multi-container setup:
+
 1.  **atlas-backend**: NestJS API (Node 20 Alpine).
 2.  **atlas-frontend**: React Static Assets served via Nginx (Alpine).
 3.  **postgres**: Production database (managed externally recommended, but container provided).
 
 ## 1. Prerequisites
 
-*   A Virtual Private Server (VPS) (e.g., AWS EC2, DigitalOcean Droplet) with Docker and Docker Compose installed.
-*   OR a PaaS provider (Render, Railway) capable of building from `Dockerfile`.
-*   A Google Gemini API Key.
-*   A Stripe Secret Key (for payments).
+- A Virtual Private Server (VPS) (e.g., AWS EC2, DigitalOcean Droplet) with Docker and Docker Compose installed.
+- OR a PaaS provider (Render, Railway) capable of building from `Dockerfile`.
+- A Google Gemini API Key.
+- A Stripe Secret Key (for payments).
 
 ## 2. Environment Variables
 
@@ -61,8 +61,8 @@ SMTP_PASS=...
 
 In a production environment, you should run a host-level Nginx or Traefik to handle SSL termination (Let's Encrypt) and route traffic:
 
-*   `your-domain.com` -> `localhost:80` (Frontend Container)
-*   `api.your-domain.com` -> `localhost:3000` (Backend Container)
+- `your-domain.com` -> `localhost:80` (Frontend Container)
+- `api.your-domain.com` -> `localhost:3000` (Backend Container)
 
 ## 5. Health Checks
 

@@ -1,0 +1,31 @@
+# ========================================
+# Frontend Development: Vite with HMR
+# ========================================
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install build tools
+RUN apk add --no-cache git
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies (including dev dependencies for development)
+RUN npm ci --prefer-offline
+
+# Copy application code
+COPY tsconfig.json eslint.config.js vite.config.ts ./
+COPY index.html ./
+COPY public ./public
+COPY components ./components
+COPY context ./context
+COPY hooks ./hooks
+COPY services ./services
+COPY App.tsx App.test.tsx index.tsx types.ts env.d.ts ./
+
+EXPOSE 5173
+
+# Run Vite dev server in host mode to enable HMR from container
+CMD ["npm", "run", "dev", "--", "--host"]

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 interface TooltipProps {
@@ -8,7 +7,12 @@ interface TooltipProps {
   className?: string;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ content, children, position = 'top', className = '' }) => {
+const Tooltip: React.FC<TooltipProps> = ({
+  content,
+  children,
+  position = 'top',
+  className = '',
+}) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const positionClasses = {
@@ -26,16 +30,20 @@ const Tooltip: React.FC<TooltipProps> = ({ content, children, position = 'top', 
   };
 
   return (
-    <div 
+    <div
       className={`relative flex items-center justify-center group ${className}`}
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
     >
       {children}
       {isVisible && (
-        <div className={`absolute z-[100] px-2 py-1 text-xs font-medium text-white bg-gray-800 rounded shadow-lg whitespace-nowrap pointer-events-none ${positionClasses[position]}`}>
+        <div
+          className={`absolute z-[100] px-2 py-1 text-xs font-medium text-white bg-gray-800 rounded shadow-lg whitespace-nowrap pointer-events-none ${positionClasses[position]}`}
+        >
           {content}
-          <div className={`absolute w-0 h-0 border-4 border-transparent ${arrowClasses[position]}`}></div>
+          <div
+            className={`absolute w-0 h-0 border-4 border-transparent ${arrowClasses[position]}`}
+          ></div>
         </div>
       )}
     </div>

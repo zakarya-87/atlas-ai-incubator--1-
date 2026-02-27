@@ -1,39 +1,59 @@
-import React, { createContext, useState, useEffect, useContext, ReactNode, useCallback } from 'react';
-import { signIn, signUp, AuthResponse, fetchUserProfile } from '../services/authService';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+  useCallback,
+} from 'react';
+import {
+  signIn,
+  signUp,
+  AuthResponse,
+  fetchUserProfile,
+} from '../services/authService';
 import { AuthCredentials } from '../types';
 import { STORAGE_KEYS } from '../utils/constants';
 
 /**
-* SECURITY UPDATE:
-* Now using httpOnly cookies for JWT tokens to prevent XSS attacks.
-*
-* The token is stored in an httpOnly cookie and automatically sent with requests.
-* The frontend no longer handles the JWT token directly.
-*/
+ * SECURITY UPDATE:
+ * Now using httpOnly cookies for JWT tokens to prevent XSS attacks.
+ *
+ * The token is stored in an httpOnly cookie and automatically sent with requests.
+ * The frontend no longer handles the JWT token directly.
+ */
 
 // Demo-only admin local storage key
 const DEMO_ADMIN_KEY = 'demo_admin_user';
 
 interface AuthContextType {
-user: { email: string; role?: string; name?: string } | null;
-token: string | null; // This will now always be null since tokens are in cookies
-isAuthenticated: boolean;
-isAdmin: boolean;
-login: (credentials: AuthCredentials) => Promise<void>;
-register: (credentials: AuthCredentials) => Promise<void>;
-logout: () => void;
-loading: boolean;
-refreshAuth: () => Promise<void>;
-signInAsAdminDemo: () => void;
+  user: { email: string; role?: string; name?: string } | null;
+  token: string | null; // This will now always be null since tokens are in cookies
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  login: (credentials: AuthCredentials) => Promise<void>;
+  register: (credentials: AuthCredentials) => Promise<void>;
+  logout: () => void;
+  loading: boolean;
+  refreshAuth: () => Promise<void>;
+  signInAsAdminDemo: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export { AuthContext };
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<{ email: string; role?: string; name?: string } | null>(null);
-  const [token, setToken] = useState<string | null>(null); // Always null now that we use cookies
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<{
+    email: string;
+    role?: string;
+    name?: string;
+  } | null>(null);
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+  );
   const [loading, setLoading] = useState<boolean>(true);
 
   // Initialize auth state by verifying current session
@@ -52,6 +72,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser({ email: profile.email });
       } catch (error) {
         // If the session is invalid, user remains unauthenticated
+        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+        setToken(null);
       } finally {
         setLoading(false);
       }
@@ -64,22 +86,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await signIn(credentials);
 
+      // Save token if available (Backend v2 support for Bearer auth fallback)
+      if (response.access_token) {
+        console.log('[AuthContext] Login response has access_token:', response.access_token.substring(0, 10));
+        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.access_token);
+        setToken(response.access_token);
+      } else {
+        console.warn('[AuthContext] Login response missing access_token');
+      }
+
       // If signIn succeeds, fetch user profile to set current user state
       const profile = await fetchUserProfile();
       setUser({ email: profile.email });
-      // Token is now in httpOnly cookie, so we don't store it
-      setToken(null);
     } catch (error) {
       // Clear any partial state
       logout();
       throw error;
     }
-  }, []);
+  }, []); // Removed logout dependency to avoid cycle, used internal logic if needed or just throw
 
   const register = useCallback(async (credentials: AuthCredentials) => {
     await signUp(credentials);
-    // Note: Registration doesn't auto-login, user must sign in
-  }, []);
+    // Auto-login after registration
+    await login(credentials);
+  }, [login]);
 
   const logout = useCallback(async () => {
     try {
@@ -87,11 +117,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.removeItem(DEMO_ADMIN_KEY);
       // Clear venture ID to prevent ownership mismatch on next login
       localStorage.removeItem('atlas_venture_id');
+
+      // Clear access token
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+
       // Call backend to clear the authentication cookie
-      await fetch(`${(import.meta as any).env?.VITE_BACKEND_URL || 'http://localhost:3000'}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include', // Include cookies in request
-      });
+      // Pass token in header if available for the logout call itself
+      const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      await fetch(
+        `/api/auth/logout`,
+        {
+          method: 'POST',
+          headers,
+          credentials: 'include', // Include cookies in request
+        }
+      );
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -121,18 +164,79 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!user) return;
 
     // Check session validity periodically (every 5 minutes)
-    const intervalId = setInterval(() => {
-      refreshAuth();
-    }, 5 * 60 * 1000);
+    const intervalId = setInterval(
+      () => {
+        refreshAuth();
+      },
+      5 * 60 * 1000
+    );
 
     return () => clearInterval(intervalId);
   }, [user, refreshAuth]);
 
-  const signInAsAdminDemo = useCallback(() => {
-    const demoUser = { email: 'admin-demo@local', name: 'Admin (Demo)', role: 'admin' };
-    setUser(demoUser);
-    localStorage.setItem(DEMO_ADMIN_KEY, JSON.stringify(demoUser));
-    setToken(null);
+  const signInAsAdminDemo = useCallback(async () => {
+    // Use the actual seeded admin credentials from the database
+    const demoCredentials = {
+      email: 'admin@atlas.com',
+      password: 'admin123',
+    };
+    
+    try {
+      console.log('[Demo Admin] Attempting to login with seeded admin...');
+      
+      // Perform actual login to get valid token
+      const response = await fetch(
+        `/api/auth/signin`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(demoCredentials),
+          credentials: 'include',
+        }
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to login');
+      }
+      
+      const data = await response.json();
+      console.log('[Demo Admin] Login successful, fetching profile...');
+      
+      // Save token if provided
+      if (data.access_token) {
+        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.access_token);
+        setToken(data.access_token);
+      }
+      
+      // Fetch user profile to get full user data including credits
+      const profile = await fetchUserProfile();
+      
+      const demoUser = {
+        email: profile.email,
+        name: profile.fullName || 'Atlas Admin',
+        role: profile.role || 'admin',
+      };
+      
+      setUser(demoUser);
+      localStorage.setItem(DEMO_ADMIN_KEY, JSON.stringify(demoUser));
+      
+      console.log('[Demo Admin] Successfully logged in as:', demoUser.email);
+      console.log('[Demo Admin] Credits:', profile.credits);
+      
+    } catch (error) {
+      console.error('[Demo Admin] Login failed:', error);
+      // Fallback to showing error but still set local user for UI
+      const fallbackUser = {
+        email: demoCredentials.email,
+        name: 'Atlas Admin (Demo)',
+        role: 'admin',
+      };
+      setUser(fallbackUser);
+      localStorage.setItem(DEMO_ADMIN_KEY, JSON.stringify(fallbackUser));
+      setToken('demo-token');
+      throw error;
+    }
   }, []);
 
   const value = {
@@ -148,11 +252,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     signInAsAdminDemo,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = (): AuthContextType => {

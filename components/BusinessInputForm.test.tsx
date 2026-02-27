@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 import BusinessInputForm from './BusinessInputForm';
@@ -22,7 +28,8 @@ const mockTranslations: Record<string, string> = {
   competitorInfoLabel: 'Competitor Info',
   businessDescriptionPlaceholder: 'Describe your business idea...',
   uploadScreenshotLabel: 'Upload Competitor Screenshot',
-  uploadScreenshotDescription: 'Gemini Vision will analyze the uploaded screenshot to provide insights on your competitor.',
+  uploadScreenshotDescription:
+    'Gemini Vision will analyze the uploaded screenshot to provide insights on your competitor.',
   inputHintPrefix: 'Press',
   inputHintSuffix: 'to submit.',
   buttonGenerate: 'Generate Analysis',
@@ -35,7 +42,9 @@ vi.mock('../context/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => mockTranslations[key] || key,
   }),
-  LanguageProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  LanguageProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 describe('BusinessInputForm Component (TC010)', () => {
@@ -61,7 +70,9 @@ describe('BusinessInputForm Component (TC010)', () => {
     );
 
     expect(screen.getByLabelText(/business description/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/describe your business/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/describe your business/i)
+    ).toBeInTheDocument();
   });
 
   it('should handle text input changes', () => {
@@ -72,7 +83,9 @@ describe('BusinessInputForm Component (TC010)', () => {
     );
 
     const textarea = screen.getByRole('textbox');
-    fireEvent.change(textarea, { target: { value: 'Test business description' } });
+    fireEvent.change(textarea, {
+      target: { value: 'Test business description' },
+    });
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).toHaveBeenCalledWith('Test business description');
@@ -81,7 +94,10 @@ describe('BusinessInputForm Component (TC010)', () => {
   it('should enable submit button when valid input is provided', () => {
     render(
       <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="Valid business description" />
+        <BusinessInputForm
+          {...defaultProps}
+          value="Valid business description"
+        />
       </LanguageProvider>
     );
 
@@ -103,7 +119,11 @@ describe('BusinessInputForm Component (TC010)', () => {
   it('should disable submit button when loading', () => {
     render(
       <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="Valid input" isLoading={true} />
+        <BusinessInputForm
+          {...defaultProps}
+          value="Valid input"
+          isLoading={true}
+        />
       </LanguageProvider>
     );
 
@@ -114,7 +134,10 @@ describe('BusinessInputForm Component (TC010)', () => {
   it('should call onSubmit when form is submitted', () => {
     render(
       <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="Valid business description" />
+        <BusinessInputForm
+          {...defaultProps}
+          value="Valid business description"
+        />
       </LanguageProvider>
     );
 
@@ -127,7 +150,10 @@ describe('BusinessInputForm Component (TC010)', () => {
   it('should submit form with Ctrl+Enter', () => {
     render(
       <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="Valid business description" />
+        <BusinessInputForm
+          {...defaultProps}
+          value="Valid business description"
+        />
       </LanguageProvider>
     );
 
@@ -140,7 +166,10 @@ describe('BusinessInputForm Component (TC010)', () => {
   it('should submit form with Cmd+Enter on Mac', () => {
     render(
       <LanguageProvider>
-        <BusinessInputForm {...defaultProps} value="Valid business description" />
+        <BusinessInputForm
+          {...defaultProps}
+          value="Valid business description"
+        />
       </LanguageProvider>
     );
 
@@ -167,7 +196,9 @@ describe('BusinessInputForm Component (TC010)', () => {
       </LanguageProvider>
     );
 
-    expect(screen.getByText(/Upload Competitor Screenshot/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Upload Competitor Screenshot/i)
+    ).toBeInTheDocument();
     expect(screen.getByText(/Gemini Vision will analyze/i)).toBeInTheDocument();
   });
 
@@ -191,7 +222,11 @@ describe('BusinessInputForm Component (TC010)', () => {
   it('should submit form with image when image is uploaded', async () => {
     render(
       <LanguageProvider>
-        <BusinessInputForm {...defaultProps} activeTool="competitorAnalysis" value="Valid description" />
+        <BusinessInputForm
+          {...defaultProps}
+          activeTool="competitorAnalysis"
+          value="Valid description"
+        />
       </LanguageProvider>
     );
 
@@ -247,12 +282,15 @@ describe('BusinessInputForm Component (TC010)', () => {
   it('should show loading spinner when generating', () => {
     render(
       <LanguageProvider>
-        <BusinessInputForm {...defaultProps} isLoading={true} value="Valid input" />
+        <BusinessInputForm
+          {...defaultProps}
+          isLoading={true}
+          value="Valid input"
+        />
       </LanguageProvider>
     );
 
     const spinner = screen.getByRole('status');
     expect(spinner).toBeInTheDocument();
   });
-
 });

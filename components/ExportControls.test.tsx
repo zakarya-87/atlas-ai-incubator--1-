@@ -2,7 +2,11 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import ExportControls from './ExportControls';
-import { exportToPdf, exportToCsv, exportToMarkdown } from '../utils/exportUtils';
+import {
+  exportToPdf,
+  exportToCsv,
+  exportToMarkdown,
+} from '../utils/exportUtils';
 import { downloadReportPdf } from '../services/geminiService';
 
 // Mock dependencies
@@ -19,7 +23,9 @@ vi.mock('../services/geminiService', () => ({
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-    button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+    button: ({ children, ...props }: any) => (
+      <button {...props}>{children}</button>
+    ),
   },
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
@@ -41,18 +47,19 @@ describe('ExportControls Component (TC013)', () => {
   const mockAnalysisData = {
     id: 'test-analysis-123',
     strengths: [
-      { point: 'Strong brand recognition', explanation: 'Established market presence' },
-      { point: 'Skilled workforce', explanation: 'Experienced team members' }
+      {
+        point: 'Strong brand recognition',
+        explanation: 'Established market presence',
+      },
+      { point: 'Skilled workforce', explanation: 'Experienced team members' },
     ],
     weaknesses: [
-      { point: 'Limited resources', explanation: 'Startup constraints' }
+      { point: 'Limited resources', explanation: 'Startup constraints' },
     ],
     opportunities: [
-      { point: 'Growing market', explanation: 'Industry expansion' }
+      { point: 'Growing market', explanation: 'Industry expansion' },
     ],
-    threats: [
-      { point: 'Competition', explanation: 'New market entrants' }
-    ]
+    threats: [{ point: 'Competition', explanation: 'New market entrants' }],
   };
 
   const defaultProps = {
@@ -201,7 +208,9 @@ describe('ExportControls Component (TC013)', () => {
     });
 
     await waitFor(() => {
-      expect(mockAlert).toHaveBeenCalledWith('Failed to download official report.');
+      expect(mockAlert).toHaveBeenCalledWith(
+        'Failed to download official report.'
+      );
     });
 
     mockAlert.mockRestore();
@@ -323,9 +332,12 @@ describe('ExportControls Component (TC013)', () => {
     fireEvent.mouseLeave(exportControls);
 
     // Menu should be hidden (AnimatePresence will remove it)
-    await waitFor(() => {
-      expect(screen.queryByText('exportAsPdf')).not.toBeInTheDocument();
-    }, { timeout: 1000 });
+    await waitFor(
+      () => {
+        expect(screen.queryByText('exportAsPdf')).not.toBeInTheDocument();
+      },
+      { timeout: 1000 }
+    );
   });
 
   it('should handle different analysis types', () => {

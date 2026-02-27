@@ -17,6 +17,7 @@ jest.mock('@google/generative-ai', () => ({
 }));
 
 import { ConfigService } from '@nestjs/config';
+import { AIProviderFactory } from '../providers/ai-provider.factory';
 import { BaseAgent } from './base.agent';
 import { SchemaType } from '@google/generative-ai';
 
@@ -28,11 +29,17 @@ class TestAgent extends BaseAgent {
   async generate(
     prompt: string,
     context: string,
-    schema?: any,
+    schema?: Record<string, unknown> | null,
     systemInstruction?: string,
     images?: string[]
   ) {
-    return this.executeGeminiCall('gemini-2.5-pro', prompt, schema, systemInstruction, images);
+    return this.executeGeminiCall(
+      'gemini-2.5-pro',
+      prompt,
+      schema || null,
+      systemInstruction,
+      images
+    );
   }
 }
 
@@ -44,7 +51,7 @@ describe('BaseAgent', () => {
     // Mock ConfigService
     configService = {
       get: jest.fn((key: string) => {
-        if (key === 'API_KEY') return 'test-api-key';
+        if (key === 'GEMINI_API_KEY') return 'test-api-key';
         return undefined;
       }),
     };
@@ -85,7 +92,13 @@ describe('BaseAgent', () => {
       const context = 'Brand analysis';
       const images = ['data:image/png;base64,iVBORw0KGgo...'];
 
-      const result = await agent.generate(prompt, context, undefined, undefined, images);
+      const result = await agent.generate(
+        prompt,
+        context,
+        undefined,
+        undefined,
+        images
+      );
 
       expect(result).toBeDefined();
       expect(result.data).toEqual({ result: 'success', data: 'test' });
@@ -103,9 +116,9 @@ describe('BaseAgent', () => {
         type: SchemaType.OBJECT,
         properties: {
           title: { type: SchemaType.STRING },
-          items: { 
-            type: SchemaType.ARRAY, 
-            items: { type: SchemaType.STRING } 
+          items: {
+            type: SchemaType.ARRAY,
+            schema: { type: 'object' } as Record<string, unknown>,
           },
         },
         required: ['title', 'items'],
@@ -128,7 +141,7 @@ describe('BaseAgent', () => {
       const systemInstruction = 'You are a strategic analyst';
 
       const result = await agent.generate(
-        'test', 
+        'test',
         'context',
         undefined,
         systemInstruction
@@ -144,7 +157,13 @@ describe('BaseAgent', () => {
         'data:image/png;base64,def456',
       ];
 
-      const result = await agent.generate('analyze', 'images', undefined, undefined, images);
+      const result = await agent.generate(
+        'analyze',
+        'images',
+        undefined,
+        undefined,
+        images
+      );
 
       expect(result).toBeDefined();
       expect(result.data).toEqual({ result: 'success', data: 'test' });
@@ -175,7 +194,7 @@ describe('BaseAgent', () => {
       const client = (agent as any).getClient();
 
       expect(client).toBeDefined();
-      expect(configService.get).toHaveBeenCalledWith('API_KEY');
+      expect(configService.get).toHaveBeenCalledWith('GEMINI_API_KEY');
     });
 
     it('should throw error when API key is missing', () => {
@@ -183,10 +202,88 @@ describe('BaseAgent', () => {
         get: () => undefined,
       };
 
-      const agent2 = new TestAgent(noKeyConfig as any);
+      const provider = new TestAgent(
+        noKeyConfig as unknown as ConfigService,
+        undefined as unknown as AIProviderFactory
+      );
 
-      expect(() => (agent2 as any).getClient()).toThrow();
+      expect(() => (provider as unknown as { getClient(): void }).getClient()).toThrow();
+    });
+  });
+
+  describe('Fallback Logic', () => {
+    let mockProviderFactory: any;
+    let mockSecondaryProvider: any;
+
+    beforeEach(() => {
+      mockSecondaryProvider = {
+        complete: jest.fn().mockResolvedValue({
+          text: '{"result": "fallback-success"}',
+          data: { result: 'fallback-success' },
+        }),
+      };
+
+      mockProviderFactory = {
+        getAvailableProviders: jest.fn().mockReturnValue(['gemini', 'openai']),
+        getProvider: jest.fn().mockReturnValue(mockSecondaryProvider),
+      };
+
+      // Create agent instance with provider factory for fallback testing
+      agent = new TestAgent(configService as ConfigService, mockProviderFactory as unknown as AIProviderFactory);
+    });
+
+    it('should fallback to secondary provider on Gemini rate limit (429)', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockRejectedValue(new Error('RESOURCE_EXHAUSTED (429)')),
+      };
+
+      const client = {
+        getGenerativeModel: jest.fn().mockReturnValue(generativeModel),
+      };
+
+      // Inject mocked client to avoid getClient() logic
+      (agent as any).aiClient = client;
+
+      const result = await agent.generate('test', 'context');
+
+      expect(result.data).toEqual({ result: 'fallback-success' });
+      expect(mockProviderFactory.getProvider).toHaveBeenCalledWith('openai');
+      expect(mockSecondaryProvider.complete).toHaveBeenCalled();
+    });
+
+    it('should exhaust all retries before attempting fallback', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockRejectedValue(new Error('RESOURCE_EXHAUSTED (429)')),
+      };
+
+      const client = {
+        getGenerativeModel: jest.fn().mockReturnValue(generativeModel),
+      };
+
+      (agent as any).aiClient = client;
+
+      await agent.generate('test', 'context');
+
+      // Default maxRetries is 3
+      expect(generativeModel.generateContent).toHaveBeenCalledTimes(3);
+    });
+
+    it('should throw InternalServerErrorException if both primary and fallbacks fail', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockRejectedValue(new Error('RESOURCE_EXHAUSTED (429)')),
+      };
+
+      const client = {
+        getGenerativeModel: jest.fn().mockReturnValue(generativeModel),
+      };
+
+      (agent as any).aiClient = client;
+
+      mockSecondaryProvider.complete.mockRejectedValue(new Error('OpenAI also failed'));
+
+      await expect(agent.generate('test', 'context')).rejects.toThrow(
+        'API rate limit exceeded. We attempted multiple retries and fallbacks.'
+      );
     });
   });
 });
-

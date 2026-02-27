@@ -4,7 +4,11 @@ import { test, expect, Page } from '@playwright/test';
 test.describe.configure({ mode: 'serial' });
 
 // Helper functions
-async function loginUser(page: Page, email: string = 'founder@startup.com', password: string = 'password123') {
+async function loginUser(
+  page: Page,
+  email: string = 'founder@startup.com',
+  password: string = 'password123'
+) {
   await page.goto('/');
 
   // Wait for auth modal to appear
@@ -60,8 +64,9 @@ async function switchLanguage(page: Page, language: 'en' | 'fr' | 'ar') {
 }
 
 test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
-
-  test('should complete full login and authentication flow', async ({ page }) => {
+  test('should complete full login and authentication flow', async ({
+    page,
+  }) => {
     await page.goto('/');
 
     // Verify auth modal appears
@@ -84,7 +89,9 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     await expect(page).toHaveURL(/.*dashboard/);
   });
 
-  test('should navigate main dashboard and verify component load', async ({ page }) => {
+  test('should navigate main dashboard and verify component load', async ({
+    page,
+  }) => {
     await loginUser(page);
 
     // Verify dashboard layout components
@@ -98,16 +105,21 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     await expect(page.locator('text=/ATLAS AI Incubator/')).toBeVisible();
 
     // Verify navigation modules are visible
-    const sidebarModules = page.locator('[data-testid="sidebar-nav"] [data-module]');
+    const sidebarModules = page.locator(
+      '[data-testid="sidebar-nav"] [data-module]'
+    );
     await expect(sidebarModules).toHaveCount(await sidebarModules.count());
   });
 
-  test('should perform data input and trigger AI analysis generation', async ({ page }) => {
+  test('should perform data input and trigger AI analysis generation', async ({
+    page,
+  }) => {
     await loginUser(page);
     await navigateToModule(page, 'swot');
 
     // Fill business description
-    const businessDescription = 'A revolutionary startup that uses AI to help entrepreneurs build better business plans and financial forecasts. We serve early-stage founders who need professional-grade analysis tools but lack the resources for expensive consultants.';
+    const businessDescription =
+      'A revolutionary startup that uses AI to help entrepreneurs build better business plans and financial forecasts. We serve early-stage founders who need professional-grade analysis tools but lack the resources for expensive consultants.';
     await fillBusinessInputForm(page, businessDescription);
 
     // Verify character count
@@ -127,12 +139,15 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     await expect(swotQuadrants).toBeVisible();
   });
 
-  test('should validate undo and redo functionality on input forms', async ({ page }) => {
+  test('should validate undo and redo functionality on input forms', async ({
+    page,
+  }) => {
     await loginUser(page);
     await navigateToModule(page, 'swot');
 
     const initialText = 'Initial business description';
-    const modifiedText = 'Modified business description with additional details';
+    const modifiedText =
+      'Modified business description with additional details';
 
     // Fill initial text
     await fillBusinessInputForm(page, initialText);
@@ -143,11 +158,15 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     await expect(page.locator('textarea')).toHaveValue(modifiedText);
 
     // Test undo (Ctrl+Z or Cmd+Z)
-    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+z' : 'Control+z');
+    await page.keyboard.press(
+      process.platform === 'darwin' ? 'Meta+z' : 'Control+z'
+    );
     await expect(page.locator('textarea')).toHaveValue(initialText);
 
     // Test redo (Ctrl+Y or Cmd+Y)
-    await page.keyboard.press(process.platform === 'darwin' ? 'Meta+Shift+z' : 'Control+y');
+    await page.keyboard.press(
+      process.platform === 'darwin' ? 'Meta+Shift+z' : 'Control+y'
+    );
     await expect(page.locator('textarea')).toHaveValue(modifiedText);
   });
 
@@ -215,9 +234,13 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
 
       // Verify module-specific output
       if (module === 'swot') {
-        await expect(page.locator('text=/Strengths|Weaknesses|Opportunities|Threats/')).toBeVisible();
+        await expect(
+          page.locator('text=/Strengths|Weaknesses|Opportunities|Threats/')
+        ).toBeVisible();
       } else if (module === 'pestel') {
-        await expect(page.locator('text=/Political|Economic|Social|Technological/')).toBeVisible();
+        await expect(
+          page.locator('text=/Political|Economic|Social|Technological/')
+        ).toBeVisible();
       }
 
       // Verify navigation back to dashboard works
@@ -243,7 +266,10 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     await expect(submitButton).toBeDisabled();
   });
 
-  test('should maintain session state across page refreshes', async ({ page, context }) => {
+  test('should maintain session state across page refreshes', async ({
+    page,
+    context,
+  }) => {
     await loginUser(page);
 
     // Navigate to a module and fill form
@@ -260,7 +286,9 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     // This test verifies the authentication session persists
   });
 
-  test('should handle responsive design across different viewport sizes', async ({ page }) => {
+  test('should handle responsive design across different viewport sizes', async ({
+    page,
+  }) => {
     // Test mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
     await loginUser(page);
@@ -280,15 +308,21 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     await expect(page.locator('.grid-cols-1.md\\:grid-cols-2')).toBeVisible();
   });
 
-  test('should support keyboard navigation throughout application', async ({ page }) => {
+  test('should support keyboard navigation throughout application', async ({
+    page,
+  }) => {
     await loginUser(page);
 
     // Tab through main navigation
     await page.keyboard.press('Tab');
-    await expect(page.locator('[data-testid="header"]').locator(':focus')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="header"]').locator(':focus')
+    ).toBeVisible();
 
     await page.keyboard.press('Tab');
-    await expect(page.locator('[data-testid="sidebar-nav"]').locator(':focus')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="sidebar-nav"]').locator(':focus')
+    ).toBeVisible();
 
     // Navigate to a module using keyboard
     await navigateToModule(page, 'swot');
@@ -301,19 +335,23 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     expect(activeElement).toBe('business-description-input');
   });
 
-  test('should handle file upload workflow for competitor analysis', async ({ page }) => {
+  test('should handle file upload workflow for competitor analysis', async ({
+    page,
+  }) => {
     await loginUser(page);
     await navigateToModule(page, 'competitorAnalysis');
 
     // Verify file upload section is visible
-    await expect(page.locator('text=/Upload Competitor Screenshot/')).toBeVisible();
+    await expect(
+      page.locator('text=/Upload Competitor Screenshot/')
+    ).toBeVisible();
 
     // Upload a file (mock file)
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles({
       name: 'competitor.png',
       mimeType: 'image/png',
-      buffer: Buffer.from('fake-image-data')
+      buffer: Buffer.from('fake-image-data'),
     });
 
     // Verify file preview appears
@@ -324,7 +362,9 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     await generateAnalysis(page);
 
     // Verify analysis includes visual insights
-    await expect(page.locator('text=/competitors|gaps|differentiators/')).toBeVisible();
+    await expect(
+      page.locator('text=/competitors|gaps|differentiators/')
+    ).toBeVisible();
   });
 
   test('should complete end-to-end export workflow', async ({ page }) => {
@@ -350,7 +390,10 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     }
   });
 
-  test('should handle concurrent user actions without conflicts', async ({ page, context }) => {
+  test('should handle concurrent user actions without conflicts', async ({
+    page,
+    context,
+  }) => {
     await loginUser(page);
 
     // Open multiple tabs/windows
@@ -371,7 +414,7 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
         await navigateToModule(page2, 'pestel');
         await fillBusinessInputForm(page2, 'Concurrent analysis 2');
         await generateAnalysis(page2);
-      })()
+      })(),
     ]);
 
     // Verify both analyses complete successfully
@@ -379,10 +422,13 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
     await expect(page2.locator('text=/Political/')).toBeVisible();
   });
 
-  test('should maintain data integrity across workflow steps', async ({ page }) => {
+  test('should maintain data integrity across workflow steps', async ({
+    page,
+  }) => {
     await loginUser(page);
 
-    const testData = 'Comprehensive business analysis for data integrity testing';
+    const testData =
+      'Comprehensive business analysis for data integrity testing';
 
     // Step 1: Input data
     await navigateToModule(page, 'swot');
@@ -406,7 +452,7 @@ test.describe('End-to-End Workflow Testing with Playwright (TC018)', () => {
 
   test('should handle network interruptions gracefully', async ({ page }) => {
     // Mock network failure
-    await page.route('**/api/**', route => route.abort());
+    await page.route('**/api/**', (route) => route.abort());
 
     await loginUser(page);
     await navigateToModule(page, 'swot');

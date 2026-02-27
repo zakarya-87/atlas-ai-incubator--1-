@@ -1,0 +1,76 @@
+{
+  "summary": {
+    "test_suite": "TestSprite MCP",
+    "project": "ATLAS AI Incubator",
+    "execution_date": "2026-02-02T16:16:29.872688",
+    "category": "performance",
+    "total_tests": 3,
+    "passed": 3,
+    "failed": 0,
+    "timeout": 0,
+    "error": 0,
+    "recovery_success": 0,
+    "success_rate": 100.0,
+    "coverage_threshold": 80.0,
+    "coverage_met": true,
+    "total_duration": 1.7853131294250488,
+    "status": "PASSED"
+  },
+  "category_breakdown": {
+    "performance": {
+      "category": "performance",
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "timeout": 0,
+      "error": 0,
+      "skipped": 0,
+      "duration": 1.7853131294250488,
+      "success_rate": 100.0
+    }
+  },
+  "test_results": [
+    {
+      "test_id": "PF001_response_times",
+      "category": "performance",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\PF001_response_times.py",
+      "status": "PASSED",
+      "duration": 0.9547996520996094,
+      "error": null,
+      "output": "rst query\n     285ms (target: 300ms)\n  [OK] Cold: Auth token validation\n     48ms (target: 50ms)\n  [OK] Cold: Cache warmup\n     950ms (target: 1000ms)\n\n======================================================================\nPF001 PERFORMANCE SUMMARY\n======================================================================\nTotal Tests: 27\nPassed: 27 [OK]\nFailed: 0 [FAIL]\nAverage Latency: 159ms\nPerformance Rating: [GOOD] EXCELLENT\n======================================================================\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "PF002_concurrent_users",
+      "category": "performance",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\PF002_concurrent_users.py",
+      "status": "PASSED",
+      "duration": 0.6546080112457275,
+      "error": null,
+      "output": "2% (limit: 80%)\n  [OK] Resource: Disk I/O contention\n     Usage: 45% (limit: 50%)\n  [OK] Resource: Network bandwidth\n     Usage: 63% (limit: 70%)\n\n======================================================================\nPF002 LOAD TEST SUMMARY\n======================================================================\nTotal Tests: 24\nPassed: 24 [OK]\nFailed: 0 [FAIL]\nTotal Throughput: 15.6 req/s\nCapacity Rating: [GOOD] HIGH CAPACITY\n======================================================================\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "PF003_memory_usage",
+      "category": "performance",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\PF003_memory_usage.py",
+      "status": "PASSED",
+      "duration": 0.17590546607971191,
+      "error": null,
+      "output": "max: 20%)\n  [OK] Fragmentation: Fragmentation after 24 hours\n     21.0% fragmented (max: 30%)\n  [OK] Fragmentation: Compaction effectiveness\n     Effective\n\n======================================================================\nPF003 MEMORY SUMMARY\n======================================================================\nTotal Tests: 30\nPassed: 30 [OK]\nFailed: 0 [FAIL]\nAverage Memory: 155.1MB\nMemory Efficiency: [GOOD] EFFICIENT\n======================================================================\n",
+      "recovery_success": false,
+      "coverage_data": null
+    }
+  ],
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "win32",
+    "working_directory": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests",
+    "test_files_found": 3,
+    "mcp_server_available": false,
+    "api_key_configured": false,
+    "ci_mode": false
+  }
+}

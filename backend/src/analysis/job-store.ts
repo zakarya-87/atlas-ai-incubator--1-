@@ -3,7 +3,7 @@ import { JobStatusResponse } from './jobs.service';
 // Simple in-memory job store for local/dev usage when BullMQ isn't configured.
 const jobs = new Map<string, JobStatusResponse>();
 
-export function setJob(id: string, status: JobStatusResponse) {
+export function setJob(id: string, status: JobStatusResponse): void {
   jobs.set(id, status);
 }
 

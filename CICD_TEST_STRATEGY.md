@@ -1,34 +1,39 @@
 # ATLAS AI Incubator - CI/CD & Test Strategy
 
 ## 1. Testing Philosophy
+
 We will adhere to the **Testing Pyramid**:
+
 1.  **Unit Tests (60%):** Fast, isolated tests for utility functions and backend business logic.
 2.  **Integration Tests (30%):** Testing API endpoints and database interactions.
 3.  **E2E Tests (10%):** Simulating critical user journeys (Login -> Generate SWOT -> View History).
 
 ## 2. Tooling Stack
 
-| Scope | Tool | Usage |
-| :--- | :--- | :--- |
-| **Unit (Frontend)** | **Vitest** | Fast replacement for Jest. Tests React components and hooks. |
-| **Unit (Backend)** | **Jest** | Standard for NestJS. Tests Services and Controllers. |
-| **Integration** | **Supertest** | Tests HTTP endpoints in NestJS against a test DB. |
-| **E2E** | **Playwright** | Browser automation. Tests the full flow across Chrome/Firefox/Safari. |
-| **CI/CD** | **GitHub Actions** | Orchestration of the pipeline. |
+| Scope               | Tool               | Usage                                                                 |
+| :------------------ | :----------------- | :-------------------------------------------------------------------- |
+| **Unit (Frontend)** | **Vitest**         | Fast replacement for Jest. Tests React components and hooks.          |
+| **Unit (Backend)**  | **Jest**           | Standard for NestJS. Tests Services and Controllers.                  |
+| **Integration**     | **Supertest**      | Tests HTTP endpoints in NestJS against a test DB.                     |
+| **E2E**             | **Playwright**     | Browser automation. Tests the full flow across Chrome/Firefox/Safari. |
+| **CI/CD**           | **GitHub Actions** | Orchestration of the pipeline.                                        |
 
 ## 3. Test Plan Details
 
 ### A. Frontend Tests
-*   **Component Rendering:** Ensure `SwotDisplay`, `FinancialForecastDisplay` render without crashing.
-*   **Mocking:** Mock the API calls to ensure the UI handles `Loading`, `Success`, and `Error` states correctly.
-*   **Snapshot Testing:** Ensure complex UI charts/tables don't regress visually.
+
+- **Component Rendering:** Ensure `SwotDisplay`, `FinancialForecastDisplay` render without crashing.
+- **Mocking:** Mock the API calls to ensure the UI handles `Loading`, `Success`, and `Error` states correctly.
+- **Snapshot Testing:** Ensure complex UI charts/tables don't regress visually.
 
 ### B. Backend Tests
-*   **Service Logic:** Ensure the `PromptBuilder` generates the correct string based on language inputs.
-*   **Validation:** Ensure the API rejects empty inputs or invalid tool types.
-*   **AI Handling:** Mock the Google GenAI response to test how the backend handles malformed JSON from the AI model (Robustness).
+
+- **Service Logic:** Ensure the `PromptBuilder` generates the correct string based on language inputs.
+- **Validation:** Ensure the API rejects empty inputs or invalid tool types.
+- **AI Handling:** Mock the Google GenAI response to test how the backend handles malformed JSON from the AI model (Robustness).
 
 ### C. E2E Scenarios (Playwright)
+
 1.  **User Flow:** User logs in -> Navigates to Strategy -> Types input -> Clicks Generate -> Verifies results appear.
 2.  **Offline/Error:** Simulate network failure during generation and verify Error Toast appears.
 
@@ -37,38 +42,41 @@ We will adhere to the **Testing Pyramid**:
 We will define two workflows: `pr-check.yml` and `deploy.yml`.
 
 ### Workflow 1: Pull Request Check (`pr-check.yml`)
-*Triggers on: Pull Request to `main`*
+
+_Triggers on: Pull Request to `main`_
 
 1.  **Lint & Format:**
-    *   Run `eslint` and `prettier --check`.
-    *   Fail if code style violations exist.
+    - Run `eslint` and `prettier --check`.
+    - Fail if code style violations exist.
 2.  **Type Check:**
-    *   Run `tsc --noEmit` to catch TypeScript errors.
+    - Run `tsc --noEmit` to catch TypeScript errors.
 3.  **Unit Testing:**
-    *   Run `npm run test:unit` (Frontend & Backend parallel).
+    - Run `npm run test:unit` (Frontend & Backend parallel).
 4.  **Integration Testing:**
-    *   Spin up ephemeral PostgreSQL container (Service Containers).
-    *   Run backend integration tests.
+    - Spin up ephemeral PostgreSQL container (Service Containers).
+    - Run backend integration tests.
 
 ### Workflow 2: Deployment (`deploy.yml`)
-*Triggers on: Push to `main` (after PR merge)*
+
+_Triggers on: Push to `main` (after PR merge)_
 
 1.  **Pre-flight:** Run Unit Tests (Safety check).
 2.  **E2E Testing:**
-    *   Build the Frontend.
-    *   Start Backend (Test Mode).
-    *   Run Playwright tests.
+    - Build the Frontend.
+    - Start Backend (Test Mode).
+    - Run Playwright tests.
 3.  **Build & Push Docker:**
-    *   Build Backend Docker Image -> Push to Container Registry (GHCR/ECR).
+    - Build Backend Docker Image -> Push to Container Registry (GHCR/ECR).
 4.  **Deploy Backend:**
-    *   Trigger webhook to update cloud provider (e.g., Render/AWS).
-    *   Run Database Migrations (`prisma migrate deploy`).
+    - Trigger webhook to update cloud provider (e.g., Render/AWS).
+    - Run Database Migrations (`prisma migrate deploy`).
 5.  **Deploy Frontend:**
-    *   Trigger Vercel/Netlify deployment via CLI or GitHub Integration.
+    - Trigger Vercel/Netlify deployment via CLI or GitHub Integration.
 
 ## 5. Configuration Snippets
 
 ### GitHub Actions: Backend Test Step
+
 ```yaml
 jobs:
   backend-test:
@@ -93,6 +101,7 @@ jobs:
 ```
 
 ### Playwright Config (`playwright.config.ts`)
+
 ```typescript
 import { defineConfig } from '@playwright/test';
 

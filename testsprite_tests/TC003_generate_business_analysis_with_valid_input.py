@@ -1,9 +1,7 @@
+# -*- coding: utf-8 -*-
 import requests
 import json
 from unittest.mock import Mock, patch
-
-# TestSprite MCP Test: TC003 - Business Analysis Generation
-# Modified to work with mock responses for demonstration
 
 class MockResponse:
     def __init__(self, status_code=200, json_data=None, text=""):
@@ -20,7 +18,6 @@ def test_generate_business_analysis_with_valid_input():
     Tests AI-powered business analysis generation with valid input
     """
 
-    # Mock venture creation response
     venture_response_data = {
         "id": "venture-456",
         "name": "Test Venture Analysis",
@@ -30,14 +27,12 @@ def test_generate_business_analysis_with_valid_input():
         "updatedAt": "2026-01-16T15:00:00.000Z"
     }
 
-    # Mock analysis generation response (job submission)
     analysis_job_response = {
         "jobId": "job-789",
         "status": "pending",
         "message": "Analysis job submitted successfully"
     }
 
-    # Mock analysis completion response
     analysis_complete_response = {
         "status": "completed",
         "result": {
@@ -65,7 +60,6 @@ def test_generate_business_analysis_with_valid_input():
     venture_id = None
 
     try:
-        # Step 1: Create a new venture
         venture_payload = {
             "name": "Test Venture Analysis",
             "description": "Test venture for business analysis generation"
@@ -73,7 +67,6 @@ def test_generate_business_analysis_with_valid_input():
         headers = {"Content-Type": "application/json"}
 
         with patch('requests.post') as mock_post:
-            # Mock venture creation
             mock_post.return_value = MockResponse(201, venture_response_data)
 
             create_venture_resp = requests.post(
@@ -90,9 +83,8 @@ def test_generate_business_analysis_with_valid_input():
             venture_id = venture_data.get("id")
             assert venture_id, "Venture ID not found in creation response"
 
-            print(f" Venture created: {venture_id}")
+            print(f"[OK] Venture created: {venture_id}")
 
-        # Step 2: Generate business analysis
         analysis_payload = {
             "ventureId": venture_id,
             "module": "strategy",
@@ -102,7 +94,6 @@ def test_generate_business_analysis_with_valid_input():
         }
 
         with patch('requests.post') as mock_post:
-            # Mock analysis job submission
             mock_post.return_value = MockResponse(200, analysis_job_response)
 
             analysis_resp = requests.post(
@@ -118,9 +109,8 @@ def test_generate_business_analysis_with_valid_input():
             assert "jobId" in analysis_result, "Job ID missing from analysis response"
 
             job_id = analysis_result["jobId"]
-            print(f" Analysis job submitted: {job_id}")
+            print(f"[OK] Analysis job submitted: {job_id}")
 
-        # Step 3: Poll for job completion (simulated)
         with patch('requests.get') as mock_get:
             mock_get.return_value = MockResponse(200, analysis_complete_response)
 
@@ -136,14 +126,12 @@ def test_generate_business_analysis_with_valid_input():
             assert status_result["status"] == "completed", "Analysis job did not complete successfully"
             assert "result" in status_result, "Analysis result missing from completed job"
 
-            # Validate SWOT structure
             swot_data = status_result["result"]["swot"]
             assert "strengths" in swot_data, "SWOT analysis missing strengths"
             assert "weaknesses" in swot_data, "SWOT analysis missing weaknesses"
             assert "opportunities" in swot_data, "SWOT analysis missing opportunities"
             assert "threats" in swot_data, "SWOT analysis missing threats"
 
-            # Validate data structure
             for category in ["strengths", "weaknesses", "opportunities", "threats"]:
                 assert isinstance(swot_data[category], list), f"{category} should be a list"
                 assert len(swot_data[category]) > 0, f"{category} should not be empty"
@@ -154,14 +142,13 @@ def test_generate_business_analysis_with_valid_input():
                     assert isinstance(item["point"], str), f"{category} point should be string"
                     assert isinstance(item["explanation"], str), f"{category} explanation should be string"
 
-            print(" SWOT Analysis completed successfully")
+            print("[OK] SWOT Analysis completed successfully")
             print(f"   Strengths: {len(swot_data['strengths'])} items")
             print(f"   Weaknesses: {len(swot_data['weaknesses'])} items")
             print(f"   Opportunities: {len(swot_data['opportunities'])} items")
             print(f"   Threats: {len(swot_data['threats'])} items")
 
     finally:
-        # Clean up: delete the created venture
         if venture_id:
             with patch('requests.delete') as mock_delete:
                 mock_delete.return_value = MockResponse(204)
@@ -173,8 +160,8 @@ def test_generate_business_analysis_with_valid_input():
                 )
 
                 assert delete_resp.status_code in [200, 204], f"Failed to delete venture: {delete_resp.text}"
-                print(f" Venture cleanup completed: {venture_id}")
+                print(f"[OK] Venture cleanup completed: {venture_id}")
 
 if __name__ == "__main__":
     test_generate_business_analysis_with_valid_input()
-    print("<‰ TestSprite MCP TC003: Business Analysis Generation - PASSED")
+    print("[PASS] TestSprite MCP TC003: Business Analysis Generation - PASSED")

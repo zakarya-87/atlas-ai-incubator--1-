@@ -1,12 +1,15 @@
-
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { Integration } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class IntegrationsService {
   constructor(private prisma: PrismaService) {}
 
-  async getIntegrations(ventureId: string, userId: string) {
+  async getIntegrations(ventureId: string, userId: string): Promise<Integration[]> {
     await this.validateVentureAccess(ventureId, userId);
 
     return this.prisma.integration.findMany({
@@ -14,13 +17,18 @@ export class IntegrationsService {
     });
   }
 
-  async toggleIntegration(ventureId: string, userId: string, provider: string, connect: boolean) {
+  async toggleIntegration(
+    ventureId: string,
+    userId: string,
+    provider: string,
+    connect: boolean
+  ): Promise<Integration> {
     await this.validateVentureAccess(ventureId, userId);
 
     if (connect) {
       const mockConfig = JSON.stringify({
-          accessToken: `mock_${provider}_token_${Date.now()}`,
-          connectedAt: new Date().toISOString()
+        accessToken: `mock_${provider}_token_${Date.now()}`,
+        connectedAt: new Date().toISOString(),
       });
 
       return this.prisma.integration.upsert({
@@ -57,20 +65,27 @@ export class IntegrationsService {
     }
   }
 
-  private async validateVentureAccess(ventureId: string, userId: string) {
-      const venture = await this.prisma.venture.findUnique({
-          where: { id: ventureId }
+  private async validateVentureAccess(ventureId: string, userId: string): Promise<void> {
+    const venture = await this.prisma.venture.findUnique({
+      where: { id: ventureId },
+    });
+
+    if (!venture) {
+      await this.prisma.venture.create({
+        data: {
+          id: ventureId,
+          userId,
+          name: `Venture ${ventureId.substring(0, 8)}`,
+          description: 'Auto-created venture',
+          industry: 'Technology',
+          stage: 'idea'
+        },
       });
+      return;
+    }
 
-      if (!venture) {
-           await this.prisma.venture.create({
-              data: { id: ventureId, userId, name: 'My Venture' }
-           });
-           return;
-      }
-
-      if (venture.userId !== userId) {
-          throw new ForbiddenException('Access denied to this venture');
-      }
+    if (venture.userId !== userId) {
+      throw new ForbiddenException('Access denied to this venture');
+    }
   }
 }

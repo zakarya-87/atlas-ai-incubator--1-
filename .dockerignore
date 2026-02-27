@@ -1,0 +1,110 @@
+# ========================================
+# Docker Ignore: Exclude unnecessary files
+# ========================================
+
+# Git
+.git
+.gitignore
+.gitmessage.txt
+
+# Node modules (will be installed in container)
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+package-lock.json
+
+# Build artifacts (will be built in container)
+dist
+build
+.next
+out
+
+# IDE
+.vscode
+.idea
+.DS_Store
+*.swp
+*.swo
+*~
+.editorconfig
+
+# Environment files (use .env.example instead)
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage
+.nyc_output
+test-results
+playwright-report
+.mocha
+
+# Logs
+logs
+*.log
+LogFiles
+
+# OS
+Thumbs.db
+desktop.ini
+
+# Project-specific
+backups
+.cache
+temp
+tmp
+*.tar
+*.zip
+
+# Documentation (not needed in container)
+README.md
+SETUP_GUIDE.md
+START_HERE.md
+DEPLOYMENT.md
+*.md
+MASTER_TEST_PLAN.md
+
+# Docker compose alternatives (use main compose file)
+docker-compose.azure.yml
+docker-compose.production.yml
+
+# Kubernetes/Infrastructure files
+*.yaml
+*.yml
+aci-deployment-template.json
+deploy-to-azure.ps1
+deploy-to-azure.sh
+
+# Scripts for local development
+*.bat
+*.sh
+start-local.bat
+start-local.ps1
+push-to-dockerhub.*
+deploy-to-azure.*
+backup-database.*
+start-no-docker.bat
+
+# Credentials and sensitive data
+cookies.txt
+.firebaserc
+credentials.json
+secrets.json
+
+# Unnecessary files
+.gemini
+.jules
+.github
+e2e
+test-mocks
+testsprite_tests
+*-settings.json
+*_config.json
+metadata.json
+history.json
+test-payload.json
+test_websocket.html

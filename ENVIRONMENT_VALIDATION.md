@@ -3,11 +3,13 @@
 ## ✅ Current Status
 
 ### Frontend Configuration (.env.local)
+
 - **GEMINI_API_KEY**: PLACEHOLDER_API_KEY ⚠️ **Needs real key**
 - **Port**: 5173 (configured in vite.config.ts)
 - **Environment**: development
 
 ### Backend Configuration (backend/.env)
+
 - **API_KEY**: AIzaSyD999-9wiUgARsOagLiS_5sl6DvyaktPL8 ✅ Set
 - **JWT_SECRET**: a_very_secure_production_secret_key_that_is_long_and_random ✅ Set
 - **DATABASE_URL**: file:./dev.db (SQLite for local dev) ✅ Set
@@ -18,11 +20,13 @@
 - **Redis**: localhost:6379 (optional, for BullMQ job queue)
 
 ### Database Status
+
 - **Type**: SQLite locally (file:./dev.db)
 - **Docker PostgreSQL**: Available via docker-compose.yml (postgres:15-alpine)
 - **Prisma**: Migrations in place
 
 ### Required Services
+
 - **PostgreSQL**: Not running (docker-compose up needed)
 - **Redis**: Not running (optional, for job queue)
 - **Frontend Dev Server**: Not running (npm run dev)
@@ -31,20 +35,24 @@
 ## 🔧 Setup Checklist
 
 ### Phase 1: Start Services
+
 - [ ] Start Docker services: `docker-compose up -d`
 - [ ] Verify Postgres running: `docker ps`
 - [ ] Initialize database: `cd backend && npx prisma db push`
 
 ### Phase 2: Update Keys
+
 - [ ] Add real Gemini API key to `.env.local`
 - [ ] Verify backend API_KEY in `backend/.env`
 
 ### Phase 3: Start Dev Servers
+
 - [ ] Terminal 1: `cd backend && npm run start:dev` (listens on :3000)
 - [ ] Terminal 2: `npm run dev` (listens on :5173)
 - [ ] Verify CORS allows http://localhost:5173 → :3000
 
 ### Phase 4: Validate
+
 - [ ] Frontend loads at http://localhost:5173
 - [ ] Backend API accessible at http://localhost:3000/api/docs
 - [ ] Database connection works
@@ -53,11 +61,13 @@
 ## 📋 Environment Variables Reference
 
 ### Frontend (.env.local)
+
 ```
 GEMINI_API_KEY=your_actual_key_here
 ```
 
 ### Backend (backend/.env)
+
 ```
 DATABASE_URL=postgresql://atlas_user:atlas_password@localhost:5432/atlas_db
 API_KEY=your_gemini_key
@@ -104,4 +114,3 @@ npm run dev
 - Docker Compose configuration ready for PostgreSQL
 - JWT authentication configured
 - API documentation (Swagger) configured
-

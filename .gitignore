@@ -42,3 +42,25 @@ backend/.env.local
 .qodo/
 backend/.env
 .idx/
+
+# Optional stylelint cache
+.stylelintcache
+
+# Firebase cache directory
+.firebase/
+
+# Vite files
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+.vite/
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# dotenv environment variable files
+.env
+.env.*
+!.env.example
+nul

@@ -1,0 +1,206 @@
+# TestSprite MCP Test Report
+
+**Project:** ATLAS AI Incubator  
+**Execution Date:** 2026-02-02T15:49:18.184818  
+**Test Category:** ALL  
+**TestSprite MCP:** @latest
+
+## [RESULTS] Executive Summary
+
+| Metric | Value |
+|--------|-------|
+| Total Tests | 35 |
+| [OK] Passed | 22 |
+| [FAIL] Failed | 13 |
+| [TIMEOUT] Timeout | 0 |
+| [ERROR] Error | 0 |
+| [RECOVERY] Recovery Success | 6 |
+| **Success Rate** | **62.9%** |
+| Coverage Threshold | 80.0% |
+| Coverage Met | [NO] |
+| Total Duration | 66.71s |
+| **Status** | **FAILED** |
+
+## [CATEGORIES] Category Breakdown
+
+### CORE
+
+- **Tests:** 15
+- **Passed:** 4 [OK]
+- **Failed:** 11 [FAIL]
+- **Success Rate:** 26.7%
+- **Duration:** 57.99s
+
+### EDGE_CASES
+
+- **Tests:** 6
+- **Passed:** 6 [OK]
+- **Failed:** 0 [FAIL]
+- **Success Rate:** 100.0%
+- **Duration:** 2.11s
+
+### ERROR_HANDLING
+
+- **Tests:** 6
+- **Passed:** 4 [OK]
+- **Failed:** 2 [FAIL]
+- **Success Rate:** 66.7%
+- **Duration:** 1.91s
+
+### PERFORMANCE
+
+- **Tests:** 3
+- **Passed:** 3 [OK]
+- **Failed:** 0 [FAIL]
+- **Success Rate:** 100.0%
+- **Duration:** 1.85s
+
+### REGRESSION
+
+- **Tests:** 1
+- **Passed:** 1 [OK]
+- **Failed:** 0 [FAIL]
+- **Success Rate:** 100.0%
+- **Duration:** 0.17s
+
+### SECURITY
+
+- **Tests:** 4
+- **Passed:** 4 [OK]
+- **Failed:** 0 [FAIL]
+- **Success Rate:** 100.0%
+- **Duration:** 2.68s
+
+## [FAILED] Failed Tests
+
+### TC001_User_Authentication_Success
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 5.70s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\ATLAS AI Incubator\testsprite_tests\TC001_...`
+
+### TC002_User_Authentication_Failure
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 5.33s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\ATLAS AI Incubator\testsprite_tests\TC002_...`
+
+### TC002_user_registration_with_new_email
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 4.75s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\AppData\Local\Programs\Python\Python311\Li...`
+
+### TC003_Dashboard_Rendering_and_Metrics_Display
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 5.30s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\ATLAS AI Incubator\testsprite_tests\TC003_...`
+
+### TC004_SWOT_Analysis_Component_Rendering
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 5.13s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\ATLAS AI Incubator\testsprite_tests\TC004_...`
+
+### TC005_get_venture_details_by_id
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 4.71s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\AppData\Local\Programs\Python\Python311\Li...`
+
+### TC006_get_analysis_history_for_venture
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 4.82s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\AppData\Local\Programs\Python\Python311\Li...`
+
+### TC007_update_user_profile_information
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 4.86s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\AppData\Local\Programs\Python\Python311\Li...`
+
+### TC008_create_subscription_with_valid_payment
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 4.69s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\AppData\Local\Programs\Python\Python311\Li...`
+
+### TC009_invite_team_member_with_valid_details
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 4.75s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\AppData\Local\Programs\Python\Python311\Li...`
+
+### TC010_export_analysis_in_requested_format
+
+- **Status:** FAILED
+- **Category:** core
+- **Duration:** 4.71s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\AppData\Local\Programs\Python\Python311\Li...`
+
+### EH003_database_errors
+
+- **Status:** FAILED
+- **Category:** error_handling
+- **Duration:** 0.15s
+- **Error:** `
+======================================================================
+EH003: Database Error Handli...`
+
+### EH004_ai_service_failures
+
+- **Status:** FAILED
+- **Category:** error_handling
+- **Duration:** 0.15s
+- **Error:** `Traceback (most recent call last):
+  File "C:\Users\zboud\ATLAS AI Incubator\testsprite_tests\EH004_...`
+
+## [RECOVERY] Recovery Mechanisms Validated
+
+- [OK] EH001_network_failures
+- [OK] EH002_api_errors
+- [OK] EH005_authentication_errors
+- [OK] EH006_validation_errors
+- [OK] RG001_critical_paths
+- [OK] SC004_rate_limiting
+
+## [ENV] Environment
+
+- **Python:** 3.11.9
+- **Platform:** win32
+- **MCP Server:** Standalone
+- **API Key:** Not Set
+- **CI Mode:** False
+
+## [NOTES] Notes
+
+[WARNING] Coverage threshold not met. Consider:
+- Adding more tests for uncovered code paths
+- Running edge case detection
+- Reviewing error handling coverage
+
+---
+*Generated by TestSprite MCP Test Runner*

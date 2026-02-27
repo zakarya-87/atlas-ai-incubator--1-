@@ -19,6 +19,30 @@ vi.mock('jest-axe', () => ({
   toHaveNoViolations: vi.fn(),
 }));
 
+// Mock framer-motion with prop filtering to avoid React warnings
+const filterMotionProps = (props: any) => {
+  const {
+    initial, animate, exit, variants, transition, whileHover, whileTap,
+    whileFocus, whileDrag, whileInView, viewport, layout, layoutId,
+    layoutDependency, style, ...domProps
+  } = props;
+  return domProps;
+};
+
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...filterMotionProps(props)}>{children}</div>,
+    button: ({ children, ...props }: any) => <button {...filterMotionProps(props)}>{children}</button>,
+    h3: ({ children, ...props }: any) => <h3 {...filterMotionProps(props)}>{children}</h3>,
+    p: ({ children, ...props }: any) => <p {...filterMotionProps(props)}>{children}</p>,
+    nav: ({ children, ...props }: any) => <nav {...filterMotionProps(props)}>{children}</nav>,
+    ul: ({ children, ...props }: any) => <ul {...filterMotionProps(props)}>{children}</ul>,
+    li: ({ children, ...props }: any) => <li {...filterMotionProps(props)}>{children}</li>,
+    span: ({ children, ...props }: any) => <span {...filterMotionProps(props)}>{children}</span>,
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
 // Import components to test
 import AuthModal from './AuthModal';
 import BusinessInputForm from './BusinessInputForm';
@@ -68,7 +92,9 @@ describe('Accessibility Compliance Verification (TC020)', () => {
 
       const emailInput = screen.getByLabelText(/email/i);
       const passwordInput = screen.getByLabelText(/password/i);
-      const signInButton = screen.getByRole('button', { name: /submit sign in/i });
+      const signInButton = screen.getByRole('button', {
+        name: /submit sign in/i,
+      });
 
       // Verify tab order (HTML inputs are focusable by default without explicit tabindex)
       // Check that inputs are in the document and button is not disabled
@@ -92,11 +118,13 @@ describe('Accessibility Compliance Verification (TC020)', () => {
 
       const emailInput = screen.getByLabelText(/email/i);
       const passwordInput = screen.getByLabelText(/password/i);
-      
+
       fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
       fireEvent.change(passwordInput, { target: { value: 'short' } });
-      
-      const submitButton = screen.getByRole('button', { name: /submit sign in/i });
+
+      const submitButton = screen.getByRole('button', {
+        name: /submit sign in/i,
+      });
       fireEvent.click(submitButton);
 
       // Wait for error to appear (password should be too short)
@@ -140,7 +168,7 @@ describe('Accessibility Compliance Verification (TC020)', () => {
 
       const shortcutHint = screen.getByRole('note');
       expect(shortcutHint).toBeInTheDocument();
-      
+
       const kbdElements = shortcutHint.querySelectorAll('kbd');
       expect(kbdElements).toHaveLength(2);
       expect(kbdElements[0]).toHaveTextContent('Ctrl');
@@ -150,7 +178,10 @@ describe('Accessibility Compliance Verification (TC020)', () => {
     it('should provide feedback for input quality', () => {
       render(
         <LanguageProvider>
-          <BusinessInputForm {...defaultProps} value="This is a comprehensive business description that should show excellent quality for SWOT analysis" />
+          <BusinessInputForm
+            {...defaultProps}
+            value="This is a comprehensive business description that should show excellent quality for SWOT analysis"
+          />
         </LanguageProvider>
       );
 
@@ -163,13 +194,19 @@ describe('Accessibility Compliance Verification (TC020)', () => {
     it('should handle file upload accessibility', () => {
       render(
         <LanguageProvider>
-          <BusinessInputForm {...defaultProps} activeTool="competitorAnalysis" />
+          <BusinessInputForm
+            {...defaultProps}
+            activeTool="competitorAnalysis"
+          />
         </LanguageProvider>
       );
 
       const fileInput = screen.getByLabelText(/upload/i);
       expect(fileInput).toHaveAttribute('accept', 'image/*');
-      expect(fileInput).toHaveAttribute('aria-describedby', 'image-upload-description');
+      expect(fileInput).toHaveAttribute(
+        'aria-describedby',
+        'image-upload-description'
+      );
     });
 
     it('should announce loading states to screen readers', () => {
@@ -179,7 +216,9 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </LanguageProvider>
       );
 
-      const submitButton = screen.getByRole('button', { name: /Generating.../i });
+      const submitButton = screen.getByRole('button', {
+        name: /Generating.../i,
+      });
       expect(submitButton).toBeDisabled();
     });
   });
@@ -211,10 +250,24 @@ describe('Accessibility Compliance Verification (TC020)', () => {
 
       expect(screen.getByRole('alert')).toBeInTheDocument();
 
-      rerender(<Toast {...mockToast} type="error" message="Error occurred" onDismiss={vi.fn()} />);
+      rerender(
+        <Toast
+          {...mockToast}
+          type="error"
+          message="Error occurred"
+          onDismiss={vi.fn()}
+        />
+      );
       expect(screen.getByRole('alert')).toBeInTheDocument();
 
-      rerender(<Toast {...mockToast} type="info" message="Information" onDismiss={vi.fn()} />);
+      rerender(
+        <Toast
+          {...mockToast}
+          type="info"
+          message="Information"
+          onDismiss={vi.fn()}
+        />
+      );
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });
   });
@@ -233,7 +286,9 @@ describe('Accessibility Compliance Verification (TC020)', () => {
         </LanguageProvider>
       );
 
-      const reloadButton = screen.getByRole('button', { name: /Reload Application/i });
+      const reloadButton = screen.getByRole('button', {
+        name: /Reload Application/i,
+      });
       expect(reloadButton).toBeInTheDocument();
     });
 
@@ -287,7 +342,13 @@ describe('Accessibility Compliance Verification (TC020)', () => {
     });
 
     const defaultProps = {
-      analysisData: { id: 'test', strengths: [], weaknesses: [], opportunities: [], threats: [] },
+      analysisData: {
+        id: 'test',
+        strengths: [],
+        weaknesses: [],
+        opportunities: [],
+        threats: [],
+      },
       analysisType: 'swot' as const,
       businessDescription: 'Test description',
       targetElementId: 'test-element',
@@ -317,7 +378,7 @@ describe('Accessibility Compliance Verification (TC020)', () => {
       await screen.findByText(/Download/i);
       const menuItems = screen.getAllByRole('button');
 
-      menuItems.forEach(item => {
+      menuItems.forEach((item) => {
         expect(item).not.toBeDisabled();
       });
     });
@@ -325,7 +386,7 @@ describe('Accessibility Compliance Verification (TC020)', () => {
     it('should announce loading states during export', async () => {
       // This test verifies that the ExportControls component has proper
       // accessibility attributes for loading states.
-      
+
       render(
         <LanguageProvider>
           <ExportControls {...defaultProps} />
@@ -344,15 +405,15 @@ describe('Accessibility Compliance Verification (TC020)', () => {
       // Trigger menu to appear by hovering over the main button (same as working test)
       const exportControls = screen.getByLabelText('Export');
       fireEvent.mouseEnter(exportControls);
-      
+
       // Wait for menu items to appear (same as working test)
       await screen.findByText(/Download/i);
-      
+
       // The "Download Official Report" button should exist in the DOM
       // and have proper accessibility for loading states
       const officialButton = screen.getByText(/Download Official Report/i);
       expect(officialButton).toBeInTheDocument();
-      
+
       // Verify the button has proper role attribute
       expect(officialButton).toHaveAttribute('role', 'button');
     });
@@ -392,10 +453,12 @@ describe('Accessibility Compliance Verification (TC020)', () => {
 
   describe('Screen Reader Support', () => {
     it('should provide descriptive text for icons and visual elements', () => {
-      render(<Toast id="test" type="success" message="Success" onDismiss={vi.fn()} />);
+      render(
+        <Toast id="test" type="success" message="Success" onDismiss={vi.fn()} />
+      );
 
       const icons = document.querySelectorAll('svg');
-      icons.forEach(icon => {
+      icons.forEach((icon) => {
         expect(icon).toHaveAttribute('aria-hidden', 'true');
       });
     });
@@ -418,7 +481,9 @@ describe('Accessibility Compliance Verification (TC020)', () => {
     });
 
     it('should provide sufficient color contrast (visual check)', () => {
-      render(<Toast id="test" type="error" message="Error" onDismiss={vi.fn()} />);
+      render(
+        <Toast id="test" type="error" message="Error" onDismiss={vi.fn()} />
+      );
 
       const toast = screen.getByRole('alert');
       expect(toast).toHaveClass('bg-brand-secondary');
@@ -449,7 +514,9 @@ describe('Accessibility Compliance Verification (TC020)', () => {
     });
 
     it('should restore focus when modals close', () => {
-      render(<Toast id="test" type="info" message="Test" onDismiss={vi.fn()} />);
+      render(
+        <Toast id="test" type="info" message="Test" onDismiss={vi.fn()} />
+      );
 
       const closeButton = screen.getByLabelText('Close');
       expect(closeButton).toBeInTheDocument();

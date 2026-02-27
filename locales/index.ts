@@ -11,7 +11,7 @@ export const translations = {
 export type Language = keyof typeof translations;
 export type TranslationKey = keyof typeof en;
 
-export const languages: { key: Language, name: string }[] = [
+export const languages: { key: Language; name: string }[] = [
   { key: 'en', name: 'English' },
   { key: 'fr', name: 'Français' },
   { key: 'ar', name: 'العربية' },

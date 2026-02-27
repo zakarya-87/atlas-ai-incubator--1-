@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -54,7 +54,7 @@ Object.defineProperty(window, 'localStorage', {
   writable: true,
 });
 
-// Also define on global for Node environments
-if (typeof global !== 'undefined') {
-  (global as any).localStorage = localStorageMock;
+// Also define on global for Node/JSDOM environments
+if (typeof globalThis !== 'undefined') {
+  (globalThis as any).localStorage = localStorageMock;
 }

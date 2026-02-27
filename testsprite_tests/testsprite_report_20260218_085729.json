@@ -1,0 +1,208 @@
+{
+  "summary": {
+    "test_suite": "TestSprite MCP",
+    "project": "ATLAS AI Incubator",
+    "execution_date": "2026-02-18T08:57:29.756524",
+    "category": "core",
+    "total_tests": 15,
+    "passed": 15,
+    "failed": 0,
+    "timeout": 0,
+    "error": 0,
+    "recovery_success": 0,
+    "success_rate": 100.0,
+    "coverage_threshold": 80.0,
+    "coverage_met": true,
+    "total_duration": 14.197734355926514,
+    "status": "PASSED"
+  },
+  "category_breakdown": {
+    "core": {
+      "category": "core",
+      "total": 15,
+      "passed": 15,
+      "failed": 0,
+      "timeout": 0,
+      "error": 0,
+      "skipped": 0,
+      "duration": 14.18757939338684,
+      "success_rate": 100.0
+    }
+  },
+  "test_results": [
+    {
+      "test_id": "TC001_User_Authentication_Success",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC001_User_Authentication_Success.py",
+      "status": "PASSED",
+      "duration": 2.029954195022583,
+      "error": null,
+      "output": "[INFO] Testing user authentication success flow\n[OK] User authenticated successfully: testuser@example.com\n[OK] Dashboard loaded successfully\n   Ventures: 5\n   Analyses: 12\n   Team Members: 3\n[PASS] TestSprite MCP TC001: User Authentication Success - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC001_user_login_with_valid_credentials",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC001_user_login_with_valid_credentials.py",
+      "status": "PASSED",
+      "duration": 1.036346435546875,
+      "error": null,
+      "output": "STSPRITE_MODE=local)\n[PASS] Status code: 200\n[PASS] JWT token present in response\n[PASS] JWT token format valid\n[PASS] User email matches\n[PASS] User ID present\n[PASS] User role valid\n\n============================================================\n[OK] TC001 PASSED: User authentication successful\n   User: testuser@example.com (ID: user-123)\n   Role: USER\n   Token: eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...\n============================================================\n\n[SUCCESS] TestSprite MCP TC001: PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC002_User_Authentication_Failure",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC002_User_Authentication_Failure.py",
+      "status": "PASSED",
+      "duration": 0.7902042865753174,
+      "error": null,
+      "output": "[INFO] Testing authentication failure scenarios\n[OK] Invalid credentials properly rejected\n   Error: Invalid credentials\n   Message: Email or password is incorrect\n[OK] Non-existent user properly rejected\n[OK] Empty password properly rejected\n[PASS] TestSprite MCP TC002: User Authentication Failure - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC002_user_registration_with_new_email",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC002_user_registration_with_new_email.py",
+      "status": "PASSED",
+      "duration": 0.7955710887908936,
+      "error": null,
+      "output": "[INFO] Testing user registration with new email\n[OK] User registered successfully: testuser_43fa7631-999b-4356-b554-d64429990438@example.com\n   User ID: user-df2306c3-1f7c-4eae-9637-b38d32ca3c52\n[OK] User logged in successfully\n[PASS] TestSprite MCP TC002: User Registration - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC003_Dashboard_Rendering_and_Metrics_Display",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC003_Dashboard_Rendering_and_Metrics_Display.py",
+      "status": "PASSED",
+      "duration": 0.773442268371582,
+      "error": null,
+      "output": "[INFO] Testing dashboard rendering and metrics display\n[OK] Dashboard metrics loaded successfully\n   Total Ventures: 12\n   Total Analyses: 28\n   Team Members: 5\n   Pending Invitations: 2\n   Storage Used: 1.2GB\n[OK] Recent ventures loaded: 2 ventures\n[PASS] TestSprite MCP TC003: Dashboard Rendering - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC003_generate_business_analysis_with_valid_input",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC003_generate_business_analysis_with_valid_input.py",
+      "status": "PASSED",
+      "duration": 0.7626228332519531,
+      "error": null,
+      "output": "[OK] Venture created: venture-456\n[OK] Analysis job submitted: job-789\n[OK] SWOT Analysis completed successfully\n   Strengths: 2 items\n   Weaknesses: 2 items\n   Opportunities: 2 items\n   Threats: 2 items\n[OK] Venture cleanup completed: venture-456\n[PASS] TestSprite MCP TC003: Business Analysis Generation - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC004_SWOT_Analysis_Component_Rendering",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC004_SWOT_Analysis_Component_Rendering.py",
+      "status": "PASSED",
+      "duration": 0.7514708042144775,
+      "error": null,
+      "output": "[INFO] Testing SWOT analysis component rendering\n[OK] SWOT Analysis rendered successfully\n   Strengths: 2 items\n   Weaknesses: 2 items\n   Opportunities: 2 items\n   Threats: 2 items\n[PASS] TestSprite MCP TC004: SWOT Analysis Component - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC004_create_new_venture_with_valid_data",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC004_create_new_venture_with_valid_data.py",
+      "status": "PASSED",
+      "duration": 1.0191900730133057,
+      "error": null,
+      "output": "[OK] Venture created successfully: venture-789\n[OK] Venture retrieval successful\n   ID: venture-789\n   Name: Test Venture Unique-123\n   Created: 2026-01-16T15:30:00.000Z\n[OK] Venture cleanup completed: venture-789\n[PASS] TestSprite MCP TC004: Venture Creation - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC005_UndoRedo_Hook_Functionality",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC005_UndoRedo_Hook_Functionality.py",
+      "status": "PASSED",
+      "duration": 1.2162725925445557,
+      "error": null,
+      "output": "[INFO] Testing Undo/Redo Hook Functionality\n[OK] State updated: state-456\n[OK] Undo operation successful\n   Previous state strengths: 1 items\n   Previous state weaknesses: 1 items\n[OK] Redo operation successful\n   Current state strengths: 2 items\n   Current state weaknesses: 1 items\n   Current state opportunities: 2 items\n   Current state threats: 1 items\n[OK] State consistency validated\n[PASS] TestSprite MCP TC005: Undo/Redo Hook Functionality - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC005_get_venture_details_by_id",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC005_get_venture_details_by_id.py",
+      "status": "PASSED",
+      "duration": 0.749354362487793,
+      "error": null,
+      "output": "[INFO] Testing get venture details by ID\n[OK] Venture created: venture-456\n[OK] Venture details retrieved successfully\n   ID: venture-456\n   Name: Test Venture for TC005\n   Status: active\n[OK] Non-existent venture returns 404 as expected\n[PASS] TestSprite MCP TC005: Get Venture Details - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC006_get_analysis_history_for_venture",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC006_get_analysis_history_for_venture.py",
+      "status": "PASSED",
+      "duration": 0.8206727504730225,
+      "error": null,
+      "output": "[INFO] Testing get analysis history for venture\n[OK] Venture created: venture-789\n[OK] Analysis history retrieved: 3 analyses\n   - SWOT (completed) - 2026-01-15T10:00:00.000Z\n   -  Porter's Five Forces (completed) - 2026-01-14T14:30:00.000Z\n   - Business Model Canvas (completed) - 2026-01-13T09:15:00.000Z\n[PASS] TestSprite MCP TC006: Get Analysis History - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC007_update_user_profile_information",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC007_update_user_profile_information.py",
+      "status": "PASSED",
+      "duration": 0.9583752155303955,
+      "error": null,
+      "output": "[INFO] Testing update user profile information\n[OK] Original profile retrieved: Original Test User\n[OK] Profile updated successfully: Updated Test User\n   Language: fr\n   Notifications: True\n[OK] Profile changes persisted successfully\n[PASS] TestSprite MCP TC007: Update User Profile - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC008_create_subscription_with_valid_payment",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC008_create_subscription_with_valid_payment.py",
+      "status": "PASSED",
+      "duration": 0.7457985877990723,
+      "error": null,
+      "output": "[INFO] Testing create subscription with valid payment\n[OK] Subscription created successfully\n   Subscription ID: sub-456\n   Plan: premium_monthly\n   Status: active\n   Amount: $29.99/month\n   Payment: visa ending in 4242\n[PASS] TestSprite MCP TC008: Create Subscription - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC009_invite_team_member_with_valid_details",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC009_invite_team_member_with_valid_details.py",
+      "status": "PASSED",
+      "duration": 0.8582844734191895,
+      "error": null,
+      "output": "[INFO] Testing invite team member with valid details\n[OK] Venture created: venture-team-123\n[OK] Team invitation sent successfully\n   Invitation ID: invite-250f69c7-7df9-48d3-8c77-d3cc0a2e349f\n   Email: invitee+3429d4a3@example.com\n   Role: member\n   Status: pending\n[PASS] TestSprite MCP TC009: Invite Team Member - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "TC010_export_analysis_in_requested_format",
+      "category": "core",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\TC010_export_analysis_in_requested_format.py",
+      "status": "PASSED",
+      "duration": 0.8800194263458252,
+      "error": null,
+      "output": "[INFO] Testing export analysis in requested format\n[OK] Export successful: PDF\n[OK] Export successful: DOCX\n[OK] Export successful: XLSX\n[OK] All export formats tested successfully (PDF, DOCX, XLSX)\n[PASS] TestSprite MCP TC010: Export Analysis - PASSED\n",
+      "recovery_success": false,
+      "coverage_data": null
+    }
+  ],
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "win32",
+    "working_directory": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests",
+    "test_files_found": 15,
+    "mcp_server_available": true,
+    "api_key_configured": false,
+    "ci_mode": false
+  }
+}

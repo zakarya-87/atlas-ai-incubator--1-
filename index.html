@@ -1,14 +1,16 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/public/favicon.svg" />
     <title>ATLAS AI: SWOT Analysis Generator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Sans+Arabic:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Sans+Arabic:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -36,53 +38,52 @@
             },
           },
         },
+      };
+    </script>
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://aistudiocdn.com/react@^19.1.1",
+          "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+          "react/": "https://aistudiocdn.com/react@^19.1.1/",
+          "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0",
+          "framer-motion": "https://aistudiocdn.com/framer-motion@^11.3.18",
+          "jspdf": "https://aistudiocdn.com/jspdf@^2.5.1",
+          "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1",
+          "@nestjs/common": "https://aistudiocdn.com/@nestjs/common@^11.1.9",
+          "class-validator": "https://aistudiocdn.com/class-validator@^0.14.2",
+          "@nestjs/core": "https://aistudiocdn.com/@nestjs/core@^11.1.9",
+          "@prisma/client": "https://aistudiocdn.com/@prisma/client@^7.0.0",
+          "@nestjs/config": "https://aistudiocdn.com/@nestjs/config@^4.0.2",
+          "bcrypt": "https://aistudiocdn.com/bcrypt@^6.0.0",
+          "@nestjs/passport": "https://aistudiocdn.com/@nestjs/passport@^11.0.5",
+          "passport-jwt": "https://aistudiocdn.com/passport-jwt@^4.0.1",
+          "@nestjs/jwt": "https://aistudiocdn.com/@nestjs/jwt@^11.0.1",
+          "express": "https://aistudiocdn.com/express@^5.1.0",
+          "@nestjs/throttler": "https://aistudiocdn.com/@nestjs/throttler@^6.4.0",
+          "socket.io-client": "https://aistudiocdn.com/socket.io-client@4.7.2",
+          "socket.io": "https://aistudiocdn.com/socket.io@^4.8.1",
+          "@nestjs/websockets": "https://aistudiocdn.com/@nestjs/websockets@^11.1.9",
+          "@nestjs/testing": "https://aistudiocdn.com/@nestjs/testing@^11.1.9",
+          "@nestjs/microservices": "https://aistudiocdn.com/@nestjs/microservices@^11.1.9",
+          "supertest": "https://aistudiocdn.com/supertest@^7.1.4",
+          "@testing-library/react": "https://aistudiocdn.com/@testing-library/react@^16.3.0",
+          "vitest": "https://aistudiocdn.com/vitest@^4.0.10",
+          "vitest/": "https://aistudiocdn.com/vitest@^4.0.10/",
+          "@playwright/test": "https://aistudiocdn.com/@playwright/test@^1.56.1",
+          "puppeteer": "https://aistudiocdn.com/puppeteer@^24.30.0",
+          "stripe": "https://aistudiocdn.com/stripe@^20.0.0",
+          "nodemailer": "https://aistudiocdn.com/nodemailer@^7.0.10",
+          "@nestjs/swagger": "https://aistudiocdn.com/@nestjs/swagger@^11.2.3",
+          "@nestjs/terminus": "https://aistudiocdn.com/@nestjs/terminus@^11.0.0",
+          "helmet": "https://aistudiocdn.com/helmet@^8.1.0",
+          "compression": "https://aistudiocdn.com/compression@^1.8.1",
+          "winston": "https://aistudiocdn.com/winston@^3.18.3",
+          "nest-winston": "https://aistudiocdn.com/nest-winston@^1.10.2"
+        }
       }
     </script>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.1.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
-    "react/": "https://aistudiocdn.com/react@^19.1.1/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0",
-    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.3.18",
-    "jspdf": "https://aistudiocdn.com/jspdf@^2.5.1",
-    "html2canvas": "https://aistudiocdn.com/html2canvas@^1.4.1",
-    "@nestjs/common": "https://aistudiocdn.com/@nestjs/common@^11.1.9",
-    "class-validator": "https://aistudiocdn.com/class-validator@^0.14.2",
-    "@nestjs/core": "https://aistudiocdn.com/@nestjs/core@^11.1.9",
-    "@prisma/client": "https://aistudiocdn.com/@prisma/client@^7.0.0",
-    "@nestjs/config": "https://aistudiocdn.com/@nestjs/config@^4.0.2",
-    "bcrypt": "https://aistudiocdn.com/bcrypt@^6.0.0",
-    "@nestjs/passport": "https://aistudiocdn.com/@nestjs/passport@^11.0.5",
-    "passport-jwt": "https://aistudiocdn.com/passport-jwt@^4.0.1",
-    "@nestjs/jwt": "https://aistudiocdn.com/@nestjs/jwt@^11.0.1",
-    "express": "https://aistudiocdn.com/express@^5.1.0",
-    "@nestjs/throttler": "https://aistudiocdn.com/@nestjs/throttler@^6.4.0",
-    "socket.io-client": "https://aistudiocdn.com/socket.io-client@4.7.2",
-    "socket.io": "https://aistudiocdn.com/socket.io@^4.8.1",
-    "@nestjs/websockets": "https://aistudiocdn.com/@nestjs/websockets@^11.1.9",
-    "@nestjs/testing": "https://aistudiocdn.com/@nestjs/testing@^11.1.9",
-    "@nestjs/microservices": "https://aistudiocdn.com/@nestjs/microservices@^11.1.9",
-    "supertest": "https://aistudiocdn.com/supertest@^7.1.4",
-    "@testing-library/react": "https://aistudiocdn.com/@testing-library/react@^16.3.0",
-    "vitest": "https://aistudiocdn.com/vitest@^4.0.10",
-    "vitest/": "https://aistudiocdn.com/vitest@^4.0.10/",
-    "@playwright/test": "https://aistudiocdn.com/@playwright/test@^1.56.1",
-    "puppeteer": "https://aistudiocdn.com/puppeteer@^24.30.0",
-    "stripe": "https://aistudiocdn.com/stripe@^20.0.0",
-    "nodemailer": "https://aistudiocdn.com/nodemailer@^7.0.10",
-    "@nestjs/swagger": "https://aistudiocdn.com/@nestjs/swagger@^11.2.3",
-    "@nestjs/terminus": "https://aistudiocdn.com/@nestjs/terminus@^11.0.0",
-    "helmet": "https://aistudiocdn.com/helmet@^8.1.0",
-    "compression": "https://aistudiocdn.com/compression@^1.8.1",
-    "winston": "https://aistudiocdn.com/winston@^3.18.3",
-    "nest-winston": "https://aistudiocdn.com/nest-winston@^1.10.2"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
+  </head>
   <body class="bg-brand-primary text-brand-text font-sans antialiased">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>

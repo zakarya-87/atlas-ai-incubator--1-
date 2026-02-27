@@ -34,9 +34,13 @@ describe('AuthModal Component', () => {
     renderAuthModal();
     expect(screen.getByText('Welcome Back')).toBeInTheDocument();
     // Check for form elements by placeholder and type
-    expect(screen.getByPlaceholderText('founder@startup.com')).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('founder@startup.com')
+    ).toBeInTheDocument();
     expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: 'Sign In' })[0]).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('button', { name: 'Sign In' })[0]
+    ).toBeInTheDocument();
   });
 
   it('should call onClose when modal backdrop is clicked', () => {
@@ -55,7 +59,9 @@ describe('AuthModal Component', () => {
     // Click signup button (the tab)
     const signupTab = screen.getByRole('button', { name: 'Sign Up' });
     fireEvent.click(signupTab);
-    expect(screen.getByRole('heading', { name: 'Create Account' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Create Account' })
+    ).toBeInTheDocument();
 
     // Click back to login tab
     const signinTab = screen.getByRole('button', { name: 'Sign In' });

@@ -1,21 +1,22 @@
-
 import { AuthCredentials } from '../types';
+import { STORAGE_KEYS } from '../utils/constants';
 
 import config from '../utils/config';
 const BACKEND_URL = config.apiBaseUrl;
 
 export interface AuthResponse {
-  accessToken: string;
+  access_token?: string;
+  success?: boolean;
 }
 
 export interface UserProfile {
-    id: string;
-    email: string;
-    fullName?: string;
-    role: string;
-    credits: number;
-    subscriptionStatus: string;
-    subscriptionPlan: string;
+  id: string;
+  email: string;
+  fullName?: string;
+  role: string;
+  credits: number;
+  subscriptionStatus: string;
+  subscriptionPlan: string;
 }
 
 export const signUp = async (credentials: AuthCredentials): Promise<void> => {
@@ -32,7 +33,9 @@ export const signUp = async (credentials: AuthCredentials): Promise<void> => {
   }
 };
 
-export const signIn = async (credentials: AuthCredentials): Promise<AuthResponse> => {
+export const signIn = async (
+  credentials: AuthCredentials
+): Promise<AuthResponse> => {
   const response = await fetch(`${BACKEND_URL}/auth/signin`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -48,25 +51,42 @@ export const signIn = async (credentials: AuthCredentials): Promise<AuthResponse
   return response.json();
 };
 
-export const fetchUserProfile = async (): Promise<UserProfile> => {
-    const response = await fetch(`${BACKEND_URL}/users/profile`, {
-        credentials: 'include' // Include cookies in request
-    });
-
-    if (!response.ok) throw new Error('Failed to fetch profile');
-    return response.json();
+const getAuthHeaders = () => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
 };
 
-export const updateUserProfile = async (data: { fullName?: string; password?: string }): Promise<UserProfile> => {
-    const response = await fetch(`${BACKEND_URL}/users/profile`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Include cookies in request
-        body: JSON.stringify(data)
-    });
+export const fetchUserProfile = async (): Promise<UserProfile> => {
+  const headers = getAuthHeaders();
+  // Remove content-type for GET request if not needed, but keep Auth
+  delete headers['Content-Type']; 
 
-    if (!response.ok) throw new Error('Failed to update profile');
-    return response.json();
+  const response = await fetch(`${BACKEND_URL}/users/profile`, {
+    headers,
+    credentials: 'include', // Include cookies in request
+  });
+
+  if (!response.ok) throw new Error('Failed to fetch profile');
+  return response.json();
+};
+
+export const updateUserProfile = async (data: {
+  fullName?: string;
+  password?: string;
+}): Promise<UserProfile> => {
+  const response = await fetch(`${BACKEND_URL}/users/profile`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(),
+    credentials: 'include', // Include cookies in request
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) throw new Error('Failed to update profile');
+  return response.json();
 };

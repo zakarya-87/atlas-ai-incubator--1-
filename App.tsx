@@ -1,16 +1,38 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
-import type { GenerationRecord, AnyAnalysisData, ModuleType, AnyTool } from './types';
+import type {
+  GenerationRecord,
+  AnyAnalysisData,
+  ModuleType,
+  AnyTool,
+} from './types';
 import {
-  generateSwotAnalysis, generatePestelAnalysis, generateMarketAnalysis, generateMarketResearch,
-  generateRoadmap, generateLeanCanvas, generateOkrWorkflow, generateIdeaValidation,
-  generateProblemValidation, generateCompetitorAnalysis, generateCustomerValidation,
-  generateRiskFeasibilityAnalysis, generateValidationTracker, generateBudget,
-  generateFinancialForecast, generateCashFlowForecast, generateKpiDashboard,
-  generateMilestones, generateExpansionStrategy, generatePitchDeck, generateInvestorMatches,
-  generateFundraisingRoadmap, fetchVentureHistory, deleteAnalysisRecord, generateBrandIdentity
+  generateSwotAnalysis,
+  generatePestelAnalysis,
+  generateMarketAnalysis,
+  generateMarketResearch,
+  generateRoadmap,
+  generateLeanCanvas,
+  generateOkrWorkflow,
+  generateIdeaValidation,
+  generateProblemValidation,
+  generateCompetitorAnalysis,
+  generateCustomerValidation,
+  generateRiskFeasibilityAnalysis,
+  generateValidationTracker,
+  generateBudget,
+  generateFinancialForecast,
+  generateCashFlowForecast,
+  generateKpiDashboard,
+  generateMilestones,
+  generateExpansionStrategy,
+  generatePitchDeck,
+  generateInvestorMatches,
+  generateFundraisingRoadmap,
+  fetchVentureHistory,
+  deleteAnalysisRecord,
+  generateBrandIdentity,
 } from './services/geminiService';
 import { useLanguage } from './context/LanguageContext';
 import { translations, TranslationKey } from './locales';
@@ -30,7 +52,8 @@ const generateUUID = () => {
     return crypto.randomUUID();
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };
@@ -41,17 +64,25 @@ const AppContent: React.FC = () => {
 
   // --- Global State ---
   // Use persisted state for the input description to save drafts
-  const [businessDescription, setBusinessDescription] = usePersistedState<string>('atlas_input_draft', '');
+  const [businessDescription, setBusinessDescription] =
+    usePersistedState<string>('atlas_input_draft', '');
 
-  const [lastSubmittedImage, setLastSubmittedImage] = useState<string | undefined>(undefined);
+  const [lastSubmittedImage, setLastSubmittedImage] = useState<
+    string | undefined
+  >(undefined);
   const [ventureId, setVentureId] = useState<string>('');
   const [activeModule, setActiveModule] = useState<ModuleType>('dashboard'); // Default to Dashboard
   const [activeTool, setActiveTool] = useState<AnyTool>('overview');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<{ code: string; message: string } | null>(null);
+  const [error, setError] = useState<{ code: string; message: string } | null>(
+    null
+  );
   const [isRetrying, setIsRetrying] = useState<boolean>(false);
-  const [generationHistory, setGenerationHistory] = useState<GenerationRecord[]>([]);
-  const [viewingHistoryRecord, setViewingHistoryRecord] = useState<GenerationRecord | null>(null);
+  const [generationHistory, setGenerationHistory] = useState<
+    GenerationRecord[]
+  >([]);
+  const [viewingHistoryRecord, setViewingHistoryRecord] =
+    useState<GenerationRecord | null>(null);
 
   // UI State
   const [isTourOpen, setIsTourOpen] = useState(false);
@@ -62,7 +93,11 @@ const AppContent: React.FC = () => {
   const {
     state: currentAnalysis,
     set: setCurrentAnalysis,
-    undo, redo, canUndo, canRedo, reset: resetHistory
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    reset: resetHistory,
   } = useUndoRedo<AnyAnalysisData | null>(null);
 
   // --- Initialization ---
@@ -86,13 +121,12 @@ const AppContent: React.FC = () => {
           const history = await fetchVentureHistory(ventureId);
           setGenerationHistory(history);
         } catch (e) {
-          console.error("Failed to load history from backend", e);
+          console.error('Failed to load history from backend', e);
         }
       }
     };
     loadHistory();
   }, [ventureId, isAuthenticated]); // Added missing dependencies
-
 
   // --- Navigation Logic ---
   const clearAnalysisData = () => {
@@ -108,36 +142,65 @@ const AppContent: React.FC = () => {
     setIsFocusMode(false); // Exit focus on nav
   }, []);
 
-  const handleModuleChange = useCallback((module: ModuleType) => {
-    if (module === activeModule) return;
-    clearAnalysisData();
-    setViewingHistoryRecord(null);
-    setActiveModule(module);
-    setIsFocusMode(false);
+  const handleModuleChange = useCallback(
+    (module: ModuleType) => {
+      if (module === activeModule) return;
+      clearAnalysisData();
+      setViewingHistoryRecord(null);
+      setActiveModule(module);
+      setIsFocusMode(false);
 
-    // Default tool selection logic
-    switch (module) {
-      case 'dashboard': setActiveTool('overview'); break;
-      case 'fundamentals': setActiveTool('ideaValidation'); break;
-      case 'strategy': setActiveTool('swot'); break;
-      case 'marketAnalysis': setActiveTool('overview'); break;
-      case 'finance': setActiveTool('budgetGenerator'); break;
-      case 'growth': setActiveTool('milestones'); break;
-      case 'funding': setActiveTool('pitchDeckGenerator'); break;
-      case 'architecture': setActiveTool('systemDesign'); break;
-      case 'audit': setActiveTool('trail'); break;
-      case 'integrations': setActiveTool('connectors'); break;
-      case 'productivity': setActiveTool('taskManager'); break;
-      default: setActiveTool('swot');
-    }
-  }, [activeModule]);
+      // Default tool selection logic
+      switch (module) {
+        case 'dashboard':
+          setActiveTool('overview');
+          break;
+        case 'fundamentals':
+          setActiveTool('ideaValidation');
+          break;
+        case 'strategy':
+          setActiveTool('swot');
+          break;
+        case 'marketAnalysis':
+          setActiveTool('overview');
+          break;
+        case 'finance':
+          setActiveTool('budgetGenerator');
+          break;
+        case 'growth':
+          setActiveTool('milestones');
+          break;
+        case 'funding':
+          setActiveTool('pitchDeckGenerator');
+          break;
+        case 'architecture':
+          setActiveTool('systemDesign');
+          break;
+        case 'audit':
+          setActiveTool('trail');
+          break;
+        case 'integrations':
+          setActiveTool('connectors');
+          break;
+        case 'productivity':
+          setActiveTool('taskManager');
+          break;
+        default:
+          setActiveTool('swot');
+      }
+    },
+    [activeModule]
+  );
 
-  const handleToolChange = useCallback((tool: AnyTool) => {
-    if (tool === activeTool) return;
-    clearAnalysisData();
-    setViewingHistoryRecord(null);
-    setActiveTool(tool);
-  }, [activeTool]);
+  const handleToolChange = useCallback(
+    (tool: AnyTool) => {
+      if (tool === activeTool) return;
+      clearAnalysisData();
+      setViewingHistoryRecord(null);
+      setActiveTool(tool);
+    },
+    [activeTool]
+  );
 
   // --- History Logic ---
   const handleViewHistoryRecord = (record: GenerationRecord) => {
@@ -151,9 +214,9 @@ const AppContent: React.FC = () => {
   const handleDeleteHistoryRecord = async (id: string) => {
     try {
       await deleteAnalysisRecord(id);
-      setGenerationHistory(prev => prev.filter(item => item.id !== id));
+      setGenerationHistory((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
-      console.error("Failed to delete record", error);
+      console.error('Failed to delete record', error);
     }
   };
 
@@ -162,109 +225,173 @@ const AppContent: React.FC = () => {
     clearAnalysisData();
   };
 
-  const handleSaveNewVersion = useCallback((originalRecord: GenerationRecord, modifiedData: AnyAnalysisData, message: string) => {
-    const newRecord: GenerationRecord = {
-      ...originalRecord,
-      id: `${Date.now()}-${Math.random()}`,
-      timestamp: new Date().toISOString(),
-      inputDescription: message,
-      data: modifiedData,
-    };
-    setGenerationHistory(prev => [newRecord, ...prev]);
-    handleViewHistoryRecord(newRecord);
-  }, []);
+  const handleSaveNewVersion = useCallback(
+    (
+      originalRecord: GenerationRecord,
+      modifiedData: AnyAnalysisData,
+      message: string
+    ) => {
+      const newRecord: GenerationRecord = {
+        ...originalRecord,
+        id: `${Date.now()}-${Math.random()}`,
+        timestamp: new Date().toISOString(),
+        inputDescription: message,
+        data: modifiedData,
+      };
+      setGenerationHistory((prev) => [newRecord, ...prev]);
+      handleViewHistoryRecord(newRecord);
+    },
+    []
+  );
 
   // --- AI Generation Logic ---
-  const handleGenerate = useCallback(async (image?: string, refinement?: { instruction: string; parentId: string }) => {
-    if (!businessDescription.trim() && !refinement) {
-      setError({ code: 'errorEmptyDescription', message: t('errorEmptyDescription') });
-      return;
-    }
+  const handleGenerate = useCallback(
+    async (
+      image?: string,
+      refinement?: { instruction: string; parentId: string }
+    ) => {
+      if (!businessDescription.trim() && !refinement) {
+        setError({
+          code: 'errorEmptyDescription',
+          message: t('errorEmptyDescription'),
+        });
+        return;
+      }
 
-    if (!isAuthenticated) {
-      setIsAuthModalOpen(true);
-      return;
-    }
+      if (!isAuthenticated) {
+        setIsAuthModalOpen(true);
+        return;
+      }
 
-    // If refining, we don't clear the current analysis immediately to avoid flash
-    if (!refinement) {
-      clearAnalysisData();
-      setViewingHistoryRecord(null);
-    }
+      // If refining, we don't clear the current analysis immediately to avoid flash
+      if (!refinement) {
+        clearAnalysisData();
+        setViewingHistoryRecord(null);
+      }
 
-    setIsLoading(true);
-    setIsRetrying(false);
-    if (image) setLastSubmittedImage(image);
+      setIsLoading(true);
+      setIsRetrying(false);
+      if (image) setLastSubmittedImage(image);
 
-    const generationFunctions: { [key in AnyTool]?: (desc: string, lang: 'en' | 'fr' | 'ar', ventureId: string, image?: string, refinement?: any) => Promise<any> } = {
-      'swot': generateSwotAnalysis,
-      'pestel': generatePestelAnalysis,
-      'roadmap': generateRoadmap,
-      'leanCanvas': generateLeanCanvas,
-      'okrWorkflow': generateOkrWorkflow,
-      'overview': generateMarketAnalysis,
-      'research': generateMarketResearch,
-      'ideaValidation': generateIdeaValidation,
-      'problemValidation': generateProblemValidation,
-      'competitorAnalysis': generateCompetitorAnalysis,
-      'customerValidation': generateCustomerValidation,
-      'riskFeasibility': generateRiskFeasibilityAnalysis,
-      'validationTracker': generateValidationTracker,
-      'brandIdentity': generateBrandIdentity,
-      'budgetGenerator': generateBudget,
-      'financialForecast': generateFinancialForecast,
-      'cashFlowForecast': generateCashFlowForecast,
-      'kpiDashboards': generateKpiDashboard,
-      'milestones': generateMilestones,
-      'expansionStrategy': generateExpansionStrategy,
-      'pitchDeckGenerator': generatePitchDeck,
-      'investorDatabase': generateInvestorMatches,
-      'fundraisingRoadmap': generateFundraisingRoadmap,
-    };
+      const generationFunctions: {
+        [key in AnyTool]?: (
+          desc: string,
+          lang: 'en' | 'fr' | 'ar',
+          ventureId: string,
+          image?: string,
+          refinement?: any
+        ) => Promise<any>;
+      } = {
+        swot: generateSwotAnalysis,
+        pestel: generatePestelAnalysis,
+        roadmap: generateRoadmap,
+        leanCanvas: generateLeanCanvas,
+        okrWorkflow: generateOkrWorkflow,
+        overview: generateMarketAnalysis,
+        research: generateMarketResearch,
+        ideaValidation: generateIdeaValidation,
+        problemValidation: generateProblemValidation,
+        competitorAnalysis: generateCompetitorAnalysis,
+        customerValidation: generateCustomerValidation,
+        riskFeasibility: generateRiskFeasibilityAnalysis,
+        validationTracker: generateValidationTracker,
+        brandIdentity: generateBrandIdentity,
+        budgetGenerator: generateBudget,
+        financialForecast: generateFinancialForecast,
+        cashFlowForecast: generateCashFlowForecast,
+        kpiDashboards: generateKpiDashboard,
+        milestones: generateMilestones,
+        expansionStrategy: generateExpansionStrategy,
+        pitchDeckGenerator: generatePitchDeck,
+        investorDatabase: generateInvestorMatches,
+        fundraisingRoadmap: generateFundraisingRoadmap,
+      };
 
-    const generate = generationFunctions[activeTool];
+      const generate = generationFunctions[activeTool];
 
-    if (generate) {
-      try {
-        // Pass the optional image and refinement arguments
-        const data = await generate(businessDescription, language, ventureId, image || lastSubmittedImage, refinement);
-        setCurrentAnalysis(data);
+      if (generate) {
+        try {
+          // Pass the optional image and refinement arguments
+          const data = await generate(
+            businessDescription,
+            language,
+            ventureId,
+            image || lastSubmittedImage,
+            refinement
+          );
+          setCurrentAnalysis(data);
 
-        const newRecord: GenerationRecord = {
-          id: data.id || `${Date.now()}-${Math.random()}`,
-          timestamp: new Date().toISOString(),
-          module: activeModule,
-          tool: activeTool,
-          toolNameKey: `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
-          inputDescription: refinement ? `Refinement: ${refinement.instruction}` : businessDescription,
-          data: data,
-        };
-        setGenerationHistory(prev => [newRecord, ...prev]);
+          const newRecord: GenerationRecord = {
+            id: data.id || `${Date.now()}-${Math.random()}`,
+            timestamp: new Date().toISOString(),
+            module: activeModule,
+            tool: activeTool,
+            toolNameKey:
+              `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
+            inputDescription: refinement
+              ? `Refinement: ${refinement.instruction}`
+              : businessDescription,
+            data: data,
+          };
+          setGenerationHistory((prev) => [newRecord, ...prev]);
 
-        if (refinement) {
-          // If refining, treat the new result as the "viewed record" to show context
-          setViewingHistoryRecord(newRecord);
+          if (refinement) {
+            // If refining, treat the new result as the "viewed record" to show context
+            setViewingHistoryRecord(newRecord);
+          }
+        } catch (e: any) {
+          if (e.message && e.message.includes('Authentication Required')) {
+            setIsAuthModalOpen(true);
+          } else if (e.message === 'errorRateLimit') {
+            setError({ code: 'errorRateLimit', message: t('errorRateLimit') });
+          } else {
+            setError({
+              code: e.message,
+              message: t(e.message as TranslationKey) || t('errorApiGeneric'),
+            });
+          }
+        } finally {
+          setIsLoading(false);
         }
-
-      } catch (e: any) {
-        if (e.message && e.message.includes('Authentication Required')) {
-          setIsAuthModalOpen(true);
-        } else if (e.message === 'errorRateLimit') {
-          setError({ code: 'errorRateLimit', message: t('errorRateLimit') });
-        } else {
-          setError({ code: e.message, message: t(e.message as TranslationKey) || t('errorApiGeneric') });
-        }
-      } finally {
+      } else {
         setIsLoading(false);
       }
-    } else {
-      setIsLoading(false);
-    }
-  }, [businessDescription, activeTool, activeModule, language, t, ventureId, setCurrentAnalysis, isAuthenticated, lastSubmittedImage]);
+    },
+    [
+      businessDescription,
+      activeTool,
+      activeModule,
+      language,
+      t,
+      ventureId,
+      setCurrentAnalysis,
+      isAuthenticated,
+      lastSubmittedImage,
+    ]
+  );
 
   const handleRetry = () => {
     setIsRetrying(true);
     handleGenerate(lastSubmittedImage);
+  };
+
+  const handleAnalysisResult = (data: { jobId: string; result: AnyAnalysisData }) => {
+    // Update state with the received analysis result
+    setCurrentAnalysis(data.result);
+    setIsLoading(false);
+
+    // Create a new history record
+    const newRecord: GenerationRecord = {
+      id: data.result.id || `${Date.now()}-${Math.random()}`,
+      timestamp: new Date().toISOString(),
+      module: activeModule,
+      tool: activeTool,
+      toolNameKey:
+        `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
+      inputDescription: businessDescription,
+      data: data.result,
+    };
+    setGenerationHistory((prev) => [newRecord, ...prev]);
   };
 
   const handleRefinement = (instruction: string) => {
@@ -276,19 +403,37 @@ const AppContent: React.FC = () => {
   };
 
   // --- Render Helpers ---
-  const showInputForm = !['dashboard', 'systemDesign', 'connectors', 'trail', 'experimentBuilder', 'taskManager'].includes(activeModule) && !['experimentBuilder'].includes(activeTool) && !viewingHistoryRecord;
+  const showInputForm =
+    ![
+      'dashboard',
+      'systemDesign',
+      'connectors',
+      'trail',
+      'experimentBuilder',
+      'taskManager',
+    ].includes(activeModule) &&
+    !['experimentBuilder'].includes(activeTool) &&
+    !viewingHistoryRecord;
 
   // Invoke Module Router to get content
   const { subNav, content } = ModuleRouter({
-    activeModule, activeTool, currentAnalysis, isLoading, error, isRetrying,
-    ventureId, generationHistory, viewingHistoryRecord,
+    activeModule,
+    activeTool,
+    currentAnalysis,
+    isLoading,
+    error,
+    isRetrying,
+    ventureId,
+    generationHistory,
+    viewingHistoryRecord,
     onToolChange: handleToolChange,
     onRetry: handleRetry,
     onUpdateAnalysis: setCurrentAnalysis,
     onSaveVersion: handleSaveNewVersion,
     onViewHistory: handleViewHistoryRecord,
     onDeleteHistory: handleDeleteHistoryRecord,
-    onNavigate: handleNavigate
+    onNavigate: handleNavigate,
+    onAnalysisResult: handleAnalysisResult,
   });
 
   return (
@@ -324,7 +469,10 @@ const AppContent: React.FC = () => {
 
         {/* Refinement Control */}
         {currentAnalysis && !isLoading && !error && (
-          <RefinementControl onRefine={handleRefinement} isLoading={isLoading} />
+          <RefinementControl
+            onRefine={handleRefinement}
+            isLoading={isLoading}
+          />
         )}
 
         {/* Footer Elements */}
@@ -332,10 +480,18 @@ const AppContent: React.FC = () => {
           <SourcesList sources={(currentAnalysis as any)._sources} />
         )}
 
-        {currentAnalysis && !isLoading && !error &&
+        {currentAnalysis && !isLoading && !error && (
           <>
-            <UndoRedoControls onUndo={undo} onRedo={redo} canUndo={canUndo} canRedo={canRedo} />
-            <ViewControls isFocusMode={isFocusMode} onToggleFocusMode={() => setIsFocusMode(!isFocusMode)} />
+            <UndoRedoControls
+              onUndo={undo}
+              onRedo={redo}
+              canUndo={canUndo}
+              canRedo={canRedo}
+            />
+            <ViewControls
+              isFocusMode={isFocusMode}
+              onToggleFocusMode={() => setIsFocusMode(!isFocusMode)}
+            />
             <ExportControls
               analysisData={currentAnalysis as any}
               analysisType={activeTool as any}
@@ -343,7 +499,7 @@ const AppContent: React.FC = () => {
               targetElementId="export-content-area"
             />
           </>
-        }
+        )}
       </div>
     </Layout>
   );

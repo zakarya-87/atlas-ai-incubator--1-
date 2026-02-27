@@ -1,5 +1,4 @@
-
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
@@ -8,33 +7,36 @@ import { User } from '@prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
   constructor(private usersService: UsersService) {
     super({
       jwtFromRequest: (req: Request) => {
-        // First try to extract from cookie
-        let token = req?.cookies?.accessToken;
-
-        // Fallback to Authorization header for backward compatibility
+        const cookies = req.cookies as Record<string, string> | undefined;
+        let token: string | undefined = cookies?.accessToken;
         if (!token) {
-          token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+          token = ExtractJwt.fromAuthHeaderAsBearerToken()(req) ?? undefined;
         }
-
-        return token;
+        return token || null;
       },
-      secretOrKey: process.env.JWT_SECRET || 'secretKey', // Use environment variable
+      secretOrKey: process.env.JWT_SECRET || 'default-secret',
     });
   }
 
-  async validate(payload: { email: string }): Promise<any> {
-    // Temporarily disabled for testing. Always returns an admin user.
-    return {
-      id: 'cl-admin-user-id',
-      email: 'admin@atlas.com',
-      role: 'ADMIN',
-      credits: 999,
-      subscriptionStatus: 'active',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  async validate(payload: { id: string; email: string }): Promise<User> {
+    const { id } = payload;
+
+    try {
+      const user = await this.usersService.findById(id);
+
+      if (!user) {
+        this.logger.warn(`User not found for ID: ${id}`);
+        throw new UnauthorizedException('User not found');
+      }
+
+      return user;
+    } catch (error) {
+      this.logger.error(`Validation error for user ID ${id}:`, error);
+      throw error;
+    }
   }
 }

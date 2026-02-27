@@ -1,0 +1,89 @@
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+  AIProvider,
+  AIProviderInterface,
+  AIProviderRequest,
+  AIProviderResponse,
+  ChatCompletionResponse,
+} from '../interfaces/ai-provider.interface';
+
+@Injectable()
+export class GrokProvider implements AIProviderInterface {
+  private readonly apiKey: string;
+  private readonly model: string;
+  private readonly apiUrl = 'https://api.x.ai/v1/chat/completions';
+
+  constructor(private configService: ConfigService) {
+    this.apiKey = this.configService.get<string>('GROK_API_KEY') || '';
+    this.model = this.configService.get<string>('GROK_MODEL', 'grok-beta');
+  }
+
+  getName(): AIProvider {
+    return AIProvider.GROK;
+  }
+
+  async complete(request: AIProviderRequest): Promise<AIProviderResponse> {
+    if (!this.apiKey) {
+      throw new Error('GROK_API_KEY is not defined');
+    }
+
+    const messages = [];
+    if (request.systemInstruction) {
+      messages.push({ role: 'system', content: request.systemInstruction });
+    }
+
+    let userContent = request.prompt;
+    if (request.context) {
+      userContent = `${request.context}\n\nTask: ${request.prompt}`;
+    }
+
+    messages.push({ role: 'user', content: userContent });
+
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: this.model,
+          messages,
+          response_format: request.schema ? { type: 'json_object' } : undefined,
+          stream: false,
+          temperature: 0,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Grok API error: ${response.status} ${error}`);
+      }
+
+      const result = (await response.json()) as ChatCompletionResponse;
+      const text = result.choices[0].message.content;
+      let data: Record<string, unknown> = { text };
+
+      if (request.schema) {
+        try {
+          data = JSON.parse(text) as Record<string, unknown>;
+        } catch {
+          console.error('[Grok] JSON Parse Error:', text);
+          throw new InternalServerErrorException('Grok model produced malformed JSON');
+        }
+      }
+
+      return {
+        text,
+        data,
+        rawResponse: result,
+      };
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error('[Grok] API Call failed:', msg);
+      throw new InternalServerErrorException(`Grok generation failed: ${msg}`);
+    }
+  }
+}

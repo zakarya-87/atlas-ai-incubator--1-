@@ -1,7 +1,9 @@
-
 import { useState, useEffect, useCallback } from 'react';
 
-function usePersistedState<T>(key: string, initialState: T): [T, (value: T | ((val: T) => T)) => void] {
+function usePersistedState<T>(
+  key: string,
+  initialState: T
+): [T, (value: T | ((val: T) => T)) => void] {
   // Initialize state function to read from localStorage only on first render
   const [state, setState] = useState<T>(() => {
     try {

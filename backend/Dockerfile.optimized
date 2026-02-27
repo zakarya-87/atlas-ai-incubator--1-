@@ -1,0 +1,56 @@
+# Development Dockerfile - Optimized for faster builds
+# This is a SINGLE-STAGE build optimized for development speed
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install required packages
+RUN apk add --no-cache postgresql-client curl
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Configure npm for better network resilience
+RUN npm config set fetch-timeout 300000 && \
+    npm config set fetch-retries 3 && \
+    npm config set progress false && \
+    npm config set audit false && \
+    npm config set fund false
+
+# Copy package files first (for better layer caching)
+COPY package*.json ./
+
+# Install dependencies with optimized settings
+# Using --prefer-offline to use cache when available
+RUN npm install --legacy-peer-deps --prefer-offline --no-audit --no-fund || \
+    npm install --legacy-peer-deps --no-audit --no-fund
+
+# Copy prisma schema
+COPY prisma ./prisma
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Change ownership to non-root user
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
+
+# Expose the application port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:3000/health || exit 1
+
+# Start the application
+CMD ["npm", "run", "start:prod"]

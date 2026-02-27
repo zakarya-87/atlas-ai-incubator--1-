@@ -1,0 +1,134 @@
+
+> atlas-ai-incubator-root@1.0.0 lint
+> eslint . --quiet
+
+
+C:\Users\zboud\ATLAS AI Incubator\components\ArchitectureExplanation.tsx
+   97:64  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  163:76  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  164:27  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  183:69  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  208:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\zboud\ATLAS AI Incubator\components\AuditTrailDisplay.tsx
+  121:26  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  121:52  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\zboud\ATLAS AI Incubator\components\BrandIdentityDisplay.tsx
+  105:15  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  105:34  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\zboud\ATLAS AI Incubator\components\ErrorMessage.tsx
+  92:9  error  Unexpected lexical declaration in case block  no-case-declarations
+
+C:\Users\zboud\ATLAS AI Incubator\components\ExperimentBuilderDisplay.tsx
+  46:33  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\zboud\ATLAS AI Incubator\components\ExperimentBuilderDisplay.tsx:46:33
+  44 |     const column = newBoard.columns.find((c: ExperimentColumn) => c.id === colId);
+  45 |     if (column) {
+> 46 |       const newCardId = `card-${Date.now()}`;
+     |                                 ^^^^^^^^^^ Cannot call impure function
+  47 |       column.cards.push({
+  48 |         id: newCardId,
+  49 |         content: t('experimentBuilderCardPlaceholder'),  react-hooks/purity
+
+C:\Users\zboud\ATLAS AI Incubator\components\FinancialForecastDisplay.tsx
+  124:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\zboud\ATLAS AI Incubator\components\FinancialForecastDisplay.tsx:124:5
+  122 |   useEffect(() => {
+  123 |     // When the base data from props changes (e.g., new generation), reset the lab
+> 124 |     setLiveForecast(data);
+      |     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  125 |     setGrowthRate(initialGrowthRate);
+  126 |     setCogsMargin(initialCogsMargin);
+  127 |     setOpexScaling(initialOpexScaling);  react-hooks/set-state-in-effect
+
+C:\Users\zboud\ATLAS AI Incubator\components\Header.tsx
+  19:39  error  Component definition is missing display name                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/display-name
+  40:12  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\zboud\ATLAS AI Incubator\components\Header.tsx:40:12
+  38 |          // In demo admin mode, show high credits without backend calls
+  39 |          if (isAdmin) {
+> 40 |            setCredits(9999);
+     |            ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  41 |            setIsPro(true);
+  42 |            return;
+  43 |          }  react-hooks/set-state-in-effect
+
+C:\Users\zboud\ATLAS AI Incubator\components\Hero.tsx
+  10:35  error  Component definition is missing display name  react/display-name
+
+C:\Users\zboud\ATLAS AI Incubator\components\ModuleErrorBoundary.tsx
+  107:57  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\zboud\ATLAS AI Incubator\components\OkrWorkflowDisplay.tsx
+  140:11  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  140:34  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\zboud\ATLAS AI Incubator\components\Search.tsx
+  195:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\zboud\ATLAS AI Incubator\components\Search.tsx:195:7
+  193 |           t(item.moduleNameKey).toLowerCase().includes(lowerCaseQuery)
+  194 |       );
+> 195 |       setResults(filteredResults);
+      |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  196 |       setIsOpen(true);
+  197 |     } else {
+  198 |       setResults([]);  react-hooks/set-state-in-effect
+
+C:\Users\zboud\ATLAS AI Incubator\components\SidebarNav.tsx
+  325:47  error  Component definition is missing display name  react/display-name
+
+C:\Users\zboud\ATLAS AI Incubator\components\TaskManager.tsx
+  19:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\zboud\ATLAS AI Incubator\components\TaskManager.tsx:19:7
+  17 |     const savedTasks = localStorage.getItem('atlas-ai-tasks');
+  18 |     if (savedTasks) {
+> 19 |       setTasks(JSON.parse(savedTasks));
+     |       ^^^^^^^^ Avoid calling setState() directly within an effect
+  20 |     }
+  21 |   }, []);
+  22 |  react-hooks/set-state-in-effect
+
+C:\Users\zboud\ATLAS AI Incubator\context\AuthContext.test.tsx
+  131:20  error  React Hook "useAuth" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+
+C:\Users\zboud\ATLAS AI Incubator\context\LanguageContext.test.tsx
+  92:20  error  React Hook "useLanguage" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+
+C:\Users\zboud\ATLAS AI Incubator\context\ToastContext.test.tsx
+  101:20  error  React Hook "useToast" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function  react-hooks/rules-of-hooks
+
+Ô£û 24 problems (24 errors, 0 warnings)
+

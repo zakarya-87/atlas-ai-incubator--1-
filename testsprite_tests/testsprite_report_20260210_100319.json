@@ -1,0 +1,54 @@
+{
+  "summary": {
+    "test_suite": "TestSprite MCP",
+    "project": "ATLAS AI Incubator",
+    "execution_date": "2026-02-10T10:03:19.200204",
+    "category": "lint",
+    "total_tests": 1,
+    "passed": 0,
+    "failed": 1,
+    "timeout": 0,
+    "error": 0,
+    "recovery_success": 0,
+    "success_rate": 0.0,
+    "coverage_threshold": 80.0,
+    "coverage_met": false,
+    "total_duration": 62.96042060852051,
+    "status": "FAILED"
+  },
+  "category_breakdown": {
+    "lint": {
+      "category": "lint",
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "timeout": 0,
+      "error": 0,
+      "skipped": 0,
+      "duration": 62.944661378860474,
+      "success_rate": 0.0
+    }
+  },
+  "test_results": [
+    {
+      "test_id": "LT001_lint_check",
+      "category": "lint",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\LT001_lint_check.py",
+      "status": "FAILED",
+      "duration": 62.944661378860474,
+      "error": "\n[LT001] Starting Strict Production Lint Check...\n  [EXEC] Running strict ESLint on backend...\n  [FAIL] Production linting failed (61.78s)\n     Violations detected:\n\nOops! Something went wrong! :(\n\nESLint: 9.39.2\n\nESLint couldn't find an eslint.config.(js|mjs|cjs) file.\n\nFrom ESLint v9.0.0, the default configuration file is now eslint.config.js.\nIf you are using a .eslintrc.* file, please follow the migration guide\nto update your configuration file to the new format:\n\nhttps://eslint.org/docs/latest/use/configure/migration-guide\n\nIf you still have problems after following the migration guide, please stop by\nhttps://eslint.org/chat/help to chat with the team.\n\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    }
+  ],
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "win32",
+    "working_directory": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests",
+    "test_files_found": 1,
+    "mcp_server_available": true,
+    "api_key_configured": false,
+    "ci_mode": false
+  }
+}

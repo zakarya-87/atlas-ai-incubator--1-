@@ -1,4 +1,11 @@
-import React, { createContext, useState, useContext, useEffect, useCallback, ReactNode } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from 'react';
 import { translations, Language, TranslationKey } from '../locales';
 
 interface LanguageContextType {
@@ -7,9 +14,13 @@ interface LanguageContextType {
   t: (key: TranslationKey) => string;
 }
 
-export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+export const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined
+);
 
-export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [language, setLanguage] = useState<Language>('en');
 
   useEffect(() => {
@@ -17,9 +28,12 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
   }, [language]);
 
-  const t = useCallback((key: TranslationKey) => {
-    return translations[language][key] || translations['en'][key];
-  }, [language]);
+  const t = useCallback(
+    (key: TranslationKey) => {
+      return (translations[language] as any)[key] || (translations['en'] as any)[key];
+    },
+    [language]
+  );
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

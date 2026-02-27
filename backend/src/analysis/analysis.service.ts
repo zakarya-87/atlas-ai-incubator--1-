@@ -1,5 +1,11 @@
-
-import { Injectable, InternalServerErrorException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { SchemaType } from '@google/generative-ai';
 import { PrismaService } from '../prisma/prisma.service';
 import { GenerateAnalysisDto } from './dto/generate-analysis.dto';
@@ -10,41 +16,51 @@ import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AnalysisService {
+  private readonly logger = new Logger(AnalysisService.name);
+  constructor(
+    private prisma: PrismaService,
+    private historyService: HistoryService,
+    private agentFactory: AnalysisAgentFactory,
+    private eventsGateway: EventsGateway,
+    private usersService: UsersService
+  ) {}
 
-    constructor(
-        private prisma: PrismaService,
-        private historyService: HistoryService,
-        private agentFactory: AnalysisAgentFactory,
-        private eventsGateway: EventsGateway,
-        private usersService: UsersService,
-    ) { }
+  private async getVentureContext(
+    ventureId: string,
+    currentTool: string
+  ): Promise<string> {
+    try {
+      // Fetch the last 10 relevant analyses to build a robust context window
+      const history = await this.historyService.getRecentAnalysesForContext(
+        ventureId,
+        currentTool
+      );
 
-    private async getVentureContext(ventureId: string, currentTool: string): Promise<string> {
-        try {
-            // Fetch the last 10 relevant analyses to build a robust context window
-            const history = await this.historyService.getRecentAnalysesForContext(ventureId, currentTool);
+      if (!history || history.length === 0) return '';
 
-            if (!history || history.length === 0) return "";
+      // Format context using XML tags, which Gemini models parse highly effectively.
+      // This distinguishes "Memory" from "Current Task".
+      const contextRecords = history
+        .map((record) => {
+          // resultData is already a JSON string from the database
+          // We just need to truncate it if too long
+          const dataString =
+            typeof record.resultData === 'string'
+              ? record.resultData
+              : JSON.stringify(record.resultData);
+          const truncatedData =
+            dataString.length > 4000
+              ? dataString.substring(0, 4000) + '...(truncated)'
+              : dataString;
 
-            // Format context using XML tags, which Gemini models parse highly effectively.
-            // This distinguishes "Memory" from "Current Task".
-            const contextRecords = history.map(record => {
-                // resultData is already a JSON string from the database
-                // We just need to truncate it if too long
-                const dataString = typeof record.resultData === 'string'
-                    ? record.resultData
-                    : JSON.stringify(record.resultData);
-                const truncatedData = dataString.length > 4000
-                    ? dataString.substring(0, 4000) + "...(truncated)"
-                    : dataString;
-
-                return `
-    <historical_artifact type="${record.tool}" date="${record.createdAt}">
+          return `
+    <historical_artifact type="${record.tool}" date="${record.createdAt.toISOString()}">
         ${truncatedData}
     </historical_artifact>`;
-            }).join('\n');
+        })
+        .join('\n');
 
-            return `
+      return `
 <venture_memory_bank>
     <instruction>
         The following XML block contains previous analyses generated for this specific venture. 
@@ -55,119 +71,107 @@ export class AnalysisService {
     ${contextRecords}
 </venture_memory_bank>
 `;
+    } catch (error) {
+      this.logger.warn('Failed to fetch venture context', error);
+      return '';
+    }
+  }
 
-        } catch (error) {
-            console.warn("Failed to fetch venture context", error);
-            return "";
-        }
+  private emitLog(ventureId: string, agent: string, messageKey: string): void {
+    try {
+      this.eventsGateway.emitLog(ventureId, {
+        id: Math.random().toString(36).substring(2, 9),
+        agent: agent,
+        messageKey: messageKey,
+        timestamp: Date.now(),
+      });
+    } catch (e) {
+      // Fail silently on log emission errors to prevent crashing the analysis generation
+      this.logger.warn('Failed to emit agent log via WebSocket', e);
+    }
+  }
+
+  private async ensureVentureAccess(
+    ventureId: string,
+    userId: string
+  ): Promise<void> {
+    const venture = await this.prisma.venture.findUnique({
+      where: { id: ventureId },
+    });
+
+    if (!venture) {
+      await this.prisma.venture.create({
+        data: {
+          id: ventureId,
+          name: 'My Venture',
+          userId: userId,
+        },
+      });
+      return;
     }
 
-    private emitLog(ventureId: string, agent: string, messageKey: string) {
-        try {
-            this.eventsGateway.emitLog(ventureId, {
-                id: Math.random().toString(36).substr(2, 9),
-                agent: agent,
-                messageKey: messageKey,
-                timestamp: Date.now()
-            });
-        } catch (e) {
-            // Fail silently on log emission errors to prevent crashing the analysis generation
-            console.warn("Failed to emit agent log via WebSocket", e);
-        }
+    if (venture.userId === userId) return;
+
+    const member = await this.prisma.ventureMember.findUnique({
+      where: {
+        ventureId_userId: {
+          ventureId: ventureId,
+          userId: userId,
+        },
+      },
+    });
+
+    if (member) return;
+
+    // Venture exists but user doesn't have access
+    // Check if this looks like a pre-auth venture (localStorage UUID)
+    const isPreAuthVenture = ventureId.includes('-') && ventureId.length > 30;
+
+    if (isPreAuthVenture) {
+      this.logger.log(
+        `Transferring pre-auth venture ${ventureId} to user ${userId}`
+      );
+      await this.prisma.venture.update({
+        where: { id: ventureId },
+        data: { userId: userId },
+      });
+      return;
     }
 
-    async generateAnalysis(dto: GenerateAnalysisDto, userId: string) {
-        let schema = dto.responseSchema;
-        let promptKey = dto.prompt;
+    if (userId === 'dev-test-user-id') {
+      this.logger.warn(
+        `Venture ${ventureId} owner mismatch. Proceeding as Dev Admin.`
+      );
+      return;
+    }
 
-        if (!promptKey) {
-            schema = { type: SchemaType.OBJECT, properties: { result: { type: SchemaType.STRING } } };
-            promptKey = `Analyze: ${dto.description}`;
-        }
+    throw new ForbiddenException('Venture ID mismatch or unauthorized access.');
+  }
 
-        try {
-            // 0. Check Credits (SaaS Limit)
-            // If userId is dev-bypass, skip check. Otherwise enforce.
-            if (userId !== 'dev-test-user-id') {
-                await this.usersService.checkAndDeductCredits(userId);
-            }
+  private async getRefinementContext(
+    dto: GenerateAnalysisDto
+  ): Promise<{ prompt: string; systemInstruction: string }> {
+    if (!dto.parentAnalysisId) {
+      throw new BadRequestException('Parent analysis ID required for refinement');
+    }
 
-            this.emitLog(dto.ventureId, 'Systems Architect', 'agentLogAnalyzingContext');
+    const parentAnalysis = await this.prisma.analysis.findUnique({
+      where: { id: dto.parentAnalysisId },
+    });
 
-            // 1. Security & Access Check (Owner OR Member)
-            const venture = await this.prisma.venture.findUnique({
-                where: { id: dto.ventureId }
-            });
+    if (!parentAnalysis) {
+      throw new NotFoundException('Parent analysis for refinement not found.');
+    }
 
-            if (!venture) {
-                await this.prisma.venture.create({
-                    data: {
-                        id: dto.ventureId,
-                        name: 'My Venture',
-                        userId: userId
-                    }
-                });
-            } else {
-                const isOwner = venture.userId === userId;
-                let isMember = false;
-
-                if (!isOwner) {
-                    const member = await this.prisma.ventureMember.findUnique({
-                        where: {
-                            ventureId_userId: {
-                                ventureId: dto.ventureId,
-                                userId: userId
-                            }
-                        }
-                    });
-                    isMember = !!member;
-                }
-
-                if (!isOwner && !isMember) {
-                    // Venture exists but user doesn't have access
-                    // Check if this looks like a pre-auth venture (localStorage UUID)
-                    // If so, transfer ownership to the authenticated user
-                    const isPreAuthVenture = dto.ventureId.includes('-') && dto.ventureId.length > 30;
-                    
-                    if (isPreAuthVenture) {
-                        console.log(`Transferring pre-auth venture ${dto.ventureId} to user ${userId}`);
-                        await this.prisma.venture.update({
-                            where: { id: dto.ventureId },
-                            data: { userId: userId }
-                        });
-                    } else if (userId === 'dev-test-user-id') {
-                        console.warn(`Venture ${dto.ventureId} owner mismatch. Proceeding as Dev Admin.`);
-                    } else {
-                        throw new ForbiddenException("Venture ID mismatch or unauthorized access.");
-                    }
-                }
-            }
-
-            // 2. Context Hydration (Standard or Refinement)
-            let context = "";
-            let finalPrompt = promptKey;
-            let refinementSystemInstruction = "";
-
-            if (dto.refinementInstruction && dto.parentAnalysisId) {
-                this.emitLog(dto.ventureId, 'Lead Strategist', 'agentLogAnalyzingContext'); // Re-use log for "Analyzing Request"
-
-                // Fetch Parent Analysis
-                const parentAnalysis = await (this.prisma as any).analysis.findUnique({
-                    where: { id: dto.parentAnalysisId }
-                });
-
-                if (!parentAnalysis) throw new NotFoundException("Parent analysis for refinement not found.");
-
-                // Construct Refinement Prompt
-                finalPrompt = `
+    const prompt = `
             CONTEXT - ORIGINAL BUSINESS DESCRIPTION:
             "${dto.description}"
 
             CONTEXT - PREVIOUS ANALYSIS RESULT (JSON):
-            ${JSON.stringify(parentAnalysis.resultData)}
+            ${parentAnalysis.resultData}
 
             USER REFINEMENT REQUEST:
-            "${dto.refinementInstruction}"
+            "${dto.refinementInstruction || ''}"
 
             TASK:
             Regenerate the analysis. Start with the "PREVIOUS ANALYSIS RESULT" as your baseline.
@@ -175,23 +179,78 @@ export class AnalysisService {
             Keep the same JSON structure/schema as the previous result.
           `;
 
-                refinementSystemInstruction = `
+    const systemInstruction = `
             You are an expert business consultant iterating on a draft.
             Your goal is to modify the existing analysis to better fit the user's specific feedback.
             Do not lose valuable information from the previous result unless the refinement contradicts it.
           `;
 
-            } else {
-                // Standard Flow
-                this.emitLog(dto.ventureId, 'Lead Strategist', 'agentLogIdentifyingFactors');
-                context = await this.getVentureContext(dto.ventureId, dto.tool);
-            }
+    return { prompt, systemInstruction };
+  }
 
-            // 3. Agent Selection & Execution
-            this.emitLog(dto.ventureId, 'Lead Strategist', 'agentLogSynthesizing');
-            const agent = this.agentFactory.getAgent(dto.module, dto.tool);
+  async generateAnalysis(
+    dto: GenerateAnalysisDto,
+    userId: string
+  ): Promise<Record<string, unknown>> {
+    let schema = dto.responseSchema;
+    let promptKey = dto.prompt;
 
-            const baseSystemInstruction = `
+    if (!promptKey) {
+      schema = {
+        type: SchemaType.OBJECT,
+        properties: { result: { type: SchemaType.STRING } },
+      };
+      promptKey = `Analyze: ${dto.description}`;
+    }
+
+    try {
+      // 0. Check Credits (SaaS Limit)
+      // Skip credit check for dev-bypass user or admin users
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (userId !== 'dev-test-user-id' && user?.role !== 'ADMIN') {
+        await this.usersService.checkAndDeductCredits(userId);
+      }
+
+      this.emitLog(
+        dto.ventureId,
+        'Systems Architect',
+        'agentLogAnalyzingContext'
+      );
+
+      // 1. Security & Access Check
+      await this.ensureVentureAccess(dto.ventureId, userId);
+
+      // 2. Context Hydration (Standard or Refinement)
+      let context = '';
+      let finalPrompt = promptKey;
+      let refinementSystemInstruction = '';
+
+      if (dto.refinementInstruction) {
+        this.emitLog(
+          dto.ventureId,
+          'Lead Strategist',
+          'agentLogAnalyzingContext'
+        );
+        const refContext = await this.getRefinementContext(dto);
+        finalPrompt = refContext.prompt;
+        refinementSystemInstruction = refContext.systemInstruction;
+      } else {
+        this.emitLog(
+          dto.ventureId,
+          'Lead Strategist',
+          'agentLogIdentifyingFactors'
+        );
+        context = await this.getVentureContext(dto.ventureId, dto.tool);
+      }
+
+      // 3. Agent Selection & Execution
+      this.emitLog(dto.ventureId, 'Lead Strategist', 'agentLogSynthesizing');
+      const agent = this.agentFactory.getAgent(dto.module, dto.tool);
+
+      const baseSystemInstruction = `
 You are the ATLAS AI Engine, a Lead Venture Architect and Tier-1 Strategy Consultant.
 Your objective is to build a coherent, viable, and scalable business case for the user.
 
@@ -208,43 +267,68 @@ The user has provided a description and potentially a history of previous work.
 Synthesize this information to produce the next logical step in their business planning.
 `;
 
-            const effectiveSystemInstruction = refinementSystemInstruction
-                ? `${baseSystemInstruction}\n\n${refinementSystemInstruction}`
-                : baseSystemInstruction;
+      const effectiveSystemInstruction = refinementSystemInstruction
+        ? `${baseSystemInstruction}\n\n${refinementSystemInstruction}`
+        : baseSystemInstruction;
 
-            this.emitLog(dto.ventureId, 'Market Researcher', 'agentLogScanningMarket');
+      this.emitLog(
+        dto.ventureId,
+        'Market Researcher',
+        'agentLogScanningMarket'
+      );
 
-            const response = await agent.generate(
-                finalPrompt,
-                context,
-                schema,
-                effectiveSystemInstruction,
-                dto.images
-            );
+      const response = await agent.generate(
+        finalPrompt,
+        context,
+        schema,
+        effectiveSystemInstruction,
+        dto.images
+      );
 
-            // 4. Persistence
-            this.emitLog(dto.ventureId, 'Systems Architect', 'agentLogFinalizingOutput');
-            const savedRecord = await (this.prisma as any).analysis.create({
-                data: {
-                    ventureId: dto.ventureId,
-                    userId: userId,
-                    module: dto.module,
-                    tool: dto.tool,
-                    inputContext: dto.refinementInstruction ? `Refinement: ${dto.refinementInstruction}` : dto.description,
-                    resultData: JSON.stringify(response.data), // Prisma expects a String, not an Object
-                    parentId: dto.parentAnalysisId || undefined // Link versions if refining
-                }
-            });
+      // 4. Persistence
+      this.emitLog(
+        dto.ventureId,
+        'Systems Architect',
+        'agentLogFinalizingOutput'
+      );
 
-            return {
-                ...response.data,
-                id: savedRecord.id
-            };
+      const savedRecord = await this.persistAnalysisResult(
+        dto,
+        userId,
+        response.data
+      );
 
-        } catch (error: any) {
-            console.error('Analysis Service Error:', error);
-            if (error instanceof ForbiddenException) throw error;
-            throw new InternalServerErrorException(error.message || 'Failed to generate analysis');
-        }
+      return {
+        ...response.data,
+        id: savedRecord.id,
+      };
+    } catch (error: unknown) {
+      this.logger.error('Analysis Service Error:', error);
+      if (error instanceof ForbiddenException) throw error;
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to generate analysis';
+      throw new InternalServerErrorException(errorMessage);
     }
+  }
+
+  private async persistAnalysisResult(
+    dto: GenerateAnalysisDto,
+    userId: string,
+    resultData: Record<string, unknown>
+  ): Promise<{ id: string }> {
+    return this.prisma.analysis.create({
+      data: {
+        ventureId: dto.ventureId,
+        userId: userId,
+        module: dto.module,
+        tool: dto.tool,
+        inputContext: dto.refinementInstruction
+          ? `Refinement: ${dto.refinementInstruction}`
+          : dto.description,
+        resultData: JSON.stringify(resultData),
+        parentId: dto.parentAnalysisId || undefined,
+      },
+      select: { id: true },
+    });
+  }
 }

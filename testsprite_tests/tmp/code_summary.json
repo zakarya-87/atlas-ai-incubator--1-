@@ -42,8 +42,8 @@
                     "schema": {
                       "type": "object",
                       "properties": {
-                        "email": {"type": "string"},
-                        "password": {"type": "string"}
+                        "email": { "type": "string" },
+                        "password": { "type": "string" }
                       }
                     }
                   }
@@ -60,8 +60,8 @@
                     "schema": {
                       "type": "object",
                       "properties": {
-                        "email": {"type": "string"},
-                        "password": {"type": "string"}
+                        "email": { "type": "string" },
+                        "password": { "type": "string" }
                       }
                     }
                   }
@@ -96,11 +96,11 @@
                     "schema": {
                       "type": "object",
                       "properties": {
-                        "ventureId": {"type": "string"},
-                        "module": {"type": "string"},
-                        "tool": {"type": "string"},
-                        "description": {"type": "string"},
-                        "language": {"type": "string"}
+                        "ventureId": { "type": "string" },
+                        "module": { "type": "string" },
+                        "tool": { "type": "string" },
+                        "description": { "type": "string" },
+                        "language": { "type": "string" }
                       }
                     }
                   }
@@ -131,8 +131,8 @@
                     "schema": {
                       "type": "object",
                       "properties": {
-                        "name": {"type": "string"},
-                        "description": {"type": "string"}
+                        "name": { "type": "string" },
+                        "description": { "type": "string" }
                       }
                     }
                   }
@@ -208,10 +208,7 @@
     {
       "name": "Team Collaboration",
       "description": "Invite team members and manage access",
-      "files": [
-        "components/ShareModal.tsx",
-        "services/geminiService.ts"
-      ],
+      "files": ["components/ShareModal.tsx", "services/geminiService.ts"],
       "api_doc": {
         "openapi": "3.0.0",
         "paths": {
@@ -224,9 +221,9 @@
                     "schema": {
                       "type": "object",
                       "properties": {
-                        "ventureId": {"type": "string"},
-                        "email": {"type": "string"},
-                        "role": {"type": "string"}
+                        "ventureId": { "type": "string" },
+                        "email": { "type": "string" },
+                        "role": { "type": "string" }
                       }
                     }
                   }
@@ -240,10 +237,7 @@
     {
       "name": "Export Functionality",
       "description": "Export analysis results to various formats",
-      "files": [
-        "components/ExportControls.tsx",
-        "utils/exportUtils.ts"
-      ],
+      "files": ["components/ExportControls.tsx", "utils/exportUtils.ts"],
       "api_doc": {
         "openapi": "3.0.0",
         "paths": {
@@ -256,8 +250,8 @@
                     "schema": {
                       "type": "object",
                       "properties": {
-                        "analysisId": {"type": "string"},
-                        "format": {"type": "string"}
+                        "analysisId": { "type": "string" },
+                        "format": { "type": "string" }
                       }
                     }
                   }
@@ -289,7 +283,7 @@
                     "schema": {
                       "type": "object",
                       "properties": {
-                        "language": {"type": "string"}
+                        "language": { "type": "string" }
                       }
                     }
                   }
@@ -303,10 +297,7 @@
     {
       "name": "Undo/Redo Functionality",
       "description": "State management with undo/redo capabilities",
-      "files": [
-        "hooks/useUndoRedo.ts",
-        "components/UndoRedoControls.tsx"
-      ],
+      "files": ["hooks/useUndoRedo.ts", "components/UndoRedoControls.tsx"],
       "api_doc": {
         "openapi": "3.0.0",
         "paths": {

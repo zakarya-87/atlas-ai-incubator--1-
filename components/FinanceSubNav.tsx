@@ -7,7 +7,10 @@ interface FinanceSubNavProps {
   onToolChange: (tool: FinanceTool) => void;
 }
 
-const FinanceSubNav: React.FC<FinanceSubNavProps> = ({ activeTool, onToolChange }) => {
+const FinanceSubNav: React.FC<FinanceSubNavProps> = ({
+  activeTool,
+  onToolChange,
+}) => {
   const { t } = useLanguage();
 
   const navItems: { key: FinanceTool; label: string }[] = [

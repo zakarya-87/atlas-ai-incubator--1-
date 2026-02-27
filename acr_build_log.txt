@@ -1,0 +1,141 @@
+﻿2026/02/26 17:08:37 Downloading source code...
+
+2026/02/26 17:08:38 Finished downloading source code
+
+2026/02/26 17:08:38 Using acb_vol_667823e6-ba93-436d-b51e-ad3b790605aa as the home volume
+2026/02/26 17:08:38 Setting up Docker configuration...
+2026/02/26 17:08:38 Successfully set up Docker configuration
+2026/02/26 17:08:38 Logging in to registry: atlasairegistry.azurecr.io
+2026/02/26 17:08:39 Successfully logged into atlasairegistry.azurecr.io
+2026/02/26 17:08:39 Executing step ID: build. Timeout(sec): 28800, Working directory: '', Network: ''
+2026/02/26 17:08:39 Scanning for dependencies...
+2026/02/26 17:08:39 Successfully scanned dependencies
+2026/02/26 17:08:39 Launching container with name: build
+Sending build context to Docker daemon  1.266MB
+
+
+
+Step 1/24 : FROM node:20-alpine AS build
+20-alpine: Pulling from library/node
+589002ba0eae: Pulling fs layer
+ad6d96c196e3: Pulling fs layer
+eb87f4721c91: Pulling fs layer
+e31b20165522: Pulling fs layer
+e31b20165522: Waiting
+eb87f4721c91: Verifying Checksum
+eb87f4721c91: Download complete
+e31b20165522: Verifying Checksum
+e31b20165522: Download complete
+589002ba0eae: Verifying Checksum
+589002ba0eae: Download complete
+589002ba0eae: Pull complete
+ad6d96c196e3: Download complete
+
+ad6d96c196e3: Pull complete
+eb87f4721c91: Pull complete
+e31b20165522: Pull complete
+Digest: sha256:09e2b3d9726018aecf269bd35325f46bf75046a643a66d28360ec71132750ec8
+Status: Downloaded newer image for node:20-alpine
+ ---> 458b0b7c1c60
+Step 2/24 : WORKDIR /app
+ ---> Running in 709270fea034
+Removing intermediate container 709270fea034
+ ---> c0d18691f834
+Step 3/24 : RUN apk add --no-cache python3 make g++
+
+ ---> Running in b25167804b79
+( 1/29) Installing libstdc++-dev (15.2.0-r2)
+( 2/29) Installing jansson (2.14.1-r0)
+( 3/29) Installing zstd-libs (1.5.7-r2)
+( 4/29) Installing binutils (2.45.1-r0)
+( 5/29) Installing libgomp (15.2.0-r2)
+( 6/29) Installing libatomic (15.2.0-r2)
+( 7/29) Installing gmp (6.3.0-r4)
+( 8/29) Installing isl26 (0.26-r1)
+( 9/29) Installing mpfr4 (4.2.2-r0)
+(10/29) Installing mpc1 (1.3.1-r1)
+(11/29) Installing gcc (15.2.0-r2)
+(12/29) Installing musl-dev (1.2.5-r21)
+(13/29) Installing g++ (15.2.0-r2)
+(14/29) Installing make (4.4.1-r3)
+
+(15/29) Installing libbz2 (1.0.8-r6)
+(16/29) Installing libexpat (2.7.4-r0)
+(17/29) Installing libffi (3.5.2-r0)
+(18/29) Installing gdbm (1.26-r0)
+(19/29) Installing xz-libs (5.8.2-r0)
+(20/29) Installing mpdecimal (4.0.1-r0)
+(21/29) Installing ncurses-terminfo-base (6.5_p20251123-r0)
+(22/29) Installing libncursesw (6.5_p20251123-r0)
+(23/29) Installing libpanelw (6.5_p20251123-r0)
+(24/29) Installing readline (8.3.1-r0)
+(25/29) Installing sqlite-libs (3.51.2-r0)
+(26/29) Installing python3 (3.12.12-r0)
+(27/29) Installing python3-pycache-pyc0 (3.12.12-r0)
+(28/29) Installing pyc (3.12.12-r0)
+(29/29) Installing python3-pyc (3.12.12-r0)
+Executing busybox-1.37.0-r30.trigger
+OK: 301.2 MiB in 47 packages
+Removing intermediate container b25167804b79
+ ---> eb060ec9f679
+Step 4/24 : COPY package*.json ./
+
+ ---> 34eebfdc6463
+Step 5/24 : RUN npm config set fetch-timeout 120000 &&     npm config set fetch-retries 2 &&     npm config set progress false &&     npm config set audit false &&     npm config set fund false &&     npm ci --legacy-peer-deps --no-audit --no-fund
+ ---> Running in c38ef055b161
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+
+
+
+added 1094 packages in 34s
+
+Removing intermediate container c38ef055b161
+ ---> f5382be9df95
+Step 6/24 : COPY . ./
+
+az : ERROR: The command failed with an unexpected error. Here is the traceback:
+At line:1 char:1
++ az acr task logs -r atlasairegistry --run-id ca24 2>&1 | Out-File -Fi ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (ERROR: The comm... the traceback::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ERROR: 'charmap' codec can't encode character '\u2714' in position 139: character maps to <undefined>
+Traceback (most recent call last):
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\knack/cli.py", line 233, in invoke
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", 
+line 669, in execute
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", 
+line 737, in _run_jobs_serially
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", 
+line 706, in _run_job
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/__init__.py", 
+line 336, in __call__
+  File 
+"D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/core/commands/command_operation.py", 
+line 120, in handler
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/acr/task.py", 
+line 1126, in acr_task_logs
+  File 
+"D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/acr/_stream_utils.py", 
+line 56, in stream_logs
+  File 
+"D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\azure/cli/command_modules/acr/_stream_utils.py", 
+line 126, in _stream_logs
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\colorama/ansitowin32.py", line 47, in 
+write
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\colorama/ansitowin32.py", line 177, in 
+write
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\colorama/ansitowin32.py", line 202, in 
+write_and_convert
+  File "D:\a\_work\1\s\build_scripts\windows\artifacts\cli\Lib\site-packages\colorama/ansitowin32.py", line 210, in 
+write_plain_text
+  File "encodings\cp1252.py", line 19, in encode
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2714' in position 139: character maps to <undefined>
+To check existing issues, please visit: https://github.com/Azure/azure-cli/issues

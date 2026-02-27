@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import Layout from './Layout';
@@ -12,7 +18,9 @@ import { ToastProvider } from '../context/ToastContext';
 import type { ModuleType, AnyTool } from '../types';
 
 // Mock child component for testing
-const MockChildComponent = () => <div data-testid="mock-child">Mock Content</div>;
+const MockChildComponent = () => (
+  <div data-testid="mock-child">Mock Content</div>
+);
 
 // Mock sub navigation component
 const MockSubNav = () => <div data-testid="mock-subnav">Sub Navigation</div>;
@@ -37,7 +45,7 @@ describe('Layout Integration Tests', () => {
     onReturnToWorkspace: mockReturnToWorkspace,
     timestamp: undefined,
     isFocusMode: false,
-    onToggleFocusMode: mockToggleFocusMode
+    onToggleFocusMode: mockToggleFocusMode,
   };
 
   const renderLayout = (props = {}) => {
@@ -115,8 +123,6 @@ describe('Layout Integration Tests', () => {
       // AuthModal should not be rendered
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
-
-
   });
 
   describe('Responsive Behavior Integration', () => {
@@ -151,18 +157,20 @@ describe('Layout Integration Tests', () => {
       const mockTimestamp = '2023-01-01T12:00:00Z';
       renderLayout({
         viewingHistoryRecord: true,
-        timestamp: mockTimestamp
+        timestamp: mockTimestamp,
       });
 
       // History record banner should be visible
-      expect(screen.getByText(/viewing historical version/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/viewing historical version/i)
+      ).toBeInTheDocument();
       expect(screen.getByText(/return to workspace/i)).toBeInTheDocument();
     });
 
     it('should call onReturnToWorkspace when clicking return button', () => {
       renderLayout({
         viewingHistoryRecord: true,
-        timestamp: '2023-01-01T12:00:00Z'
+        timestamp: '2023-01-01T12:00:00Z',
       });
 
       const returnButton = screen.getByText(/return to workspace/i);
@@ -220,7 +228,9 @@ describe('SidebarNav Component Integration Tests', () => {
 
     // Dashboard button should be active (find in desktop sidebar)
     const sidebarNav = document.getElementById('sidebar-nav');
-    const dashboardButton = within(sidebarNav).getByText(/dashboard/i).closest('button');
+    const dashboardButton = within(sidebarNav)
+      .getByText(/dashboard/i)
+      .closest('button');
     expect(dashboardButton).toHaveClass('bg-brand-teal/20 text-brand-teal');
   });
 

@@ -1,8 +1,43 @@
 {
   "mcpServers": {
+    "vercel": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "vercel-mcp-server"
+      ],
+      "env": {
+        "VERCEL_TOKEN": "${VERCEL_TOKEN}"
+      }
+    },
     "workspace-developer": {
       "httpUrl": "https://workspace-developer.goog/mcp",
       "trust": true
+    },
+    "devtool": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@standardbeagle/agnt"
+      ],
+      "env": {
+        "AGNT_PROJECT_PATH": "c:/Users/zboud/ATLAS AI Incubator"
+      }
+    },
+    "testsprite": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@testsprite/testsprite-mcp@latest"
+      ],
+      "env": {
+        "API_KEY": "${TESTSPRITE_API_KEY}",
+        "PROJECT_PATH": "c:/Users/zboud/ATLAS AI Incubator",
+        "COVERAGE_THRESHOLD": "85",
+        "EDGE_CASE_MODE": "aggressive",
+        "ERROR_TESTING": "comprehensive",
+        "AUTO_GENERATE": "true"
+      }
     }
   }
 }

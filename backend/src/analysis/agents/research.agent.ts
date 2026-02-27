@@ -1,24 +1,25 @@
-
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BaseAgent } from './base.agent';
 import { AgentGenerationResponse } from '../interfaces/ai-agent.interface';
-import { Tool } from '@google/generative-ai';
+import { AIProviderFactory } from '../providers/ai-provider.factory';
 
 @Injectable()
 export class ResearchAgent extends BaseAgent {
-  constructor(configService: ConfigService) {
-    super(configService);
+  constructor(
+    configService: ConfigService,
+    protected readonly providerFactory: AIProviderFactory
+  ) {
+    super(configService, providerFactory);
   }
 
   async generate(
     prompt: string,
     context: string,
-    schema?: any,
+    schema?: Record<string, unknown>,
     systemInstruction?: string,
     images?: string[]
   ): Promise<AgentGenerationResponse> {
-
     // --- PASS 1: GATHER INTELLIGENCE (Google Search + Vision) ---
     // We cannot use responseSchema with googleSearch, so we get raw text first.
     const searchPrompt = `
@@ -37,44 +38,50 @@ export class ResearchAgent extends BaseAgent {
 
     // Prepare content parts (Text + Optional Images)
     // For generateContent: pass parts array directly, not wrapped with role
-    let searchContents: any;
-
     if (images && images.length > 0) {
-      const parts: any[] = [{ text: searchPrompt }];
-      images.forEach(imgBase64 => {
-        const cleanBase64 = imgBase64.replace(/^data:image\/\w+;base64,/, "");
+      const parts: Record<string, unknown>[] = [{ text: searchPrompt }];
+      images.forEach((imgBase64) => {
+        const cleanBase64 = imgBase64.replace(/^data:image\/\w+;base64,/, '');
         parts.push({
           inlineData: {
             mimeType: 'image/jpeg',
-            data: cleanBase64
-          }
+            data: cleanBase64,
+          },
         });
       });
       // Pass parts array directly for multimodal content
-      searchContents = parts;
-    } else {
-      // For text-only, pass as string
-      searchContents = searchPrompt;
     }
 
-    // Use getClient() for lazy loading
-    const model = this.getClient().getGenerativeModel({
-      model: 'gemini-2.5-pro',
-      tools: [{ googleSearch: {} } as any], // Enable Grounding
-      generationConfig: {
-        temperature: 0.3, // Low temperature for factual accuracy
-      },
-    });
+    const searchResponse = await this.executeGeminiCall(
+      '',
+      searchPrompt,
+      null, // No schema for research pass
+      systemInstruction || 'You are the ATLAS AI Engine. Conduct comprehensive market research.',
+      images,
+      [{ googleSearch: {} } as Record<string, unknown>] // Pass tools for Grounding
+    );
 
-    const searchResponse = await model.generateContent(searchContents);
+    const rawText = searchResponse.text;
 
-    const rawText = searchResponse.response.text();
+    // Extract citations (Grounding Metadata) from rawResponse safely
+    const rawResponse = searchResponse.rawResponse as Record<string, unknown>;
+    const candidates = (rawResponse?.response as Record<string, unknown>)
+      ?.candidates as Record<string, unknown>[];
+    const groundingMetadata = candidates?.[0]?.groundingMetadata as Record<
+      string,
+      unknown
+    >;
+    const groundingChunks =
+      (groundingMetadata?.groundingChunks as Record<string, unknown>[]) || [];
 
-    // Extract citations (Grounding Metadata)
-    const groundingChunks = searchResponse.response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
     const sources = groundingChunks
-      .map((chunk: any) => chunk.web?.uri ? { title: chunk.web.title, url: chunk.web.uri } : null)
-      .filter((source: any) => source !== null);
+      .map((chunk) => {
+        const web = chunk.web as Record<string, string>;
+        return web?.uri ? { title: web.title, url: web.uri } : null;
+      })
+      .filter(
+        (source): source is { title: string; url: string } => source !== null
+      );
 
     // --- PASS 2: STRUCTURE DATA (JSON Formatting) ---
     // Now we feed the research notes into a schema-enforced call to get the UI-ready JSON.
@@ -92,22 +99,22 @@ export class ResearchAgent extends BaseAgent {
     `;
 
     const formattedResponse = await this.executeGeminiCall(
-      'gemini-2.5-pro',
+      '',
       formattingPrompt,
-      schema,
-      "You are a strict JSON formatting engine."
+      schema || null,
+      'You are a strict JSON formatting engine.'
     );
 
     // --- MERGE & RETURN ---
     // Inject the sources into the result data so the frontend can display them
     const finalData = {
       ...formattedResponse.data,
-      _sources: sources
+      _sources: sources,
     };
 
     return {
       text: formattedResponse.text,
-      data: finalData
+      data: finalData,
     };
   }
 }

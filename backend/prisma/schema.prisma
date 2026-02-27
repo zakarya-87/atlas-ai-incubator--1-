@@ -2,13 +2,30 @@
 // Learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl"]
+  provider      = "prisma-client-js"
+  binaryTargets   = ["native", "linux-musl"]
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+// ==========================================
+// KNOWLEDGE BASE (RAG Support)
+// ==========================================
+
+model Document {
+  id        BigInt   @id @default(autoincrement())
+  content   String
+  metadata  Json?
+  embedding Unsupported("vector(768)")?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("documents")
 }
 
 // ==========================================

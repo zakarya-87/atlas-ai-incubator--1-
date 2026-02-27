@@ -1,0 +1,33 @@
+additional_properties:
+  zones:
+  - '2'
+apiVersion: 2024-05-01-preview
+extended_location: null
+location: westus2
+name: atlasinstance
+properties:
+  containers:
+  - name: atlasinstance
+    properties:
+      configMap:
+        keyValuePairs: {}
+      environmentVariables: []
+      image: mcr.microsoft.com/oss/nginx/nginx:1.9.15-alpine
+      ports: []
+      resources:
+        requests:
+          cpu: 4.0
+          memoryInGB: 8.0
+  diagnostics:
+    logAnalytics:
+      logType: ContainerInstanceLogs
+      workspaceId: b1dbfc82-9bdd-464d-bc66-0de95aeae02c
+  initContainers: []
+  isCreatedFromStandbyPool: false
+  isCustomProvisioningTimeout: false
+  osType: Linux
+  provisioningTimeoutInSeconds: 1800
+  restartPolicy: OnFailure
+  sku: Standard
+tags: {}
+type: Microsoft.ContainerInstance/containerGroups

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { FundamentalsTool } from '../types';
@@ -8,14 +7,23 @@ interface FundamentalsSubNavProps {
   onToolChange: (tool: FundamentalsTool) => void;
 }
 
-const FundamentalsSubNav: React.FC<FundamentalsSubNavProps> = ({ activeTool, onToolChange }) => {
+const FundamentalsSubNav: React.FC<FundamentalsSubNavProps> = ({
+  activeTool,
+  onToolChange,
+}) => {
   const { t } = useLanguage();
 
   const navItems: { key: FundamentalsTool; label: string }[] = [
     { key: 'ideaValidation', label: t('fundamentalsNavIdeaValidation') },
     { key: 'problemValidation', label: t('fundamentalsNavProblemValidation') },
-    { key: 'competitorAnalysis', label: t('fundamentalsNavCompetitorAnalysis') },
-    { key: 'customerValidation', label: t('fundamentalsNavCustomerValidation') },
+    {
+      key: 'competitorAnalysis',
+      label: t('fundamentalsNavCompetitorAnalysis'),
+    },
+    {
+      key: 'customerValidation',
+      label: t('fundamentalsNavCustomerValidation'),
+    },
     { key: 'brandIdentity', label: t('fundamentalsNavBrandIdentity') },
     { key: 'riskFeasibility', label: t('fundamentalsNavRiskFeasibility') },
     { key: 'validationTracker', label: t('fundamentalsNavValidationTracker') },

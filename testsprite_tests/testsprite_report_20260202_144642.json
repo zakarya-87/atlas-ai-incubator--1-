@@ -1,0 +1,109 @@
+{
+  "summary": {
+    "test_suite": "TestSprite MCP",
+    "project": "ATLAS AI Incubator",
+    "execution_date": "2026-02-02T14:46:42.969541",
+    "category": "edge_cases",
+    "total_tests": 6,
+    "passed": 4,
+    "failed": 2,
+    "timeout": 0,
+    "error": 0,
+    "recovery_success": 0,
+    "success_rate": 66.66666666666666,
+    "coverage_threshold": 80.0,
+    "coverage_met": false,
+    "total_duration": 6.323125839233398,
+    "status": "FAILED"
+  },
+  "category_breakdown": {
+    "edge_cases": {
+      "category": "edge_cases",
+      "total": 6,
+      "passed": 4,
+      "failed": 2,
+      "timeout": 0,
+      "error": 0,
+      "skipped": 0,
+      "duration": 6.323125839233398,
+      "success_rate": 66.66666666666666
+    }
+  },
+  "test_results": [
+    {
+      "test_id": "EC001_input_validation",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC001_input_validation.py",
+      "status": "FAILED",
+      "duration": 2.732543706893921,
+      "error": "\n======================================================================\nEC001: Input Validation Edge Cases\n======================================================================\n\n======================================================================\nRunning: Empty Inputs\n======================================================================\n\n[TEST] Empty Input Handling\n  [OK] PASS Empty input: empty string\n      Value: ''\n  [OK] PASS Empty input: whitespace only\n      Value: '   '\n  [OK] PASS Empty input: tab and newline\n      Value: '\\t\\n'\n  [OK] PASS Empty input: null value\n      Value: None\n  [OK] PASS Empty input: empty array\n      Value: []\n  [OK] PASS Empty input: empty object\n      Value: {}\n\n======================================================================\nRunning: Maximum Lengths\n======================================================================\n\n[TEST] Maximum Length Boundaries\n  [OK] PASS venture_name - exactly at limit\n      Length: 255/255\n  [OK] PASS venture_name - one over limit\n      Length: 256/255\n  [OK] PASS venture_name - way over limit\n      Length: 1000/255\n  [OK] PASS description - exactly at limit\n      Length: 5000/5000\n  [OK] PASS description - one over limit\n      Length: 5001/5000\n  [OK] PASS email - exactly at limit\n      Length: 254/254\n  [OK] PASS email - one over limit\n      Length: 255/254\n\n======================================================================\nRunning: Unicode Boundaries\n======================================================================\n\n[TEST] Unicode Boundary Cases\n  [OK] PASS Unicode: family emoji (ZWJ sequence)\n      Chars: 7, Bytes: 25\n  [OK] PASS Unicode: Arabic RTL text\n      Chars: 5, Bytes: 10\n  [OK] PASS Unicode: zero-width space\n      Chars: 11, Bytes: 13\n  [OK] PASS Unicode: combining accent\n      Chars: 4, Bytes: 5\n  [OK] PASS Unicode: multiple emoji\n      Chars: 21, Bytes: 24\n  [OK] PASS Unicode: null character\n      Chars: 1, Bytes: 1\n  [OK] PASS Unicode: max BMP character\n      Chars: 1, Bytes: 3\n  [OK] PASS Unicode: supplementary character\n      Chars: 1, Bytes: 4\n\n======================================================================\nRunning: Special Characters\n======================================================================\n\n[TEST] Special Character & Security Cases\n  [FAIL] FAIL Security: SQL injection attempt\n      Input sanitized: False\n  [FAIL] FAIL Security: XSS script tag\n      Input sanitized: False\n  [FAIL] FAIL Security: XSS javascript protocol\n      Input sanitized: False\n  [FAIL] FAIL Security: XSS event handler\n      Input sanitized: False\n  [FAIL] FAIL Security: path traversal\n      Input sanitized: False\n  [OK] PASS Security: command injection\n      Input sanitized: True\n  [OK] PASS Security: backtick injection\n      Input sanitized: True\n  [OK] PASS Security: URL encoded XSS\n      Input sanitized: True\n  [OK] PASS Security: hex encoded XSS\n      Input sanitized: True\n  [OK] PASS Security: Log4j style injection\n      Input sanitized: True\n\n======================================================================\nRunning: Type Coercion\n======================================================================\n\n[TEST] Type Coercion Edge Cases\n  [OK] PASS Type coercion: string number\n      Type preserved: True\n  [OK] PASS Type coercion: actual number\n      Type preserved: True\n  [OK] PASS Type coercion: boolean true\n      Type preserved: True\n  [OK] PASS Type coercion: string true\n      Type preserved: True\n  [OK] PASS Type coercion: array value\n      Type preserved: True\n  [OK] PASS Type coercion: object like array\n      Type preserved: True\n  [OK] PASS Type coercion: float precision\n      Type preserved: True\n  [OK] PASS Type coercion: max float\n      Type preserved: True\n  [OK] PASS Type coercion: min float\n      Type preserved: True\n  [OK] PASS Type coercion: infinity\n      Type preserved: True\n  [FAIL] FAIL Type coercion: NaN\n      Type preserved: False\n\n======================================================================\nEC001 SUMMARY\n======================================================================\nTotal Tests: 42\nPassed: 36 [OK]\nFailed: 6 [FAIL]\nSuccess Rate: 85.7%\n======================================================================\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC002_boundary_conditions",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC002_boundary_conditions.py",
+      "status": "PASSED",
+      "duration": 0.6169259548187256,
+      "error": null,
+      "output": "e\n     ISO: 2099-12-31T00:00:00...\n\n[TEST] Resource Limits\n  [OK] 1MB string\n     Size: 1048578 chars, Time: 0.024s\n  [OK] 10MB string\n     Size: 10485762 chars, Time: 0.236s\n  [OK] Deep nesting\n     Size: 41 chars, Time: 0.008s\n\n======================================================================\nEC002 SUMMARY\n======================================================================\nTotal: 24\nPassed: 24 [OK]\nFailed: 0 [FAIL]\n======================================================================\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC003_concurrent_access",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC003_concurrent_access.py",
+      "status": "PASSED",
+      "duration": 1.6524996757507324,
+      "error": null,
+      "output": " Resource: Max ventures exceeded\n     101/100\n  [OK] Resource: Max team members\n     50/50\n  [OK] Resource: Max storage\n     1073741824/1073741824\n\n[TEST] Session Concurrency\n  [OK] Multiple concurrent sessions\n     Sessions: 10\n\n======================================================================\nEC003 SUMMARY\n======================================================================\nTotal: 12\nPassed: 12 [OK]\nFailed: 0 [FAIL]\n======================================================================\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC004_data_limits",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC004_data_limits.py",
+      "status": "PASSED",
+      "duration": 0.3230423927307129,
+      "error": null,
+      "output": "okens\n     3000/4000 tokens\n  [OK] AI: Output tokens\n     1500/2000 tokens\n  [OK] AI: Combined tokens\n     4500/5000 tokens\n  [OK] AI: Exceed input limit\n     4001/4000 tokens\n  [OK] AI: Exceed output limit\n     2001/2000 tokens\n\n======================================================================\nEC004 SUMMARY\n======================================================================\nTotal: 22\nPassed: 22 [OK]\nFailed: 0 [FAIL]\n======================================================================\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC005_special_characters",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC005_special_characters.py",
+      "status": "PASSED",
+      "duration": 0.3907496929168701,
+      "error": null,
+      "output": "ion\n     Sanitized\n  [OK] Cmd: Command chaining\n     Sanitized\n  [OK] Cmd: Pipe injection\n     Sanitized\n  [OK] Cmd: AND operator\n     Sanitized\n  [OK] Cmd: OR operator\n     Sanitized\n  [OK] Cmd: Comment injection\n     Sanitized\n\n======================================================================\nEC005 SUMMARY\n======================================================================\nTotal: 37\nPassed: 37 [OK]\nFailed: 0 [FAIL]\n======================================================================\n",
+      "recovery_success": false,
+      "coverage_data": null
+    },
+    {
+      "test_id": "EC006_timezone_edge_cases",
+      "category": "edge_cases",
+      "file": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests\\EC006_timezone_edge_cases.py",
+      "status": "FAILED",
+      "duration": 0.6073644161224365,
+      "error": "\n======================================================================\nEC006: Timezone Edge Cases\n======================================================================\n\n[TEST] DST Transitions\n  [OK] DST: Spring forward 2024\n     ISO: 2024-03-10T02:30:00\n  [OK] DST: Fall back 2024\n     ISO: 2024-11-03T01:30:00\n  [OK] DST: EU Spring 2024\n     ISO: 2024-03-31T02:30:00\n  [OK] DST: EU Fall 2024\n     ISO: 2024-10-27T02:30:00\n\n[TEST] Leap Year Boundaries\n  [OK] Leap: Leap day 2020\n     Date: 2020-02-29\n  [OK] Leap: Leap day 2024\n     Date: 2024-02-29\n  [OK] Leap: Non-leap 2021\n     Date: 2021-02-28\n  [OK] Leap: Feb 29 2021 invalid\n     Date: 2021-02-28\n\n[TEST] Timezone Boundaries\n  [OK] TZ: UTC-12\n     Offset: UTC-12:00\n  [OK] TZ: UTC+14\n     Offset: UTC+14:00\n  [OK] TZ: UTC\n     Offset: UTC\n  [OK] TZ: IST +5:30\n     Offset: UTC+05:30\n  [OK] TZ: Nepal +5:45\n     Offset: UTC+05:45\n\n[TEST] Unix Epoch Boundaries\n  [OK] Epoch: Epoch start\n     TS: 0\n  [FAIL] Epoch: Year 2038\n     TS: 2147472000\n  [OK] Epoch: Far future\n     TS: 4102358400\n  [OK] Epoch: Pre-epoch\n     TS: -86400\n\n[TEST] Leap Seconds\n  [OK] Leap sec: Before leap 2016\n     ISO: 2016-12-31T23:59:59+00:00\n  [OK] Leap sec: After leap 2016\n     ISO: 2017-01-01T00:00:00+00:00\n  [OK] Leap sec: Recent date\n     ISO: 2024-01-01T00:00:00+00:00\n\n======================================================================\nEC006 SUMMARY\n======================================================================\nTotal: 20\nPassed: 19 [OK]\nFailed: 1 [FAIL]\n======================================================================\n",
+      "output": null,
+      "recovery_success": false,
+      "coverage_data": null
+    }
+  ],
+  "environment": {
+    "python_version": "3.11.9",
+    "platform": "win32",
+    "working_directory": "C:\\Users\\zboud\\ATLAS AI Incubator\\testsprite_tests",
+    "test_files_found": 6,
+    "mcp_server_available": false,
+    "api_key_configured": false,
+    "ci_mode": false
+  }
+}
