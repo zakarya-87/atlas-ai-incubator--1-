@@ -1,114 +1,124 @@
-# Docker Compose for ATLAS AI Incubator Development Environment
+# ========================================
+# Docker Compose: Development Configuration
+# Full-stack with hot reload and debugging
+# ========================================
+
+version: '3.9'
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: ankane/pgvector:v0.5.1
+    container_name: atlas-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-atlas_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-atlas_password}
+      POSTGRES_DB: ${POSTGRES_DB:-atlas_db}
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-atlas_user} -d ${POSTGRES_DB:-atlas_db}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - atlas-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: atlas-redis-dev
+    restart: unless-stopped
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - atlas-network
+
+  # NestJS Backend - Development mode with hot reload
   atlas-backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - '3000:3000'
+    container_name: atlas-backend-dev
+    restart: unless-stopped
     environment:
-      - DATABASE_URL=postgresql://atlas_user:atlas_password@postgres:5432/atlas_db
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=redis_secure_password_123
-      - NODE_ENV=development
-      - JWT_SECRET=dev_jwt_secret_change_in_production_123456789
-      - JWT_EXPIRATION=7d
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-      - GROK_API_KEY=${GROK_API_KEY:-}
-      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
-      - EMAIL_HOST=${EMAIL_HOST:-smtp.gmail.com}
-      - EMAIL_PORT=${EMAIL_PORT:-587}
-      - EMAIL_USER=${EMAIL_USER:-}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-}
-      - CORS_ORIGIN=http://localhost:5173
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+      DATABASE_URL: postgresql://${POSTGRES_USER:-atlas_user}:${POSTGRES_PASSWORD:-atlas_password}@postgres:5432/${POSTGRES_DB:-atlas_db}
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      NODE_ENV: development
+      PORT: 3000
+      API_KEY: ${API_KEY:-test_key}
+      JWT_SECRET: ${JWT_SECRET:-test_secret}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+    ports:
+      - ${BACKEND_PORT:-3000}:3000
+      - 9229:9229
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    healthcheck:
-      test: [ 'CMD', 'curl', '-f', 'http://localhost:3000/api/health' ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    volumes:
+      # Mount source for hot reload
+      - ./backend/src:/app/src
+      - ./backend/prisma:/app/prisma
+      - /app/node_modules
+      - /app/dist
+    command: npm run start:dev
     networks:
       - atlas-network
 
+  # React Frontend - Development mode with hot reload
   atlas-frontend:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:3000}
+    container_name: atlas-frontend-dev
+    restart: unless-stopped
     ports:
-      - '5173:5173'
-    environment:
-      - VITE_BACKEND_URL=http://localhost:3000
-      - HTTP_PROXY=${HTTP_PROXY}
-      - HTTPS_PROXY=${HTTPS_PROXY}
-      - NO_PROXY=${NO_PROXY}
-      - http_proxy=${http_proxy}
-      - https_proxy=${https_proxy}
-      - no_proxy=${no_proxy}
-    volumes:
-      - .:/app
-      - /app/node_modules
+      - ${FRONTEND_PORT:-5173}:5173
     depends_on:
-      atlas-backend:
-        condition: service_healthy
-    healthcheck:
-      test: [ 'CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:5173/' ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    networks:
-      - atlas-network
-
-  postgres:
-    image: postgres:15-alpine
-    ports:
-      - '5432:5432'
+      - atlas-backend
+    volumes:
+      # Mount source for Vite HMR
+      - ./src:/app/src
+      - ./components:/app/components
+      - ./context:/app/context
+      - ./hooks:/app/hooks
+      - ./services:/app/services
+      - ./public:/app/public
+      - /app/node_modules
     environment:
-      POSTGRES_USER: atlas_user
-      POSTGRES_PASSWORD: atlas_password
-      POSTGRES_DB: atlas_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ 'CMD-SHELL', 'pg_isready -U atlas_user -d atlas_db' ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      VITE_HMR_HOST: localhost
+      VITE_HMR_PORT: 5173
+      VITE_HMR_PROTOCOL: ws
+      VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:3000}
     networks:
       - atlas-network
 
-  redis:
-    image: redis:alpine
-    command: redis-server --requirepass redis_secure_password_123
-    ports:
-      - '6379:6379'
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: [ 'CMD', 'redis-cli', '-a', 'redis_secure_password_123', 'ping' ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - atlas-network
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
 
 networks:
   atlas-network:
     driver: bridge
-    driver_opts:
-      com.docker.network.driver.mtu: 1400
-
-
-volumes:
-  postgres_data:
-  redis_data:

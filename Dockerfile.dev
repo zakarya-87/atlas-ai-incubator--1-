@@ -1,30 +1,31 @@
-# Development Dockerfile for ATLAS AI Incubator Frontend
+# ========================================
+# Frontend Development: Vite with HMR
+# ========================================
+
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Configure npm for better network resilience and low concurrency
-RUN npm config set fetch-timeout 600000 && \
-    npm config set fetch-retries 10 && \
-    npm config set fetch-retry-mintimeout 60000 && \
-    npm config set fetch-retry-maxtimeout 300000 && \
-    npm config set maxsockets 3 && \
-    npm config set progress false && \
-    npm config set audit false && \
-    npm config set fund false && \
-    npm config set registry https://registry.npmjs.org/
+# Install build tools
+RUN apk add --no-cache git
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (use npm ci for reliable installs)
-RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+# Install dependencies (including dev dependencies for development)
+RUN npm ci --prefer-offline
 
-# Copy all source files
-COPY . .
+# Copy application code
+COPY tsconfig.json eslint.config.js vite.config.ts ./
+COPY index.html ./
+COPY public ./public
+COPY components ./components
+COPY context ./context
+COPY hooks ./hooks
+COPY services ./services
+COPY App.tsx App.test.tsx index.tsx types.ts env.d.ts ./
 
-# Expose Vite dev server port
 EXPOSE 5173
 
-# Start Vite dev server with host binding for Docker
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Run Vite dev server in host mode to enable HMR from container
+CMD ["npm", "run", "dev", "--", "--host"]

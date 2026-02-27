@@ -1,23 +1,17 @@
-// Centralized frontend runtime configuration
-// Validates and exposes environment variables used client-side.
-
-export type FrontendConfig = {
-  apiBaseUrl: string;
-  mode: string;
-};
-
-function getEnv(key: string, fallback?: string): string {
-  const v = (import.meta as any).env?.[key];
-  if (v == null || v === '') {
-    if (fallback !== undefined) return fallback;
-    throw new Error(`Missing required env: ${key}`);
-  }
-  return v;
-}
-
-export const config: FrontendConfig = {
-  apiBaseUrl: '/api',
-  mode: ((import.meta as any).env?.MODE as string) || 'development',
+// Configuration loader
+const config = {
+  apiBaseUrl: process.env.VITE_BACKEND_URL || 'http://localhost:3000',
+  wsUrl: (process.env.VITE_BACKEND_URL || 'http://localhost:3000').replace(/^http/, 'ws'),
+  timeout: 30000,
+  app: {
+    name: 'ATLAS AI Incubator',
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+  },
+  features: {
+    enableDevTools: process.env.NODE_ENV === 'development',
+    enableAnalytics: process.env.VITE_ENABLE_ANALYTICS !== 'false',
+  },
 };
 
 export default config;

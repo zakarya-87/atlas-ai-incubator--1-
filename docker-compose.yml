@@ -1,77 +1,154 @@
+# ========================================
+# Docker Compose: Production Configuration
+# Full-stack deployment with all services
+# ========================================
+
+version: '3.9'
+
 services:
-  atlas-backend:
-    build: ./backend
-    ports:
-      - '3000:3000'
+  # PostgreSQL Database with pgVector support
+  postgres:
+    image: ankane/pgvector:v0.5.1
+    restart: unless-stopped
     environment:
-      - DATABASE_URL=postgresql://atlas_user:atlas_password@postgres:5432/atlas_db
-      - API_KEY=${API_KEY:-test_key}
-      - JWT_SECRET=${JWT_SECRET:-test_secret}
-      - NODE_ENV=development
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      POSTGRES_USER: ${POSTGRES_USER:-atlas_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-atlas_password}
+      POSTGRES_DB: ${POSTGRES_DB:-atlas_db}
+      # Performance optimizations for development
+      POSTGRES_INITDB_ARGS: -c shared_buffers=256MB -c effective_cache_size=512MB
+    ports:
+      - ${POSTGRES_PORT:-5432}:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-atlas_user} -d ${POSTGRES_DB:-atlas_db}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - atlas-network
+    security_opt:
+      - no-new-privileges:true
+
+  # Redis Cache & Job Queue
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - atlas-network
+    security_opt:
+      - no-new-privileges:true
+
+  # NestJS Backend API
+  atlas-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+    restart: unless-stopped
+    environment:
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-atlas_user}:${POSTGRES_PASSWORD:-atlas_password}@postgres:5432/${POSTGRES_DB:-atlas_db}
+      
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_password}
+      
+      # Application
+      NODE_ENV: production
+      PORT: 3000
+      API_KEY: ${API_KEY:-test_key}
+      JWT_SECRET: ${JWT_SECRET:-test_secret}
+      
+      # External APIs
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+    
+    ports:
+      - ${BACKEND_PORT:-3000}:3000
+    
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    
     volumes:
-      - ./backend:/app
+      # Development: mount source for hot reload (comment out in production)
+      - ./backend/src:/app/src:ro
       - /app/node_modules
+    
     healthcheck:
-      test: ['CMD-SHELL', 'curl -f http://localhost:3000/api/health || exit 1']
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+    
     networks:
       - atlas-network
-    restart: unless-stopped
+    
+    security_opt:
+      - no-new-privileges:true
+    
+    # Resource limits (adjust based on your needs)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
+  # React Frontend
   atlas-frontend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:3000}
+    restart: unless-stopped
     ports:
-      - '5173:8080'
+      - ${FRONTEND_PORT:-5173}:8080
     depends_on:
       - atlas-backend
     networks:
       - atlas-network
-    restart: unless-stopped
-
-  postgres:
-    image: ankane/pgvector:v0.5.1
-    ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_USER: atlas_user
-      POSTGRES_PASSWORD: atlas_password
-      POSTGRES_DB: atlas_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U atlas_user -d atlas_db']
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - atlas-network
-    restart: unless-stopped
-
-  redis:
-    image: redis:alpine
-    ports:
-      - '6379:6379'
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - atlas-network
-    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
 volumes:
   postgres_data:
+    driver: local
+  redis_data:
+    driver: local
 
 networks:
   atlas-network:
+    driver: bridge
