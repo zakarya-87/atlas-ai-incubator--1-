@@ -6,7 +6,12 @@
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
-    "types": ["node", "vitest/globals", "playwright/test"],
+    "types": [
+      "node",
+      "vitest/globals",
+      "playwright/test",
+      "vite/client"
+    ],
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -20,6 +25,7 @@
     "strict": true
   },
   "include": [
+    "env.d.ts",
     "index.tsx",
     "App.tsx",
     "types.ts",
@@ -29,6 +35,7 @@
     "utils/**/*.ts",
     "services/**/*.ts"
   ],
+
   "exclude": [
     "node_modules",
     "dist",

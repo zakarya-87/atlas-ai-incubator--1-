@@ -9,7 +9,7 @@ FROM node:20-alpine AS dependencies
 WORKDIR /app
 
 # Install build tools (git required for some npm packages)
-RUN apk add --no-cache git
+RUN for i in 1 2 3 4 5; do apk add --no-cache git && break || sleep 5; done
 
 # Copy package files
 COPY package*.json ./
@@ -49,7 +49,7 @@ RUN npm run build && \
 FROM nginx:1.27-alpine AS production
 
 # Install curl for health checks (minimal layer)
-RUN apk add --no-cache curl && \
+RUN for i in 1 2 3 4 5; do apk add --no-cache curl && break || sleep 5; done && \
     rm -rf /var/cache/apk/*
 
 # Create non-root user for security

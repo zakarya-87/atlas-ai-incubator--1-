@@ -101,7 +101,7 @@ export abstract class BaseAgent implements AiAgent {
   private getGeminiRequestOptions(): RequestOptions {
     const baseUrl = this.configService.get<string>('GEMINI_API_BASE_URL');
     const apiVersion = this.configService.get<string>('GEMINI_API_VERSION');
-    const requestOptions: RequestOptions = { timeout: 300000 };
+    const requestOptions: RequestOptions = { timeout: 600000 };
 
     if (baseUrl) requestOptions.baseUrl = baseUrl;
     if (apiVersion) requestOptions.apiVersion = apiVersion;
@@ -146,7 +146,7 @@ export abstract class BaseAgent implements AiAgent {
 
     const response = await this.raceWithTimeout(
       model.generateContent(contents),
-      300000
+      600000
     );
 
     const resultText = response.response.text();

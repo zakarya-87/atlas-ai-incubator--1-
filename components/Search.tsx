@@ -260,6 +260,8 @@ const Search: React.FC<SearchProps> = ({ onNavigate }) => {
         </span>
         <input
           id="search-bar"
+          name="search"
+          autoComplete="off"
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}

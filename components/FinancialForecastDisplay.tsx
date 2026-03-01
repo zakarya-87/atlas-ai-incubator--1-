@@ -52,11 +52,16 @@ const AssumptionSlider: React.FC<AssumptionSliderProps> = ({
   format,
 }) => (
   <div>
-    <label className="block text-sm font-semibold text-brand-light">
+    <label
+      htmlFor={`slider-${label.replace(/\s+/g, '-').toLowerCase()}`}
+      className="block text-sm font-semibold text-brand-light"
+    >
       {label}
     </label>
     <div className="flex items-center gap-4">
       <input
+        id={`slider-${label.replace(/\s+/g, '-').toLowerCase()}`}
+        name={`slider-${label.replace(/\s+/g, '-').toLowerCase()}`}
         type="range"
         min={min}
         max={max}

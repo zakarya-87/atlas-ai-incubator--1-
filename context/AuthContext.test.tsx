@@ -107,6 +107,8 @@ describe('AuthContext', () => {
 
   it('should call signUp on register', async () => {
     mockSignUp.mockResolvedValue({ user: { email: 'test@example.com' } });
+    mockSignIn.mockResolvedValue({ user: { email: 'test@example.com' } });
+    mockFetchUserProfile.mockResolvedValue({ email: 'test@example.com' });
 
     render(
       <AuthProvider>

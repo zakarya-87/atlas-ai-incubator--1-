@@ -132,6 +132,9 @@ const InvestorMatchingDisplay: React.FC<{ data: InvestorMatchingData }> = ({
             ))}
           </select>
           <input
+            id="sector-filter"
+            name="sectorFilter"
+            autoComplete="off"
             type="text"
             value={sectorFilter}
             onChange={(e) => setSectorFilter(e.target.value)}

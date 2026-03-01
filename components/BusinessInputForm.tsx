@@ -9,6 +9,7 @@ interface BusinessInputFormProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: (image?: string) => void;
+  onCancel?: () => void;
   isLoading: boolean;
   activeTool: AnyTool;
   extraFields?: React.ReactNode;
@@ -18,12 +19,14 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
   value,
   onChange,
   onSubmit,
+  onCancel,
   isLoading,
   activeTool,
   extraFields,
 }) => {
   const { t } = useLanguage();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getInputQuality = () => {
@@ -36,6 +39,15 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (value.trim().length === 0) {
+      setValidationError('Please enter a business description.');
+      return;
+    }
+    if (value.trim().length < 10) {
+      setValidationError('Description is too short. Please provide at least 10 characters.');
+      return;
+    }
+    setValidationError(null);
     onSubmit(imagePreview || undefined);
   };
 
@@ -79,6 +91,8 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
         <div className="relative">
           <textarea
             id="business-description"
+            name="business-description"
+            autoComplete="off"
             aria-label={
               activeTool === 'swot'
                 ? t('businessDescriptionLabel')
@@ -88,20 +102,36 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
             className="w-full h-40 p-4 bg-brand-primary/50 border-2 border-brand-accent rounded-xl focus:ring-2 focus:ring-brand-teal focus:outline-none transition-all duration-300 resize-y text-brand-text placeholder-brand-accent/60 leading-relaxed font-sans"
             placeholder={t('businessDescriptionPlaceholder')}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              onChange(e.target.value);
+              if (validationError) setValidationError(null);
+            }}
             onKeyDown={(e) => {
               if (
                 (e.ctrlKey || e.metaKey) &&
                 e.key === 'Enter' &&
-                !isLoading &&
-                value.trim().length >= 10
+                !isLoading
               ) {
+                if (value.trim().length === 0) {
+                  setValidationError('Please enter a business description.');
+                  return;
+                }
+                if (value.trim().length < 10) {
+                  setValidationError('Description is too short. Please provide at least 10 characters.');
+                  return;
+                }
+                setValidationError(null);
                 onSubmit(imagePreview || undefined);
               }
             }}
             disabled={isLoading}
             rows={5}
           />
+          {validationError && (
+            <p role="alert" className="text-red-400 text-sm mt-2 ml-1 font-semibold relative z-20">
+              {validationError}
+            </p>
+          )}
           <div
             id="char-count"
             aria-live="polite"
@@ -164,7 +194,7 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
 
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
         <p
-          className="text-sm text-brand-light text-center sm:text-left order-2 sm:order-1"
+          className="text-sm text-brand-light text-center sm:text-left order-3 sm:order-1"
           role="note"
         >
           {t('inputHintPrefix')}{' '}
@@ -177,24 +207,41 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
           </kbd>{' '}
           {t('inputHintSuffix')}
         </p>
-        <motion.button
-          type="submit"
-          className="w-full sm:w-auto px-8 py-3 bg-brand-teal hover:bg-teal-500 disabled:bg-brand-accent disabled:cursor-not-allowed text-white font-bold rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100 order-1 sm:order-2 flex items-center justify-center"
-          disabled={isLoading || value.trim().length < 10}
-          whileHover={{ scale: !isLoading ? 1.05 : 1 }}
-          whileTap={{ scale: !isLoading ? 0.95 : 1 }}
-          aria-label={isLoading ? t('buttonGenerating') : t('buttonGenerate')}
-        >
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center text-center text-brand-light">
-              <LoadingSpinner />
-              <p className="mt-4 text-lg font-semibold">{t('loadingTitle')}</p>
-              <p className="text-sm">{t('loadingText')}</p>
-            </div>
-          ) : (
-            t('buttonGenerate')
+
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-4 order-1 sm:order-2">
+          {isLoading && onCancel && (
+            <motion.button
+              type="button"
+              onClick={onCancel}
+              className="w-full sm:w-auto px-6 py-3 bg-red-500/20 hover:bg-red-500/40 text-red-200 font-bold rounded-lg shadow-lg transition-all duration-300 relative z-20"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={t('buttonCancel') || 'Cancel Generation'}
+            >
+              {t('buttonCancel') || 'Cancel'}
+            </motion.button>
           )}
-        </motion.button>
+
+          <motion.button
+            type="submit"
+            className="w-full sm:w-auto px-8 py-3 bg-brand-teal hover:bg-teal-500 disabled:bg-brand-accent disabled:cursor-not-allowed text-white font-bold rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100 flex items-center justify-center relative z-20"
+            disabled={isLoading || value.trim().length < 10}
+            whileHover={{ scale: (!isLoading && value.trim().length >= 10) ? 1.05 : 1 }}
+            whileTap={{ scale: (!isLoading && value.trim().length >= 10) ? 0.95 : 1 }}
+            aria-label={isLoading ? t('buttonGenerating') : t('buttonGenerate')}
+          >
+            {isLoading ? (
+              <div role="status" className="flex items-center justify-center space-x-2 text-brand-light">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span className="relative z-20">
+                  {t('buttonGenerating')}
+                </span>
+              </div>
+            ) : (
+              t('buttonGenerate')
+            )}
+          </motion.button>
+        </div>
       </div>
     </form>
   );

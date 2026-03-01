@@ -1,6 +1,6 @@
 // Frontend constants - comprehensive configuration
-export const API_BASE_URL = process.env.VITE_BACKEND_URL || 'http://localhost:3000';
-export const WS_URL = process.env.VITE_BACKEND_URL?.replace(/^http/, 'ws') || 'ws://localhost:3000';
+export const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || '/api';
+export const WS_URL = (import.meta.env.VITE_BACKEND_URL || '/api').replace(/^http/, 'ws');
 
 // Storage keys
 export const STORAGE_KEYS = {

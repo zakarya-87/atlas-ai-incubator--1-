@@ -76,6 +76,8 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose }) => {
                 <input
                   type="email"
                   id="email-invite"
+                  name="inviteEmail"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={t('shareModalInputPlaceholder')}
@@ -93,6 +95,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose }) => {
                 </label>
                 <select
                   id="role-select"
+                  name="inviteRole"
                   value={role}
                   onChange={(e) =>
                     setRole(e.target.value as 'contributor' | 'reviewer')

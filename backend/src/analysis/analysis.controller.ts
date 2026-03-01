@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Logger, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post, UseGuards, InternalServerErrorException } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -95,7 +95,8 @@ export class AnalysisController {
       }
     } catch (error: unknown) {
       this.logger.error('Error starting analysis:', error);
-      return { error: 'Failed to start analysis job.' };
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start analysis job.';
+      throw new InternalServerErrorException(errorMessage);
     }
   }
 

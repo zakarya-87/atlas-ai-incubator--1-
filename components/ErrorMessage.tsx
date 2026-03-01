@@ -70,9 +70,28 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  const [title, description] = message.includes('::')
-    ? message.split('::', 2)
-    : [t('errorTitle'), message];
+  // If message includes :: it comes from a translated string with a specific format
+  // Otherwise, if code matches a known raw error code, use a user-friendly fallback
+  let displayTitle = t('errorTitle');
+  let displayDesc = message;
+
+  if (message.includes('::')) {
+    const parts = message.split('::', 2);
+    displayTitle = parts[0];
+    displayDesc = parts[1];
+  } else if (code === 'SERVER_ERROR') {
+    displayTitle = 'Server Error';
+    displayDesc = 'Our servers are currently experiencing issues. Please try again later.';
+  } else if (code === 'NETWORK_ERROR') {
+    displayTitle = 'Network Disconnected';
+    displayDesc = 'Please check your internet connection and try again.';
+  } else if (code === 'TIMEOUT') {
+    displayTitle = 'Request Timed Out';
+    displayDesc = 'The operation took too long to complete. Please try again.';
+  } else if (code === 'RATE_LIMIT') {
+    displayTitle = 'Rate Limit Exceeded';
+    displayDesc = 'You have exceeded the maximum number of requests. Please wait a moment.';
+  }
 
   const errorConfig = useMemo(() => {
     switch (code) {
@@ -96,6 +115,10 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
           'errorApiFailure',
           'errorInvalidData',
           'errorRateLimit',
+          'SERVER_ERROR',
+          'NETWORK_ERROR',
+          'TIMEOUT',
+          'RATE_LIMIT'
         ];
         return {
           icon: <Icons.RetryableError />,
@@ -110,8 +133,8 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
       className={`flex flex-col items-center justify-center text-center p-6 rounded-lg w-full max-w-lg mx-auto ${errorConfig.colorClasses}`}
     >
       {errorConfig.icon}
-      <p className="text-lg font-bold">{title}</p>
-      <p className="mt-1 text-sm">{description}</p>
+      <p className="text-lg font-bold">{displayTitle}</p>
+      <p className="mt-1 text-sm">{displayDesc}</p>
       {errorConfig.showRetry && (
         <button
           onClick={onRetry}

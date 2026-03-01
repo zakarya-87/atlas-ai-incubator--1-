@@ -16,6 +16,10 @@ async function bootstrap(): Promise<void> {
     // Set global prefix for all routes
     app.setGlobalPrefix('api');
 
+    // Increase payload limits to prevent 'Payload Too Large' errors on heavy AI responses/inputs
+    app.use(require('express').json({ limit: '50mb' }));
+    app.use(require('express').urlencoded({ limit: '50mb', extended: true }));
+
     // --- COOKIE PARSER (Required for JWT cookie auth) ---
     app.use(cookieParser());
 

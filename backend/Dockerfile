@@ -9,7 +9,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Install build dependencies (python3, make, g++ needed for some npm packages)
-RUN apk add --no-cache python3 make g++ git
+RUN for i in 1 2 3 4 5; do apk add --no-cache python3 make g++ git && break || sleep 5; done
 
 # Copy package files
 COPY package*.json ./
@@ -43,7 +43,7 @@ WORKDIR /app
 
 # Install runtime system dependencies only
 # Chromium for PDF generation (puppeteer), curl for health checks, postgresql-client for db checks
-RUN apk add --no-cache \
+RUN for i in 1 2 3 4 5; do apk add --no-cache \
     chromium \
     nss \
     freetype \
@@ -51,7 +51,7 @@ RUN apk add --no-cache \
     ca-certificates \
     ttf-freefont \
     curl \
-    postgresql-client && \
+    postgresql-client && break || sleep 5; done && \
     rm -rf /var/cache/apk/*
 
 # Configure Puppeteer to use system Chromium

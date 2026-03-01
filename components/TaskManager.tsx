@@ -62,6 +62,9 @@ const TaskManager: React.FC = () => {
         </h2>
         <div className="flex gap-4">
           <input
+            id="task-input"
+            name="taskText"
+            autoComplete="off"
             type="text"
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}

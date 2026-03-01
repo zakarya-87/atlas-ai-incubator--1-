@@ -1012,6 +1012,11 @@ async function pollJobCompletion<T>(
 
         if (status.status === 'completed') {
           cleanup();
+          if (!status.result) {
+            logger.error(`[Frontend] Job ${jobId} completed but result is missing or malformed`);
+            reject(new Error(ERROR_CODES.GENERIC));
+            return;
+          }
           logger.log(`[Frontend] Job ${jobId} completed successfully`);
           resolve(status.result as T);
         } else if (status.status === 'failed') {

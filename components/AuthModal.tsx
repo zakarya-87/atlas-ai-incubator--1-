@@ -114,6 +114,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   </label>
                   <input
                     id="email"
+                    name="email"
+                    autoComplete="email"
                     aria-label={t('email')}
                     aria-required="true"
                     className="w-full p-3 bg-brand-primary/50 border border-brand-accent rounded-lg focus:ring-2 focus:ring-brand-teal focus:outline-none text-brand-text"
@@ -133,6 +135,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   </label>
                   <input
                     id="password"
+                    name="password"
+                    autoComplete={isLogin ? 'current-password' : 'new-password'}
                     aria-label={t('password')}
                     className="w-full p-3 bg-brand-primary/50 border border-brand-accent rounded-lg focus:ring-2 focus:ring-brand-teal focus:outline-none text-brand-text"
                     type="password"

@@ -215,10 +215,16 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   {activeTab === 'details' && (
                     <>
                       <div>
-                        <label className="block text-xs font-bold text-brand-light uppercase mb-1">
+                          <label
+                            htmlFor="profile-email"
+                            className="block text-xs font-bold text-brand-light uppercase mb-1"
+                          >
                           Email Address
                         </label>
                         <input
+                            id="profile-email"
+                            name="email"
+                            autoComplete="email"
                           type="email"
                           value={email}
                           disabled
@@ -229,10 +235,16 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                         </p>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold text-brand-light uppercase mb-1">
+                          <label
+                            htmlFor="profile-name"
+                            className="block text-xs font-bold text-brand-light uppercase mb-1"
+                          >
                           Full Name
                         </label>
                         <input
+                            id="profile-name"
+                            name="fullName"
+                            autoComplete="name"
                           type="text"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
@@ -245,10 +257,16 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
                   {activeTab === 'security' && (
                     <div>
-                      <label className="block text-xs font-bold text-brand-light uppercase mb-1">
+                        <label
+                          htmlFor="profile-password"
+                          className="block text-xs font-bold text-brand-light uppercase mb-1"
+                        >
                         New Password
                       </label>
                       <input
+                          id="profile-password"
+                          name="password"
+                          autoComplete="new-password"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}

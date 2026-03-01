@@ -186,6 +186,8 @@ const SwotQuadrant: React.FC<SwotQuadrantProps> = ({
                 >
                   <div className="flex flex-col space-y-2 flex-grow">
                     <input
+                      id={`edit-point-${index}`}
+                      name={`swot-point-${index}`}
                       type="text"
                       value={editedPoint}
                       onChange={(e) => setEditedPoint(e.target.value)}
@@ -193,6 +195,8 @@ const SwotQuadrant: React.FC<SwotQuadrantProps> = ({
                       aria-label="Edit point title"
                     />
                     <textarea
+                      id={`edit-explanation-${index}`}
+                      name={`swot-explanation-${index}`}
                       value={editedExplanation}
                       onChange={(e) => setEditedExplanation(e.target.value)}
                       className="w-full p-1 bg-brand-primary/50 border-b-2 border-brand-accent rounded-t-sm focus:ring-0 focus:border-brand-teal focus:outline-none transition-all text-brand-text/80 text-sm resize-y"
@@ -325,7 +329,7 @@ const SwotDisplay: React.FC<SwotDisplayProps> = ({ data: initialData, onUpdate }
           <svg className="w-12 h-12 mx-auto mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <p className="text-lg font-medium">No SWOT Data Available</p>
+          <p className="text-lg font-medium">No analysis data available</p>
           <p className="text-sm mt-2">The analysis might be empty or malformed. Try generating it again with a more detailed description.</p>
         </div>
       </motion.div>

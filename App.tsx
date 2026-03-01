@@ -375,23 +375,41 @@ const AppContent: React.FC = () => {
     handleGenerate(lastSubmittedImage);
   };
 
-  const handleAnalysisResult = (data: { jobId: string; result: AnyAnalysisData }) => {
-    // Update state with the received analysis result
-    setCurrentAnalysis(data.result);
+  const handleCancel = () => {
     setIsLoading(false);
+    setIsRetrying(false);
+    // State cleans up effectively allowing the user to start a new job.
+  };
 
-    // Create a new history record
-    const newRecord: GenerationRecord = {
-      id: data.result.id || `${Date.now()}-${Math.random()}`,
-      timestamp: new Date().toISOString(),
-      module: activeModule,
-      tool: activeTool,
-      toolNameKey:
-        `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
-      inputDescription: businessDescription,
-      data: data.result,
-    };
-    setGenerationHistory((prev) => [newRecord, ...prev]);
+  const handleAnalysisResult = (data: { jobId: string; result: AnyAnalysisData }) => {
+    try {
+      if (!data || !data.result) {
+        throw new Error('errorInvalidData');
+      }
+      // Update state with the received analysis result
+      setCurrentAnalysis(data.result);
+
+      // Create a new history record
+      const newRecord: GenerationRecord = {
+        id: data.result.id || `${Date.now()}-${Math.random()}`,
+        timestamp: new Date().toISOString(),
+        module: activeModule,
+        tool: activeTool,
+        toolNameKey:
+          `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
+        inputDescription: businessDescription,
+        data: data.result,
+      };
+      setGenerationHistory((prev) => [newRecord, ...prev]);
+    } catch (e: any) {
+      console.error('Failed to handle analysis result:', e);
+      setError({
+        code: 'errorInvalidData',
+        message: t('errorInvalidData') || 'Invalid or malformed data received from the server.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRefinement = (instruction: string) => {
@@ -458,6 +476,7 @@ const AppContent: React.FC = () => {
             value={businessDescription}
             onChange={(value) => setBusinessDescription(value)}
             onSubmit={(img) => handleGenerate(img)}
+            onCancel={handleCancel}
             isLoading={isLoading}
             activeTool={activeTool}
           />

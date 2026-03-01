@@ -73,6 +73,7 @@ describe('geminiService', () => {
     });
 
     it('should handle 429 Rate limit error', async () => {
+      vi.useFakeTimers();
       vi.mocked(fetch).mockResolvedValue({
         ok: false,
         status: 429,
@@ -80,12 +81,15 @@ describe('geminiService', () => {
         text: () => Promise.resolve('Rate Limit'),
       } as Response);
 
-      await expect(
-        generateSwotAnalysis('test', 'en', 'v1', { retryDelay: 1 })
-      ).rejects.toThrow(ERROR_CODES.RATE_LIMIT);
+      const promise = generateSwotAnalysis('test', 'en', 'v1', { retryDelay: 1 });
+      const assertPromise = expect(promise).rejects.toThrow(ERROR_CODES.RATE_LIMIT);
+
+      await vi.advanceTimersByTimeAsync(10000);
+      await assertPromise;
     });
 
     it('should handle 500 Server error', async () => {
+      vi.useFakeTimers();
       vi.mocked(fetch).mockResolvedValue({
         ok: false,
         status: 500,
@@ -93,9 +97,11 @@ describe('geminiService', () => {
         text: () => Promise.resolve('Server Error'),
       } as Response);
 
-      await expect(
-        generateSwotAnalysis('test', 'en', 'v1', { retryDelay: 1 })
-      ).rejects.toThrow(ERROR_CODES.SERVER_ERROR);
+      const promise = generateSwotAnalysis('test', 'en', 'v1', { retryDelay: 1 });
+      const assertPromise = expect(promise).rejects.toThrow(ERROR_CODES.SERVER_ERROR);
+
+      await vi.advanceTimersByTimeAsync(10000);
+      await assertPromise;
     });
   });
 

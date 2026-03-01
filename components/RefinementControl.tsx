@@ -47,6 +47,9 @@ const RefinementControl: React.FC<RefinementControlProps> = ({
       </h4>
       <form onSubmit={handleSubmit} className="flex gap-2">
         <input
+          id="refinement-input"
+          name="refinement"
+          autoComplete="off"
           type="text"
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}

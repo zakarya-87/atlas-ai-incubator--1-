@@ -129,6 +129,17 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
       // Start heartbeat
       heartbeatIntervalRef.current = setInterval(() => {
         if (socketRef.current?.connected) {
+          let timeoutFired = false;
+          const pongTimeout = setTimeout(() => {
+            timeoutFired = true;
+            logger.warn('WebSocket heartbeat timeout - missing pong');
+            socketRef.current?.disconnect();
+          }, 4000);
+
+          socketRef.current.once('pong', () => {
+            if (!timeoutFired) clearTimeout(pongTimeout);
+          });
+
           socketRef.current.emit('ping');
         }
       }, WS_CONFIG.HEARTBEAT_INTERVAL);
@@ -206,11 +217,34 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
     }, delay);
   }, [connectWebSocket]);
 
-  // Initialize WebSocket connection
+  // Initialize WebSocket connection and network listeners
   useEffect(() => {
     connectWebSocket();
-    return cleanup;
-  }, [ventureId]); // Reconnect when ventureId changes
+
+    const handleOffline = () => {
+      logger.warn('Browser network offline detected');
+      setConnectionStatus('disconnected');
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+
+    const handleOnline = () => {
+      logger.info('Browser network online detected');
+      if (reconnectAttempts.current < WS_CONFIG.RECONNECT_ATTEMPTS) {
+        handleReconnect();
+      }
+    };
+
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+      cleanup();
+    };
+  }, [ventureId, connectWebSocket, cleanup, handleReconnect]); // Reconnect when ventureId changes
 
   const startSimulatedLogs = () => {
     // Fallback for when backend WS isn't reachable or ready
