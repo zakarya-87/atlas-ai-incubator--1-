@@ -400,14 +400,14 @@ const AppContent: React.FC = () => {
 
       // Create a new history record
       const newRecord: GenerationRecord = {
-        id: data.result.id || `${Date.now()}-${Math.random()}`,
+        id: unwrappedResult.id || `${Date.now()}-${Math.random()}`,
         timestamp: new Date().toISOString(),
         module: activeModule,
         tool: activeTool,
         toolNameKey:
           `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
         inputDescription: businessDescription,
-        data: data.result,
+        data: unwrappedResult,
       };
       setGenerationHistory((prev) => [newRecord, ...prev]);
     } catch (e: any) {

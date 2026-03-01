@@ -20,19 +20,6 @@ const ExperimentBuilderDisplay: React.FC<{
 }> = ({ data, onUpdate, onSave }) => {
   const { t } = useLanguage();
 
-  // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    return (
-      <div className="w-full p-12 text-center bg-brand-secondary/30 rounded-xl border border-dashed border-brand-accent/30">
-        <div className="text-brand-text/60 max-w-sm mx-auto">
-          <p className="text-lg font-medium">No analysis data available</p>
-          <p className="text-sm mt-2">The analysis might be empty or malformed. Try generating it again with a more detailed description.</p>
-        </div>
-      </div>
-    );
-  }
-
-
   const initialData: ExperimentData = {
     columns: [
       {
@@ -49,6 +36,18 @@ const ExperimentBuilderDisplay: React.FC<{
 
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState('');
+
+  // Handle undefined, null, non-object, or array data gracefully
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return (
+      <div className="w-full p-12 text-center bg-brand-secondary/30 rounded-xl border border-dashed border-brand-accent/30">
+        <div className="text-brand-text/60 max-w-sm mx-auto">
+          <p className="text-lg font-medium">No analysis data available</p>
+          <p className="text-sm mt-2">The analysis might be empty or malformed. Try generating it again with a more detailed description.</p>
+        </div>
+      </div>
+    );
+  }
 
   const deepClone = (obj: any) => JSON.parse(JSON.stringify(obj));
 

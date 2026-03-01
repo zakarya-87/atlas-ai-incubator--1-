@@ -1103,7 +1103,7 @@ export const fetchVentureHistory = async (
         tool: record.tool as AnyTool,
         toolNameKey: toolNameKey,
         inputDescription: record.inputContext,
-        data: { ...parsedData, id: record.id } as AnyAnalysisData, // Inject ID into data
+        data: { ...unwrappedData, id: record.id } as AnyAnalysisData, // Inject ID into data
       };
     });
   } catch (error) {
