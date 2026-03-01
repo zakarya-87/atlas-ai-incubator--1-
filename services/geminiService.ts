@@ -1017,8 +1017,17 @@ async function pollJobCompletion<T>(
             reject(new Error(ERROR_CODES.GENERIC));
             return;
           }
+
+          let unwrappedResult = status.result;
+          if (unwrappedResult && typeof unwrappedResult === 'object' && !Array.isArray(unwrappedResult)) {
+              const keys = Object.keys(unwrappedResult);
+              if (keys.length === 1 && typeof unwrappedResult[keys[0]] === 'object' && !Array.isArray(unwrappedResult[keys[0]])) {
+                  unwrappedResult = unwrappedResult[keys[0]];
+              }
+          }
+
           logger.log(`[Frontend] Job ${jobId} completed successfully`);
-          resolve(status.result as T);
+          resolve(unwrappedResult as T);
         } else if (status.status === 'failed') {
           cleanup();
           logger.error(`[Frontend] Job ${jobId} failed:`, status.error);
@@ -1072,10 +1081,20 @@ export const fetchVentureHistory = async (
       const toolNameKey = `${record.module}Nav${toolKeyCap}`;
 
       // Parse the JSON result
+
       const parsedData =
         typeof record.resultData === 'string'
           ? JSON.parse(record.resultData)
           : record.resultData;
+
+      // Ensure data is unwrapped if nested
+      let unwrappedData = parsedData;
+      if (parsedData && typeof parsedData === 'object' && !Array.isArray(parsedData)) {
+          const keys = Object.keys(parsedData);
+          if (keys.length === 1 && typeof parsedData[keys[0]] === 'object' && !Array.isArray(parsedData[keys[0]])) {
+              unwrappedData = parsedData[keys[0]];
+          }
+      }
 
       return {
         id: record.id,
@@ -1084,7 +1103,7 @@ export const fetchVentureHistory = async (
         tool: record.tool as AnyTool,
         toolNameKey: toolNameKey,
         inputDescription: record.inputContext,
-        data: { ...parsedData, id: record.id } as AnyAnalysisData, // Inject ID into data
+        data: { ...unwrappedData, id: record.id } as AnyAnalysisData, // Inject ID into data
       };
     });
   } catch (error) {

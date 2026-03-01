@@ -386,19 +386,28 @@ const AppContent: React.FC = () => {
       if (!data || !data.result) {
         throw new Error('errorInvalidData');
       }
+
+      let unwrappedResult = data.result;
+      if (unwrappedResult && typeof unwrappedResult === 'object' && !Array.isArray(unwrappedResult)) {
+          const keys = Object.keys(unwrappedResult);
+          if (keys.length === 1 && typeof (unwrappedResult as any)[keys[0]] === 'object' && !Array.isArray((unwrappedResult as any)[keys[0]])) {
+              unwrappedResult = (unwrappedResult as any)[keys[0]];
+          }
+      }
+
       // Update state with the received analysis result
-      setCurrentAnalysis(data.result);
+      setCurrentAnalysis(unwrappedResult);
 
       // Create a new history record
       const newRecord: GenerationRecord = {
-        id: data.result.id || `${Date.now()}-${Math.random()}`,
+        id: unwrappedResult.id || `${Date.now()}-${Math.random()}`,
         timestamp: new Date().toISOString(),
         module: activeModule,
         tool: activeTool,
         toolNameKey:
           `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
         inputDescription: businessDescription,
-        data: data.result,
+        data: unwrappedResult,
       };
       setGenerationHistory((prev) => [newRecord, ...prev]);
     } catch (e: any) {
