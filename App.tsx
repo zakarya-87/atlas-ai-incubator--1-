@@ -386,8 +386,17 @@ const AppContent: React.FC = () => {
       if (!data || !data.result) {
         throw new Error('errorInvalidData');
       }
+
+      let unwrappedResult = data.result;
+      if (unwrappedResult && typeof unwrappedResult === 'object' && !Array.isArray(unwrappedResult)) {
+          const keys = Object.keys(unwrappedResult);
+          if (keys.length === 1 && typeof (unwrappedResult as any)[keys[0]] === 'object' && !Array.isArray((unwrappedResult as any)[keys[0]])) {
+              unwrappedResult = (unwrappedResult as any)[keys[0]];
+          }
+      }
+
       // Update state with the received analysis result
-      setCurrentAnalysis(data.result);
+      setCurrentAnalysis(unwrappedResult);
 
       // Create a new history record
       const newRecord: GenerationRecord = {

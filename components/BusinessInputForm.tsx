@@ -216,9 +216,9 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
               className="w-full sm:w-auto px-6 py-3 bg-red-500/20 hover:bg-red-500/40 text-red-200 font-bold rounded-lg shadow-lg transition-all duration-300 relative z-20"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              aria-label={t('buttonCancel') || 'Cancel Generation'}
+              aria-label={t('cancel' as any) || 'Cancel Generation'}
             >
-              {t('buttonCancel') || 'Cancel'}
+              {t('cancel' as any) || 'Cancel'}
             </motion.button>
           )}
 
