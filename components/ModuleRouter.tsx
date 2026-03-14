@@ -1,4 +1,5 @@
 import React, { Suspense } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type {
   ModuleType,
   AnyTool,
@@ -414,7 +415,19 @@ const ModuleRouter = (props: ModuleRouterProps) => {
 
   return {
     subNav: renderSubNav(),
-    content: renderContent(),
+    content: (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={isLoading ? 'loading' : error ? 'error' : currentAnalysis ? 'result' : 'welcome'}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+        >
+          {renderContent()}
+        </motion.div>
+      </AnimatePresence>
+    ),
   };
 };
 

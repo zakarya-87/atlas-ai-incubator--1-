@@ -7,6 +7,7 @@ import type {
   BudgetCategory,
 } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import DataStructureDebugger from './DataStructureDebugger';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -150,8 +151,50 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
 }) => {
   const { language, t } = useLanguage();
 
+  const normalizeList = (value: any): any[] => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'object') {
+      if (Array.isArray((value as any).items)) return (value as any).items;
+      if (Array.isArray((value as any).list)) return (value as any).list;
+      return Object.values(value).filter(Boolean);
+    }
+    return [value];
+  };
+
+  const getItemText = (item: any) => {
+    if (item == null) return 'N/A';
+    if (typeof item === 'string' || typeof item === 'number') return String(item);
+    if (typeof item === 'object') {
+      return (
+        (item as any).point ||
+        (item as any).title ||
+        (item as any).description ||
+        (item as any).summary ||
+        JSON.stringify(item)
+      );
+    }
+    return String(item);
+  };
+
+  const getItemDetails = (item: any) => {
+    if (item && typeof item === 'object') {
+      return (item as any).explanation || (item as any).details || null;
+    }
+    return null;
+  };
+
+  const budgetData =
+    (data as any)?.scenarios
+      ? (data as any)
+      : (data as any)?.budget_generator ||
+        (data as any)?.budget ||
+        (data as any)?.budget_plan ||
+        (data as any)?.plan ||
+        (data as any)?.data;
+
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('scenarios' in data)) {
+  if (!budgetData || typeof budgetData !== 'object' || Array.isArray(budgetData) || !('scenarios' in budgetData)) {
     return (
       <motion.div
         variants={containerVariants}
@@ -167,8 +210,8 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
     );
   }
   const realisticScenario =
-    (data?.scenarios || []).find((s) => s.scenarioName === 'Realistic') ||
-    (data?.scenarios || [])[0];
+    (budgetData?.scenarios || []).find((s: any) => s.scenarioName === 'Realistic') ||
+    (budgetData?.scenarios || [])[0];
 
   return (
     <motion.div
@@ -177,6 +220,7 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
       animate="visible"
       className="w-full space-y-6"
     >
+      <DataStructureDebugger data={data} label="Budget Generator Data" />
       <motion.div variants={itemVariants}>
         <h3 className="text-2xl font-bold text-brand-teal mb-4">
           {t('budgetGeneratorSummary')}
@@ -185,7 +229,7 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
           <h4 className="text-lg font-bold text-brand-light mb-2">
             {t('budgetGeneratorScenarios')}
           </h4>
-          <ScenarioTable scenarios={data.scenarios || []} language={language} />
+          <ScenarioTable scenarios={budgetData.scenarios || []} language={language} />
         </div>
       </motion.div>
 
@@ -207,14 +251,16 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
               {t('budgetGeneratorRecommendations')}
             </h3>
             <div className="space-y-3">
-              {(data?.recommendations || []).map((rec, index) => (
+              {normalizeList((budgetData as any)?.recommendations).map((rec, index) => (
                 <div key={index} className="rounded-lg p-4 bg-blue-500/5">
                   <strong className="font-semibold text-blue-300 text-sm display-block">
-                    {rec.point}
+                    {getItemText(rec)}
                   </strong>
-                  <p className="text-brand-text/80 text-sm mt-1">
-                    {rec.explanation}
-                  </p>
+                  {getItemDetails(rec) && (
+                    <p className="text-brand-text/80 text-sm mt-1">
+                      {getItemDetails(rec)}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

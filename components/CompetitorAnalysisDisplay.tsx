@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, Variants } from 'framer-motion';
 import type { CompetitorAnalysisData, AnalysisPoint } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import DataStructureDebugger from './DataStructureDebugger';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -37,12 +38,12 @@ const SectionCard: React.FC<SectionCardProps> = ({
       <h3 className={`text-xl font-bold ${textColorClass}`}>{title}</h3>
     </div>
     <ul className="space-y-3 text-brand-text/90 flex-grow">
-      {points.map((item, index) => (
+      {(points || []).map((item, index) => (
         <li key={index} className="text-sm leading-relaxed">
           <strong className="font-semibold text-brand-text/95 display-block">
-            {item.point}
+            {item?.point || 'N/A'}
           </strong>
-          <p className="text-brand-text/80">{item.explanation}</p>
+          <p className="text-brand-text/80">{item?.explanation || ''}</p>
         </li>
       ))}
     </ul>
@@ -105,8 +106,30 @@ const CompetitorAnalysisDisplay: React.FC<{ data: CompetitorAnalysisData }> = ({
 }) => {
   const { t } = useLanguage();
 
+  // Helper to normalize list items
+  const normalizeList = (value: any): any[] => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'object') {
+      if (Array.isArray((value as any).items)) return (value as any).items;
+      if (Array.isArray((value as any).list)) return (value as any).list;
+      return Object.values(value).filter(Boolean);
+    }
+    return [value];
+  };
+
+  // Extract nested data from various possible structures
+  const compData =
+    (data as any)?.competitors
+      ? (data as any)
+      : (data as any)?.competitor_analysis ||
+        (data as any)?.competitorAnalysis ||
+        (data as any)?.competitive_analysis ||
+        (data as any)?.analysis ||
+        (data as any)?.data;
+
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('competitors' in data)) {
+  if (!compData || typeof compData !== 'object' || Array.isArray(compData)) {
     return (
       <motion.div
         variants={containerVariants}
@@ -114,6 +137,7 @@ const CompetitorAnalysisDisplay: React.FC<{ data: CompetitorAnalysisData }> = ({
         animate="visible"
         className="w-full p-8 text-center"
       >
+        <DataStructureDebugger data={data} label="Competitor Analysis Data" />
         <div className="text-brand-text/60">
           <p>No competitor analysis data available.</p>
           <p className="text-sm mt-2">Please generate an analysis to see results.</p>
@@ -122,7 +146,13 @@ const CompetitorAnalysisDisplay: React.FC<{ data: CompetitorAnalysisData }> = ({
     );
   }
 
-  const getBadgeClass = (type: 'Direct' | 'Indirect' | 'Substitute') => {
+  // Get competitors with fallbacks
+  const competitors = normalizeList(compData.competitors || compData.competitor_list || compData.companies);
+  const gaps = normalizeList(compData.gaps || compData.market_gaps || compData.opportunities);
+  const differentiators = normalizeList(compData.differentiators || compData.competitive_advantages || compData.advantages);
+  const risks = normalizeList(compData.risks || compData.competitive_risks || compData.threats);
+
+  const getBadgeClass = (type: string) => {
     switch (type) {
       case 'Direct':
         return 'bg-red-500/20 text-red-300 border-red-500/30';
@@ -142,87 +172,126 @@ const CompetitorAnalysisDisplay: React.FC<{ data: CompetitorAnalysisData }> = ({
       animate="visible"
       className="w-full space-y-6"
     >
-      <motion.div
-        variants={itemVariants}
-        className="rounded-lg p-4 bg-brand-secondary/30 overflow-hidden"
-      >
-        <h3 className="text-2xl font-bold text-brand-teal mb-4">
-          {t('competitorAnalysisMap')}
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left rtl:text-right text-brand-light">
-            <thead className="text-xs text-brand-text uppercase bg-brand-accent/30">
-              <tr>
-                <th scope="col" className="px-6 py-3">
-                  {t('competitorAnalysisHeaderName')}
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  {t('competitorAnalysisHeaderType')}
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  {t('competitorAnalysisHeaderFeatures')}
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  {t('competitorAnalysisHeaderPricing')}
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  {t('competitorAnalysisHeaderPositioning')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {(data?.competitors || []).map((c, index) => (
-                <motion.tr
-                  key={index}
-                  variants={itemVariants}
-                  className="border-b border-brand-accent/50 hover:bg-brand-accent/20"
-                >
-                  <th
-                    scope="row"
-                    className="px-6 py-4 font-medium text-brand-text whitespace-nowrap"
-                  >
-                    {c.name}
+      <DataStructureDebugger data={data} label="Competitor Analysis Data" />
+      
+      {competitors.length > 0 && (
+        <motion.div
+          variants={itemVariants}
+          className="rounded-lg p-4 bg-brand-secondary/30 overflow-hidden"
+        >
+          <h3 className="text-2xl font-bold text-brand-teal mb-4">
+            {t('competitorAnalysisMap')}
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left rtl:text-right text-brand-light">
+              <thead className="text-xs text-brand-text uppercase bg-brand-accent/30">
+                <tr>
+                  <th scope="col" className="px-6 py-3">
+                    {t('competitorAnalysisHeaderName')}
                   </th>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full border ${getBadgeClass(c.type)}`}
+                  <th scope="col" className="px-6 py-3">
+                    {t('competitorAnalysisHeaderType')}
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    {t('competitorAnalysisHeaderFeatures')}
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    {t('competitorAnalysisHeaderPricing')}
+                  </th>
+                  <th scope="col" className="px-6 py-3">
+                    {t('competitorAnalysisHeaderPositioning')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {competitors.map((c: any, index: number) => (
+                  <motion.tr
+                    key={index}
+                    variants={itemVariants}
+                    className="border-b border-brand-accent/50 hover:bg-brand-accent/20"
+                  >
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-brand-text whitespace-nowrap"
                     >
-                      {c.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">{c.features}</td>
-                  <td className="px-6 py-4">{c.pricing}</td>
-                  <td className="px-6 py-4">{c.positioning}</td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </motion.div>
+                      {c.name || c.company || c.title || 'Unknown'}
+                    </th>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-full border ${getBadgeClass(c.type || c.category || 'Direct')}`}
+                      >
+                        {c.type || c.category || 'Direct'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">{c.features || c.key_features || c.strengths || '-'}</td>
+                    <td className="px-6 py-4">{c.pricing || c.price || c.price_range || '-'}</td>
+                    <td className="px-6 py-4">{c.positioning || c.market_position || c.description || '-'}</td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </motion.div>
+      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <SectionCard
-          title={t('competitorAnalysisGaps')}
-          points={data.gaps || []}
-          icon={icons.gaps}
-          bgColorClass="bg-blue-500/5"
-          textColorClass="text-blue-400"
-        />
-        <SectionCard
-          title={t('competitorAnalysisDifferentiators')}
-          points={data.differentiators || []}
-          icon={icons.differentiators}
-          bgColorClass="bg-green-500/5"
-          textColorClass="text-green-400"
-        />
-        <SectionCard
-          title={t('competitorAnalysisRisks')}
-          points={data.risks || []}
-          icon={icons.risks}
-          bgColorClass="bg-red-500/5"
-          textColorClass="text-red-400"
-        />
-      </div>
+      {(gaps.length > 0 || differentiators.length > 0 || risks.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {gaps.length > 0 && (
+            <SectionCard
+              title={t('competitorAnalysisGaps')}
+              points={gaps}
+              icon={icons.gaps}
+              bgColorClass="bg-blue-500/5"
+              textColorClass="text-blue-400"
+            />
+          )}
+          {differentiators.length > 0 && (
+            <SectionCard
+              title={t('competitorAnalysisDifferentiators')}
+              points={differentiators}
+              icon={icons.differentiators}
+              bgColorClass="bg-green-500/5"
+              textColorClass="text-green-400"
+            />
+          )}
+          {risks.length > 0 && (
+            <SectionCard
+              title={t('competitorAnalysisRisks')}
+              points={risks}
+              icon={icons.risks}
+              bgColorClass="bg-red-500/5"
+              textColorClass="text-red-400"
+            />
+          )}
+        </div>
+      )}
+
+      {/* Fallback: render any other top-level arrays/objects */}
+      {competitors.length === 0 && gaps.length === 0 && differentiators.length === 0 && risks.length === 0 && (
+        <motion.div variants={itemVariants} className="rounded-lg p-4 bg-brand-secondary/30">
+          <h3 className="text-xl font-bold text-brand-teal mb-3">Analysis Results</h3>
+          <div className="space-y-3 text-sm text-brand-text/90">
+            {Object.entries(compData).map(([key, value]) => {
+              if (key === 'id') return null;
+              const items = normalizeList(value);
+              if (items.length === 0) return null;
+              return (
+                <div key={key}>
+                  <h4 className="font-semibold text-brand-text/95 mb-2 capitalize">{key.replace(/_/g, ' ')}</h4>
+                  <ul className="space-y-1 ml-4">
+                    {items.slice(0, 10).map((item: any, idx: number) => (
+                      <li key={idx} className="flex items-start">
+                        <span className="text-brand-teal mr-2">•</span>
+                        <span>{typeof item === 'string' ? item : item?.point || item?.title || item?.description || item?.name || JSON.stringify(item)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };

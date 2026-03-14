@@ -6,6 +6,7 @@ import type {
   ResourceEstimate,
 } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import DataStructureDebugger from './DataStructureDebugger';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -97,12 +98,12 @@ const RiskCard: React.FC<{
       <h3 className={`text-xl font-bold ${textColorClass}`}>{title}</h3>
     </div>
     <ul className="space-y-3 text-brand-text/90 flex-grow">
-      {points.map((item, index) => (
+      {(points || []).map((item, index) => (
         <li key={index} className="text-sm leading-relaxed">
           <strong className="font-semibold text-brand-text/95 display-block">
-            {item.point}
+            {item?.point || 'N/A'}
           </strong>
-          <p className="text-brand-text/80">{item.explanation}</p>
+          <p className="text-brand-text/80">{item?.explanation || ''}</p>
         </li>
       ))}
     </ul>
@@ -235,8 +236,30 @@ const RiskFeasibilityDisplay: React.FC<{ data: RiskFeasibilityData }> = ({
 }) => {
   const { t } = useLanguage();
 
+  // Helper to normalize list items
+  const normalizeList = (value: any): any[] => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'object') {
+      if (Array.isArray((value as any).items)) return (value as any).items;
+      if (Array.isArray((value as any).list)) return (value as any).list;
+      return Object.values(value).filter(Boolean);
+    }
+    return [value];
+  };
+
+  // Extract nested data from various possible structures
+  const riskData =
+    (data as any)?.feasibilityScore
+      ? (data as any)
+      : (data as any)?.risk_feasibility ||
+        (data as any)?.riskFeasibility ||
+        (data as any)?.risk_analysis ||
+        (data as any)?.feasibility ||
+        (data as any)?.data;
+
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('feasibilityScore' in data)) {
+  if (!riskData || typeof riskData !== 'object' || Array.isArray(riskData)) {
     return (
       <motion.div
         variants={containerVariants}
@@ -244,6 +267,7 @@ const RiskFeasibilityDisplay: React.FC<{ data: RiskFeasibilityData }> = ({
         animate="visible"
         className="w-full p-8 text-center"
       >
+        <DataStructureDebugger data={data} label="Risk Feasibility Data" />
         <div className="text-brand-text/60">
           <p>No risk and feasibility data available.</p>
           <p className="text-sm mt-2">Please generate an analysis to see results.</p>
@@ -252,11 +276,20 @@ const RiskFeasibilityDisplay: React.FC<{ data: RiskFeasibilityData }> = ({
     );
   }
 
-  const resourceIcons = {
+  // Get data with fallbacks
+  const feasibilityScore = riskData.feasibilityScore || riskData.feasibility_score || riskData.score || { score: 0, summary: 'N/A' };
+  const resourceEstimates = normalizeList(riskData.resourceEstimates || riskData.resource_estimates || riskData.resources);
+  const regulatoryRisks = normalizeList(riskData.regulatoryRisks || riskData.regulatory_risks || riskData.regulatory);
+  const financialRisks = normalizeList(riskData.financialRisks || riskData.financial_risks || riskData.financial);
+  const operationalRisks = normalizeList(riskData.operationalRisks || riskData.operational_risks || riskData.operational);
+
+  const resourceIcons: Record<string, React.ReactNode> = {
     Time: icons.time,
     Capital: icons.capital,
     Team: icons.team,
   };
+
+  const hasScore = feasibilityScore && (typeof feasibilityScore.score === 'number' || feasibilityScore.summary);
 
   return (
     <motion.div
@@ -265,54 +298,103 @@ const RiskFeasibilityDisplay: React.FC<{ data: RiskFeasibilityData }> = ({
       animate="visible"
       className="w-full space-y-6"
     >
+      <DataStructureDebugger data={data} label="Risk Feasibility Data" />
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <FeasibilityScoreCircle
-            score={data.feasibilityScore.score}
-            summary={data.feasibilityScore.summary}
-          />
-        </div>
-        <div className="lg:col-span-2">
-          <motion.div variants={itemVariants}>
-            <h3 className="text-2xl font-bold text-brand-teal mb-4">
-              {t('riskFeasibilityResources')}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {(data.resourceEstimates || []).map((res, index) => (
-                <ResourceCard
-                  key={index}
-                  resource={res}
-                  icon={resourceIcons[res.category]}
-                />
-              ))}
-            </div>
-          </motion.div>
-        </div>
+        {hasScore && (
+          <div className="lg:col-span-1">
+            <FeasibilityScoreCircle
+              score={typeof feasibilityScore.score === 'number' ? feasibilityScore.score : 5}
+              summary={feasibilityScore.summary || 'Analysis complete'}
+            />
+          </div>
+        )}
+        {resourceEstimates.length > 0 && (
+          <div className={hasScore ? "lg:col-span-2" : "lg:col-span-3"}>
+            <motion.div variants={itemVariants}>
+              <h3 className="text-2xl font-bold text-brand-teal mb-4">
+                {t('riskFeasibilityResources')}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {resourceEstimates.map((res: any, index: number) => (
+                  <ResourceCard
+                    key={index}
+                    resource={{
+                      category: res.category || res.type || res.name || `Resource ${index + 1}`,
+                      estimate: res.estimate || res.value || res.amount || 'N/A',
+                      explanation: res.explanation || res.description || ''
+                    }}
+                    icon={resourceIcons[res.category] || icons.time}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <RiskCard
-          title={t('riskFeasibilityRegulatory')}
-          points={data.regulatoryRisks || []}
-          icon={icons.regulatory}
-          bgColorClass="bg-yellow-500/5"
-          textColorClass="text-yellow-400"
-        />
-        <RiskCard
-          title={t('riskFeasibilityFinancial')}
-          points={data.financialRisks || []}
-          icon={icons.financial}
-          bgColorClass="bg-red-500/5"
-          textColorClass="text-red-400"
-        />
-        <RiskCard
-          title={t('riskFeasibilityOperational')}
-          points={data.operationalRisks || []}
-          icon={icons.operational}
-          bgColorClass="bg-blue-500/5"
-          textColorClass="text-blue-400"
-        />
-      </div>
+      {(regulatoryRisks.length > 0 || financialRisks.length > 0 || operationalRisks.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {regulatoryRisks.length > 0 && (
+            <RiskCard
+              title={t('riskFeasibilityRegulatory')}
+              points={regulatoryRisks}
+              icon={icons.regulatory}
+              bgColorClass="bg-yellow-500/5"
+              textColorClass="text-yellow-400"
+            />
+          )}
+          {financialRisks.length > 0 && (
+            <RiskCard
+              title={t('riskFeasibilityFinancial')}
+              points={financialRisks}
+              icon={icons.financial}
+              bgColorClass="bg-red-500/5"
+              textColorClass="text-red-400"
+            />
+          )}
+          {operationalRisks.length > 0 && (
+            <RiskCard
+              title={t('riskFeasibilityOperational')}
+              points={operationalRisks}
+              icon={icons.operational}
+              bgColorClass="bg-blue-500/5"
+              textColorClass="text-blue-400"
+            />
+          )}
+        </div>
+      )}
+
+      {/* Fallback: render any other top-level data */}
+      {!hasScore && resourceEstimates.length === 0 && regulatoryRisks.length === 0 && financialRisks.length === 0 && operationalRisks.length === 0 && (
+        <motion.div variants={itemVariants} className="rounded-lg p-4 bg-brand-secondary/30">
+          <h3 className="text-xl font-bold text-brand-teal mb-3">Analysis Results</h3>
+          <div className="space-y-3 text-sm text-brand-text/90">
+            {Object.entries(riskData).map(([key, value]) => {
+              if (key === 'id') return null;
+              const items = normalizeList(value);
+              if (items.length === 0 && typeof value !== 'object') return null;
+              return (
+                <div key={key}>
+                  <h4 className="font-semibold text-brand-text/95 mb-2 capitalize">{key.replace(/_/g, ' ')}</h4>
+                  {typeof value === 'object' && !Array.isArray(value) ? (
+                    <pre className="text-xs bg-brand-primary/30 p-2 rounded overflow-auto">{JSON.stringify(value, null, 2)}</pre>
+                  ) : (
+                    <ul className="space-y-1 ml-4">
+                      {items.slice(0, 10).map((item: any, idx: number) => (
+                        <li key={idx} className="flex items-start">
+                          <span className="text-brand-teal mr-2">•</span>
+                          <span>{typeof item === 'string' ? item : item?.point || item?.title || item?.description || JSON.stringify(item)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };

@@ -85,17 +85,33 @@ export class ResearchAgent extends BaseAgent {
 
     // --- PASS 2: STRUCTURE DATA (JSON Formatting) ---
     // Now we feed the research notes into a schema-enforced call to get the UI-ready JSON.
+    // We include the schema definition in the prompt to help the LLM understand the exact structure required.
 
+    const schemaDescription = schema ? JSON.stringify(schema, null, 2) : 'No specific schema provided - use a sensible JSON structure.';
+    
     const formattingPrompt = `
-      You are a Data Structuring Specialist. 
+      You are a Data Structuring Specialist. Your ONLY job is to format research data into a SPECIFIC JSON structure.
       
-      SOURCE MATERIAL:
+      CRITICAL INSTRUCTIONS:
+      1. You MUST output JSON that EXACTLY matches the schema below.
+      2. Do NOT add extra wrapper keys like "market_research_summary" or "analysis_result".
+      3. The top-level keys of your output MUST be the exact keys defined in the schema.
+      4. Every required field in the schema MUST be present in your output.
+      
+      REQUIRED JSON SCHEMA:
+      ${schemaDescription}
+      
+      SOURCE MATERIAL (Research Notes):
       ${rawText}
       
       TASK:
-      Convert the detailed research notes above into the following JSON structure.
-      Ensure all fields are populated based on the research provided.
-      If specific data points are missing in the notes, make reasonable strategic estimates based on the context, but prioritize the researched facts.
+      Convert the research notes above into a JSON object that EXACTLY matches the schema.
+      - Use the exact property names from the schema (e.g., "marketSize", "competitors", "gaps").
+      - For array fields, provide arrays of objects matching the item schema.
+      - For nested objects, match the exact structure.
+      - If data is missing, provide reasonable estimates based on context.
+      
+      OUTPUT FORMAT: Return ONLY the JSON object with NO wrapper keys. The root keys must be exactly those defined in the schema.
     `;
 
     const formattedResponse = await this.executeGeminiCall(
