@@ -263,14 +263,17 @@ const AppContent: React.FC = () => {
         return;
       }
 
-      // If refining, we don't clear the current analysis immediately to avoid flash
+      // Set loading FIRST to prevent WelcomeMessage flash
+      setIsLoading(true);
+      setIsRetrying(false);
+
+      // Then clear previous analysis data (isLoading is already true,
+      // so ModuleRouter shows AgentOrchestrator instead of WelcomeMessage)
       if (!refinement) {
         clearAnalysisData();
         setViewingHistoryRecord(null);
       }
 
-      setIsLoading(true);
-      setIsRetrying(false);
       if (image) setLastSubmittedImage(image);
 
       const generationFunctions: {
@@ -319,6 +322,16 @@ const AppContent: React.FC = () => {
             image || lastSubmittedImage,
             refinement
           );
+          console.log('[DEBUG handleGenerate] Setting state with:', {
+            type: typeof data,
+            isNull: data === null,
+            keys: data ? Object.keys(data) : 'N/A',
+            hasStrengths: !!(data as any)?.strengths,
+            strengthsType: Array.isArray((data as any)?.strengths) ? 'array' : typeof (data as any)?.strengths,
+            firstStrength: (data as any)?.strengths?.[0],
+            hasResultData: !!(data as any)?.resultData,
+            raw: data,
+          });
           setCurrentAnalysis(data);
 
           const newRecord: GenerationRecord = {
@@ -395,7 +408,17 @@ const AppContent: React.FC = () => {
           }
       }
 
+      // Clear any previous error before updating with new data
+      setError(null);
+
       // Update state with the received analysis result
+      console.log('[DEBUG handleAnalysisResult] Setting state with:', {
+        type: typeof unwrappedResult,
+        keys: unwrappedResult ? Object.keys(unwrappedResult) : 'N/A',
+        hasStrengths: !!(unwrappedResult as any)?.strengths,
+        firstStrength: (unwrappedResult as any)?.strengths?.[0],
+        raw: unwrappedResult,
+      });
       setCurrentAnalysis(unwrappedResult);
 
       // Create a new history record

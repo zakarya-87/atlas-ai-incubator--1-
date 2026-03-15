@@ -378,12 +378,12 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto mt-8 space-y-8 animate-fade-in">
+    <div data-testid="agent-boardroom" className="w-full max-w-7xl mx-auto mt-8 space-y-8 animate-fade-in">
       {/* Agent Command Center */}
       <div className="w-full max-w-4xl mx-auto bg-brand-secondary/20 rounded-xl border border-brand-accent/30 overflow-hidden flex flex-col md:flex-row h-[280px] shadow-2xl">
         {/* Left Panel: Active Agents */}
         <div className="w-full md:w-1/3 bg-brand-secondary/50 p-4 border-b md:border-b-0 md:border-r border-brand-accent/30">
-          <h3 className="text-xs font-bold text-brand-light uppercase tracking-widest mb-4">
+          <h3 data-testid="agent-boardroom-heading" className="text-xs font-bold text-brand-light uppercase tracking-widest mb-4">
             {t('agentBoardroomStatus')}
           </h3>
           <div className="space-y-4">

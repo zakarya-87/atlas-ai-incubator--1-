@@ -41,12 +41,98 @@ describe('ResearchAgent', () => {
 
   // Add more tests here to mock the generate method and other functionalities
   describe('generate', () => {
-    it('should return a mock analysis', async () => {
-      const mockData = { text: 'Mock market research analysis', data: {} };
-      jest.spyOn(agent, 'generate').mockResolvedValue(mockData);
+    it('should perform two-pass logic: research then formatting', async () => {
+      const executeSpy = jest.spyOn(agent as any, 'executeGeminiCall');
 
-      const result = await agent.generate('Test Topic', 'Test Context');
-      expect(result).toEqual(mockData);
+      // Mock Pass 1: Research
+      executeSpy.mockResolvedValueOnce({
+        text: 'Detailed research notes',
+        data: {},
+        rawResponse: {
+          response: {
+            candidates: [
+              {
+                groundingMetadata: {
+                  groundingChunks: [
+                    { web: { title: 'Source 1', uri: 'https://example.com/1' } },
+                    { web: { title: 'Source 2', uri: 'https://example.com/2' } },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      // Mock Pass 2: Formatting
+      executeSpy.mockResolvedValueOnce({
+        text: '{"marketSize": "1B"}',
+        data: { marketSize: '1B' },
+      });
+
+      const result = await agent.generate('Test Prompt', 'Test Context', { type: 'object' });
+
+      // Verify two calls were made
+      expect(executeSpy).toHaveBeenCalledTimes(2);
+
+      // Verify Pass 1 arguments (Tools for Grounding should be present)
+      expect(executeSpy).toHaveBeenNthCalledWith(
+        1,
+        '',
+        expect.stringContaining('Conduct comprehensive market research'),
+        null,
+        expect.any(String),
+        undefined,
+        expect.arrayContaining([{ googleSearch: {} }])
+      );
+
+      // Verify Pass 2 arguments (Schema should be passed)
+      expect(executeSpy).toHaveBeenNthCalledWith(
+        2,
+        '',
+        expect.stringContaining('Convert the detailed research notes'),
+        { type: 'object' },
+        'You are a strict JSON formatting engine.'
+      );
+
+      // Verify final merged response
+      expect(result.data).toEqual({
+        marketSize: '1B',
+        _sources: [
+          { title: 'Source 1', url: 'https://example.com/1' },
+          { title: 'Source 2', url: 'https://example.com/2' },
+        ],
+      });
+    });
+
+    it('should handle images by stripping data URL prefixes', async () => {
+      const executeSpy = jest.spyOn(agent as any, 'executeGeminiCall').mockResolvedValue({
+        text: 'Result',
+        data: {},
+        rawResponse: {},
+      });
+
+      const images = ['data:image/png;base64,imagedata123'];
+      await agent.generate('Prompt', 'Context', {}, 'Instruction', images);
+
+      // Verify Pass 1 was called with images
+      expect(executeSpy).toHaveBeenCalledWith(
+        '',
+        expect.any(String),
+        null,
+        'Instruction',
+        images,
+        expect.anything()
+      );
+    });
+
+    it('should handle missing grounding metadata gracefully', async () => {
+      jest.spyOn(agent as any, 'executeGeminiCall')
+        .mockResolvedValueOnce({ text: 'Research', data: {}, rawResponse: {} })
+        .mockResolvedValueOnce({ text: 'Formatted', data: { ok: true } });
+
+      const result = await agent.generate('Prompt', 'Context');
+      expect(result.data._sources).toEqual([]);
     });
   });
 });

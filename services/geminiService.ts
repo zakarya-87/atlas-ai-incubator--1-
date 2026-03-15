@@ -1106,10 +1106,21 @@ export const fetchVentureHistory = async (
         data: { ...unwrappedData, id: record.id } as AnyAnalysisData, // Inject ID into data
       };
     });
-  } catch (error) {
-    // Suppress console noise for offline mode history checks
-    logger.warn('Failed to fetch venture history (may be offline)', error);
-    return [];
+  } catch (error: any) {
+    const message = error?.message || '';
+    const isNetworkError = message.toLowerCase().includes('failed to fetch') ||
+      message.toLowerCase().includes('network error') ||
+      message === 'errorTimeout';
+
+    if (isNetworkError) {
+      // Genuine offline/network issue — return empty silently
+      logger.warn('Failed to fetch venture history (offline)', error);
+      return [];
+    }
+
+    // Real backend error — log and rethrow so UI can react
+    logger.error('Failed to fetch venture history (backend error)', error);
+    throw error;
   }
 };
 
@@ -1147,7 +1158,7 @@ export const saveAnalysisVersion = async (
     }
   } catch (error) {
     logger.error('Failed to save version:', error);
-    // throw error; // Optionally rethrow
+    throw error;
   }
 };
 

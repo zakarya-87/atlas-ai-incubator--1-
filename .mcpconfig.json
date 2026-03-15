@@ -38,6 +38,16 @@
         "ERROR_TESTING": "comprehensive",
         "AUTO_GENERATE": "true"
       }
+    },
+    "prisma": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@abiduzzaman/prisma-mcp@latest"
+      ],
+      "env": {
+        "DATABASE_URL": "postgres://094dcb23f2fe8da3d6df08364460a79607aaac9a96dfaeed8ffaf56f98dacb80:sk_lIZKrgfQ9_00_Kq3BR2hA@db.prisma.io:5432/postgres?sslmode=require&pool=true"
+      }
     }
   }
 }

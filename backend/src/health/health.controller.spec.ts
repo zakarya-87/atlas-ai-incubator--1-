@@ -16,6 +16,15 @@ describe('HealthController', () => {
             isHealthy: jest.fn().mockResolvedValue(true),
           },
         },
+        {
+          provide: 'BullQueue_analysis-queue',
+          useValue: {
+            client: Promise.resolve({
+              ping: jest.fn().mockResolvedValue('PONG'),
+              info: jest.fn().mockResolvedValue('used_memory_human:10MB\nuptime_in_seconds:3600'),
+            }),
+          },
+        },
       ],
     }).compile();
 

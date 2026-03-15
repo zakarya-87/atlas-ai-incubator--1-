@@ -1,7 +1,29 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { SwotData, AnalysisPoint } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import type { SwotData, AnalysisPoint } from '../types';
+
+interface SwotDisplayProps {
+  data: SwotData;
+  onUpdate?: (updatedData: SwotData) => void;
+}
+
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0 },
+};
 
 interface SwotQuadrantProps {
   title: string;
@@ -11,13 +33,8 @@ interface SwotQuadrantProps {
   textColorClass: string;
   category: keyof SwotData;
   fullData: SwotData;
-  onUpdate: (updatedData: SwotData) => void;
+  onUpdate?: (updatedData: SwotData) => void;
 }
-
-const quadrantVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-};
 
 const SwotQuadrant: React.FC<SwotQuadrantProps> = ({
   title,
@@ -30,123 +47,65 @@ const SwotQuadrant: React.FC<SwotQuadrantProps> = ({
   onUpdate,
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editedPoint, setEditedPoint] = useState<string>('');
-  const [editedExplanation, setEditedExplanation] = useState<string>('');
+  const [editedPoint, setEditedPoint] = useState('');
+  const [editedExplanation, setEditedExplanation] = useState('');
 
   const handleStartEdit = (index: number) => {
     setEditingIndex(index);
-    setEditedPoint(points?.[index]?.point || '');
-    setEditedExplanation(points?.[index]?.explanation || '');
+    setEditedPoint(points[index].point);
+    setEditedExplanation(points[index].explanation || '');
   };
 
   const handleCancelEdit = () => {
     setEditingIndex(null);
   };
 
-  const handleToggleComplete = (index: number) => {
-    if (editingIndex !== null || !points) return; // Don't allow toggling while editing or if points is undefined
-
-    const updatedPoints = [...(points || [])];
-    const currentPoint = { ...(updatedPoints[index] || {}) };
-    currentPoint.completed = !currentPoint.completed;
-    updatedPoints[index] = currentPoint;
-
-    const updatedFullData = {
-      ...fullData,
-      [category]: updatedPoints,
-    };
-
-    onUpdate(updatedFullData);
-  };
-
   const handleSaveEdit = () => {
-    if (editingIndex === null || !points) return;
+    if (editingIndex === null || !onUpdate) return;
 
-    const updatedPoints = [...(points || [])];
-    updatedPoints[editingIndex] = {
-      ...updatedPoints[editingIndex],
-      point: editedPoint.trim(),
-      explanation: editedExplanation.trim(),
+    const newPoints = [...points];
+    newPoints[editingIndex] = {
+      ...newPoints[editingIndex],
+      point: editedPoint,
+      explanation: editedExplanation,
     };
 
-    const updatedFullData = {
+    const newData = {
       ...fullData,
-      [category]: updatedPoints,
+      [category]: newPoints,
     };
 
-    onUpdate(updatedFullData);
+    onUpdate(newData);
     setEditingIndex(null);
   };
 
   return (
     <motion.div
-      variants={quadrantVariants}
-      className={`rounded-lg p-4 flex flex-col h-full ${bgColorClass}`}
+      variants={itemVariants}
+      className={`p-6 rounded-xl border border-brand-accent/20 ${bgColorClass} backdrop-blur-sm flex flex-col h-full`}
     >
-      <div className="flex items-center mb-3">
-        <span className={`mr-3 rtl:ml-3 rtl:mr-0 ${textColorClass}`}>
-          {icon}
-        </span>
-        <h3 className={`text-xl font-bold ${textColorClass}`}>{title}</h3>
+      <div className="flex items-center gap-3 mb-6">
+        <div className={`${textColorClass} opacity-80`}>{icon}</div>
+        <h3 className={`text-lg font-bold uppercase tracking-wider ${textColorClass}`}>
+          {title}
+        </h3>
       </div>
-      <ul className="space-y-3 text-brand-text/90 flex-grow">
-        {(points || []).map((item, index) => (
-          <li
-            key={index}
-            className="text-sm leading-relaxed group relative p-2 -m-2 rounded-md hover:bg-white/5 transition-colors grid"
-          >
-            {/* View Content - always present but may be visually hidden */}
+
+      <ul className="space-y-4 flex-grow">
+        {points.map((point, index) => (
+          <li key={index} className="group relative">
             <motion.div
-              animate={{ opacity: editingIndex === index ? 0 : 1 }}
-              transition={{ duration: 0.1 }}
-              className={editingIndex === index ? 'pointer-events-none' : ''}
-              style={{ gridArea: '1 / 1' }}
+              layout
+              data-testid="analysis-point"
+              className="p-3 rounded-lg bg-brand-primary/40 border border-brand-accent/10 hover:border-brand-teal/30 transition-all"
             >
               <div className="flex items-start gap-3">
-                <button
-                  onClick={() => handleToggleComplete(index)}
-                  aria-label={`Mark as ${item.completed ? 'incomplete' : 'complete'}`}
-                  className={`mt-1 flex-shrink-0 h-5 w-5 rounded-sm border-2 flex items-center justify-center transition-all duration-200 ${
-                    item.completed
-                      ? 'bg-brand-teal border-brand-teal'
-                      : 'border-brand-accent group-hover:border-brand-teal'
-                  }`}
-                >
-                  <AnimatePresence>
-                    {item.completed && (
-                      <motion.svg
-                        key="check"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        className="h-3 w-3 text-white"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={4}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </motion.svg>
-                    )}
-                  </AnimatePresence>
-                </button>
-                <div
-                  className={`flex-grow transition-all duration-300 ${item.completed ? 'opacity-60' : ''}`}
-                >
-                  <strong
-                    className={`font-semibold text-brand-text/95 display-block transition-all ${item.completed ? 'line-through' : ''}`}
-                  >
-                    {item.point}
-                  </strong>
-                  <p
-                    className={`text-brand-text/80 transition-all ${item.completed ? 'line-through' : ''}`}
-                  >
-                    {item.explanation}
-                  </p>
+                <span className={`mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 ${textColorClass.replace('text-', 'bg-')}`} />
+                <div className="space-y-1">
+                  <p className="text-brand-text font-semibold leading-tight">{point.point}</p>
+                  {point.explanation && (
+                    <p className="text-brand-text/60 text-xs leading-relaxed">{point.explanation}</p>
+                  )}
                 </div>
               </div>
 
@@ -257,7 +216,7 @@ const icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={2}
-        d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.738 3h4.017c.163 0 .326.02.485.06L17 4m-7 10v5a2 2 0 002 2h.085a2 2 0 001.736-.93l2.5-4.5M17 14h-2.5"
+        d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.737 3h4.017a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.085c.607 0 1.156-.272 1.512-.741L18.5 16m-7-2H18.5"
       />
     </svg>
   ),
@@ -273,7 +232,7 @@ const icons = {
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={2}
-        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
       />
     </svg>
   ),
@@ -295,97 +254,91 @@ const icons = {
   ),
 };
 
-interface SwotDisplayProps {
-  data: SwotData;
-  onUpdate: (updatedData: SwotData) => void;
-}
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
 const SwotDisplay: React.FC<SwotDisplayProps> = ({ data: initialData, onUpdate }) => {
   const { t } = useLanguage();
 
   // Handle nested swot_analysis key if present
   const data = (initialData as any)?.swot_analysis || initialData;
 
+  console.log('[DEBUG SwotDisplay] Received data:', data);
+
   // Handle undefined, null, non-object, or array data gracefully
   if (!data || typeof data !== 'object' || Array.isArray(data) || !('strengths' in data)) {
     return (
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="w-full p-12 text-center bg-brand-secondary/30 rounded-xl border border-dashed border-brand-accent/30"
-      >
-        <div className="text-brand-text/60 max-w-sm mx-auto">
-          <svg className="w-12 h-12 mx-auto mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p className="text-lg font-medium">No analysis data available</p>
-          <p className="text-sm mt-2">The analysis might be empty or malformed. Try generating it again with a more detailed description.</p>
-        </div>
-      </motion.div>
+      <div className="w-full flex flex-col space-y-4">
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="w-full p-12 text-center bg-brand-secondary/30 rounded-xl border border-dashed border-brand-accent/30"
+        >
+          <div className="text-brand-text/60 max-w-sm mx-auto">
+            <svg className="w-12 h-12 mx-auto mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p className="text-lg font-medium">No analysis data available</p>
+            <p className="text-sm mt-2">The analysis might be empty or malformed. Try generating it again with a more detailed description.</p>
+          </div>
+        </motion.div>
+      </div>
     );
   }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="w-full"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <SwotQuadrant
-          title={t('swotStrengths')}
-          points={data.strengths || []}
-          icon={icons.strengths}
-          bgColorClass="bg-green-500/5"
-          textColorClass="text-green-400"
-          category="strengths"
-          fullData={data}
-          onUpdate={onUpdate}
-        />
-        <SwotQuadrant
-          title={t('swotWeaknesses')}
-          points={data.weaknesses || []}
-          icon={icons.weaknesses}
-          bgColorClass="bg-yellow-500/5"
-          textColorClass="text-yellow-400"
-          category="weaknesses"
-          fullData={data}
-          onUpdate={onUpdate}
-        />
-        <SwotQuadrant
-          title={t('swotOpportunities')}
-          points={data.opportunities || []}
-          icon={icons.opportunities}
-          bgColorClass="bg-blue-500/5"
-          textColorClass="text-blue-400"
-          category="opportunities"
-          fullData={data}
-          onUpdate={onUpdate}
-        />
-        <SwotQuadrant
-          title={t('swotThreats')}
-          points={data.threats || []}
-          icon={icons.threats}
-          bgColorClass="bg-red-500/5"
-          textColorClass="text-red-400"
-          category="threats"
-          fullData={data}
-          onUpdate={onUpdate}
-        />
-      </div>
-    </motion.div>
+    <div className="w-full flex flex-col space-y-4">
+
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        data-testid="analysis-output"
+        className="w-full"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <SwotQuadrant
+            title={t('swotStrengths')}
+            points={data.strengths || []}
+            icon={icons.strengths}
+            bgColorClass="bg-green-500/5"
+            textColorClass="text-green-400"
+            category="strengths"
+            fullData={data}
+            onUpdate={onUpdate}
+          />
+          <SwotQuadrant
+            title={t('swotWeaknesses')}
+            points={data.weaknesses || []}
+            icon={icons.weaknesses}
+            bgColorClass="bg-yellow-500/5"
+            textColorClass="text-yellow-400"
+            category="weaknesses"
+            fullData={data}
+            onUpdate={onUpdate}
+          />
+          <SwotQuadrant
+            title={t('swotOpportunities')}
+            points={data.opportunities || []}
+            icon={icons.opportunities}
+            bgColorClass="bg-blue-500/5"
+            textColorClass="text-blue-400"
+            category="opportunities"
+            fullData={data}
+            onUpdate={onUpdate}
+          />
+          <SwotQuadrant
+            title={t('swotThreats')}
+            points={data.threats || []}
+            icon={icons.threats}
+            bgColorClass="bg-red-500/5"
+            textColorClass="text-red-400"
+            category="threats"
+            fullData={data}
+            onUpdate={onUpdate}
+          />
+        </div>
+      </motion.div>
+    </div>
   );
 };
 

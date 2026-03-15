@@ -55,6 +55,11 @@ services:
     container_name: atlas-backend-dev
     restart: unless-stopped
     environment:
+      # Build encoding (fixes Prisma Unicode issues)
+      PYTHONIOENCODING: utf-8
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      
       DATABASE_URL: postgresql://${POSTGRES_USER:-atlas_user}:${POSTGRES_PASSWORD:-atlas_password}@postgres:5432/${POSTGRES_DB:-atlas_db}
       REDIS_HOST: redis
       REDIS_PORT: ${REDIS_PORT:-6379}

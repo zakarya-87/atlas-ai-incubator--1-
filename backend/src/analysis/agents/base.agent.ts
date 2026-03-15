@@ -53,7 +53,7 @@ export abstract class BaseAgent implements AiAgent {
     images?: string[],
     tools?: Record<string, unknown>[]
   ): Promise<AgentGenerationResponse> {
-    const maxRetries = 3;
+    const maxRetries = 5;
     let lastError: Error | null = null;
 
     const requestOptions = this.getGeminiRequestOptions();
@@ -216,7 +216,8 @@ export abstract class BaseAgent implements AiAgent {
     attempt: number,
     maxRetries: number
   ): Promise<void> {
-    const delayMs = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+    // Longer backoff for rate limits: 5s, 10s, 20s, 40s...
+    const delayMs = Math.pow(2, attempt) * 5000 + Math.random() * 2000;
     this.logger.warn(
       `[Gemini] Rate limit hit (429), retrying in ${Math.round(delayMs)}ms... (Attempt ${attempt + 1}/${maxRetries})`
     );
@@ -270,8 +271,8 @@ export abstract class BaseAgent implements AiAgent {
   ): Promise<AgentGenerationResponse | null> {
     if (!this.providerFactory) return null;
 
-    const availableProviders = this.providerFactory.getAvailableProviders();
-    const fallbacks = availableProviders.filter((p) => p !== AIProvider.GEMINI);
+    const enabledProviders = this.providerFactory.getEnabledProviders();
+    const fallbacks = enabledProviders.filter((p) => p !== AIProvider.GEMINI);
 
     for (const fbProvider of fallbacks) {
       this.logger.log(`[Fallback] Attempting ${fbProvider} due to Gemini rate limits...`);

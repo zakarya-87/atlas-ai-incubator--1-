@@ -50,6 +50,7 @@ describe('AnalysisController', () => {
           .mockResolvedValue({ id: 'venture-123', userId: 'user-123' }),
       },
       analysis: {
+        findUnique: jest.fn(),
         findMany: jest.fn().mockResolvedValue([mockAnalysisResponse]),
       },
     };
@@ -65,7 +66,6 @@ describe('AnalysisController', () => {
 
     process.env.REDIS_HOST = 'localhost'; // Ensure Redis mode for tests
     controller = module.get<AnalysisController>(AnalysisController);
-
   });
 
   afterEach(() => {
@@ -115,6 +115,75 @@ describe('AnalysisController', () => {
       await expect(
         controller.getVentureAnalyses(ventureId, mockUser)
       ).rejects.toThrow('Unauthorized or venture not found');
+    });
+  });
+
+  describe('GET /analysis/:id', () => {
+    it('should retrieve an analysis by ID', async () => {
+      const id = 'analysis-123';
+      prismaService.analysis.findUnique.mockResolvedValue({
+        ...mockAnalysisResponse,
+        userId: mockUser.id,
+      });
+
+      const result = await controller.getAnalysisById(id, mockUser);
+
+      expect(prismaService.analysis.findUnique).toHaveBeenCalledWith({
+        where: { id },
+      });
+      expect(result).toEqual({
+        ...mockAnalysisResponse,
+        userId: mockUser.id,
+      });
+    });
+
+    it('should return null if analysis is not found', async () => {
+      prismaService.analysis.findUnique.mockResolvedValue(null);
+      const result = await controller.getAnalysisById('non-existent', mockUser);
+      expect(result).toBeNull();
+    });
+
+    it('should throw ForbiddenException if user is not the owner and not an admin', async () => {
+      const otherUser = { ...mockUser, id: 'other-user' } as any;
+      prismaService.analysis.findUnique.mockResolvedValue({
+        ...mockAnalysisResponse,
+        userId: 'owner-id',
+      });
+
+      await expect(
+        controller.getAnalysisById('analysis-123', otherUser)
+      ).rejects.toThrow('You do not have permission to access this analysis');
+    });
+
+    it('should allow access if user is an admin even if not owner', async () => {
+      const adminUser = { ...mockUser, id: 'admin-id', role: 'ADMIN' } as any;
+      prismaService.analysis.findUnique.mockResolvedValue({
+        ...mockAnalysisResponse,
+        userId: 'owner-id',
+      });
+
+      const result = await controller.getAnalysisById('analysis-123', adminUser);
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('POST /analysis/generate (Dev Mode)', () => {
+    it('should run synchronously when Redis is not available', async () => {
+      delete process.env.REDIS_HOST;
+      delete process.env.REDIS_URL;
+
+      const dto: GenerateAnalysisDto = {
+        ventureId: 'venture-123',
+        module: 'strategy',
+        tool: 'swot',
+        description: 'Coffee shop',
+        language: 'en',
+      };
+
+      const result = await controller.generate(dto, mockUser as any);
+
+      expect(result).toHaveProperty('jobId');
+      expect(jobsService.queueAnalysis).not.toHaveBeenCalled();
     });
   });
 });

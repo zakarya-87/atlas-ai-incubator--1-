@@ -41,12 +41,53 @@ describe('DesignAgent', () => {
 
   // Add more tests here to mock the generate method and other functionalities
   describe('generate', () => {
-    it('should return a mock design', async () => {
-      const mockData = { text: 'Mock design concepts', data: {} };
-      jest.spyOn(agent, 'generate').mockResolvedValue(mockData);
+    it('should generate brand identity concept successfully', async () => {
+      const mockResponse = {
+        text: 'Generated brand concepts',
+        data: {
+          imagePrompt: 'A sleek tech logo',
+          rationale: 'Blue represents trust',
+          palette: ['#0000FF'],
+          logoImage: '',
+        },
+      };
 
-      const result = await agent.generate('Test Topic', 'Test Context');
-      expect(result).toEqual(mockData);
+      const executeSpy = jest.spyOn(agent as any, 'executeGeminiCall').mockResolvedValue(mockResponse);
+
+      const result = await agent.generate('Tech Brand', 'Modern startup');
+
+      expect(executeSpy).toHaveBeenCalledWith(
+        '',
+        expect.stringContaining('Create a comprehensive brand identity'),
+        null,
+        'You are a creative director and brand strategist specializing in startup branding.'
+      );
+
+      expect(result.data).toEqual(mockResponse.data);
+      expect(result.text).toContain('Brand identity concept generated successfully');
+    });
+
+    it('should provide default values when AI response is incomplete', async () => {
+      const mockIncompleteResponse = {
+        text: 'Some text',
+        data: {}, // Missing fields
+      };
+
+      jest.spyOn(agent as any, 'executeGeminiCall').mockResolvedValue(mockIncompleteResponse);
+
+      const result = await agent.generate('Test', 'Context');
+
+      expect(result.data.imagePrompt).toBe('A modern, minimalist logo concept');
+      expect(result.data.palette).toHaveLength(5);
+      expect(result.data.rationale).toContain('Brand identity designed');
+    });
+
+    it('should throw InternalServerErrorException on API failure', async () => {
+      jest.spyOn(agent as any, 'executeGeminiCall').mockRejectedValue(new Error('AI Offline'));
+
+      await expect(agent.generate('Test', 'Context')).rejects.toThrow(
+        'Failed to generate brand identity: AI Offline'
+      );
     });
   });
 });

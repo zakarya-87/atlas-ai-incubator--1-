@@ -19,6 +19,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      all: true,
       exclude: [
         'node_modules/**',
         'dist/**',
@@ -33,10 +34,10 @@ export default defineConfig({
       ],
       thresholds: {
         global: {
-          statements: 25,
-          branches: 15,
-          functions: 15,
-          lines: 25,
+          statements: 80,
+          branches: 75,
+          functions: 80,
+          lines: 80,
         },
         // Specific thresholds for high-coverage components
         './services/geminiService.ts': {

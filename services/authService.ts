@@ -90,3 +90,14 @@ export const updateUserProfile = async (data: {
   if (!response.ok) throw new Error('Failed to update profile');
   return response.json();
 };
+
+export const logout = async (): Promise<void> => {
+  const headers = getAuthHeaders();
+  const response = await fetch(`${BACKEND_URL}/auth/logout`, {
+    method: 'POST',
+    headers,
+    credentials: 'include',
+  });
+
+  if (!response.ok) throw new Error('Failed to logout');
+};

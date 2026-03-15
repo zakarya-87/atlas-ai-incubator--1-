@@ -29,12 +29,12 @@ const SectionCard: React.FC<{
       <h3 className={`text-xl font-bold ${textColorClass}`}>{title}</h3>
     </div>
     <ul className="space-y-3 text-brand-text/90 flex-grow">
-      {points.map((item, index) => (
+      {(points || []).map((item, index) => (
         <li key={index} className="text-sm leading-relaxed">
           <strong className="font-semibold text-brand-text/95 display-block">
-            {item.point}
+            {item?.point || 'N/A'}
           </strong>
-          <p className="text-brand-text/80">{item.explanation}</p>
+          <p className="text-brand-text/80">{item?.explanation || ''}</p>
         </li>
       ))}
     </ul>

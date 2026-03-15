@@ -39,7 +39,7 @@ COPY utils ./utils
 COPY App.tsx App.test.tsx index.tsx ./
 
 # Build application with Vite
-ARG VITE_BACKEND_URL=http://localhost:3000
+ARG VITE_BACKEND_URL=/api
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 
 RUN npm run build && \

@@ -13,6 +13,7 @@ import { HistoryService } from '../history/history.service';
 import { AnalysisAgentFactory } from './analysis.factory';
 import { EventsGateway } from '../events/events.gateway';
 import { UsersService } from '../users/users.service';
+import { MetricsService } from '../health/metrics.service';
 
 @Injectable()
 export class AnalysisService {
@@ -22,7 +23,8 @@ export class AnalysisService {
     private historyService: HistoryService,
     private agentFactory: AnalysisAgentFactory,
     private eventsGateway: EventsGateway,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private metricsService: MetricsService
   ) {}
 
   private async getVentureContext(
@@ -36,7 +38,12 @@ export class AnalysisService {
         currentTool
       );
 
-      if (!history || history.length === 0) return '';
+      if (!history || history.length === 0) {
+        this.metricsService.recordCacheMiss();
+        return '';
+      }
+
+      this.metricsService.recordCacheHit();
 
       // Format context using XML tags, which Gemini models parse highly effectively.
       // This distinguishes "Memory" from "Current Task".

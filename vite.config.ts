@@ -30,5 +30,15 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, '.'),
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor': ['react', 'react-dom'],
+          },
+        },
+      },
+      chunkSizeWarningLimit: 500,
+    },
   };
 });

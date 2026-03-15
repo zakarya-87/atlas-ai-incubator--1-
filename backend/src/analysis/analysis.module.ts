@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AnalysisController } from './analysis.controller';
+import { AnalyticsController } from './analytics.controller';
 import { AnalysisService } from './analysis.service';
 import { AnalysisAgentFactory } from './analysis.factory';
 import { DefaultAgent } from './agents/default.agent';
@@ -18,7 +19,7 @@ import { GrokProvider } from './providers/grok.provider';
 import { MistralProvider } from './providers/mistral.provider';
 import { OpenAIProvider } from './providers/openai.provider';
 import { AIProviderFactory } from './providers/ai-provider.factory';
-
+import { HealthModule } from '../health/health.module';
 
 @Module({
   imports: [
@@ -27,10 +28,11 @@ import { AIProviderFactory } from './providers/ai-provider.factory';
     HistoryModule,
     UsersModule,
     EventsModule,
+    HealthModule,
     // Connection is inherited from BullModule.forRootAsync() in AppModule
     BullModule.registerQueue({ name: 'analysis-queue' }),
   ],
-  controllers: [AnalysisController, JobsController],
+  controllers: [AnalysisController, AnalyticsController, JobsController],
   providers: [
     AnalysisService,
     JobsService,

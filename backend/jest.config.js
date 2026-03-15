@@ -7,42 +7,50 @@ module.exports = {
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
-  collectCoverageFrom: ['**/*.(t|j)s'],
+  collectCoverageFrom: [
+    '**/*.(t|j)s',
+    '!**/*.module.ts',
+    '!**/*.dto.ts',
+    '!**/*.entity.ts',
+    '!**/main.ts',
+    '!**/prisma-mock.factory.ts',
+    '!**/ai-defensive-parser.ts',
+  ],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
   forceExit: true, // Required for NestJS integration tests that leave open handles (HTTP servers, WebSocket gateways)
   coverageThreshold: {
     global: {
-      statements: 15,
-      branches: 10,
-      functions: 10,
-      lines: 15,
+      statements: 85,
+      branches: 85,
+      functions: 85,
+      lines: 85,
     },
-    './src/**/*.service.ts': {
+    '**/*.service.ts': {
       statements: 70,
       branches: 60,
       functions: 70,
       lines: 70,
     },
-    './src/**/health.controller.ts': {
+    '**/health.controller.ts': {
       statements: 100,
       branches: 100,
       functions: 100,
       lines: 100,
     },
-    './src/**/integrations.service.ts': {
+    '**/integrations.service.ts': {
       statements: 100,
       branches: 100,
       functions: 100,
       lines: 100,
     },
-    './src/**/ventures.service.ts': {
+    '**/ventures.service.ts': {
       statements: 100,
       branches: 100,
       functions: 100,
       lines: 100,
     },
-    './src/**/auth.service.ts': {
+    '**/auth.service.ts': {
       statements: 100,
       branches: 100,
       functions: 100,

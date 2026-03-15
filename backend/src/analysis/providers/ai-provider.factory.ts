@@ -33,6 +33,19 @@ export class AIProviderFactory {
     return Array.from(this.providers.keys());
   }
 
+  getEnabledProviders(): AIProvider[] {
+    const enabled: AIProvider[] = [];
+    if (this.configService.get<string>('MISTRAL_API_KEY')) enabled.push(AIProvider.MISTRAL);
+    if (this.configService.get<string>('GROK_API_KEY')) enabled.push(AIProvider.GROK);
+
+    const azureKey = this.configService.get<string>('AZURE_OPENAI_API_KEY');
+    const azureEndpoint = this.configService.get<string>('AZURE_OPENAI_ENDPOINT');
+    const azureDeployment = this.configService.get<string>('AZURE_OPENAI_DEPLOYMENT');
+    if (azureKey && azureEndpoint && azureDeployment) enabled.push(AIProvider.OPENAI);
+
+    return enabled;
+  }
+
   async complete(
     request: AIProviderRequest,
     providerName?: AIProvider

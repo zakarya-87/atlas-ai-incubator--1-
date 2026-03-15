@@ -46,6 +46,14 @@ else
 fi
 echo ""
 
+# Optional: Start Prisma Studio
+if [ "$START_STUDIO" = "true" ]; then
+    echo "Step 4: Starting Prisma Studio on port 5555..."
+    npx prisma studio --browser none --port 5555 --hostname 0.0.0.0 &
+    echo "✓ Prisma Studio is starting in the background"
+fi
+echo ""
+
 echo "========================================"
 echo "Startup complete! Starting application..."
 echo "========================================"

@@ -58,6 +58,9 @@ describe('BaseAgent', () => {
 
     // Create agent instance with mocked dependencies
     agent = new TestAgent(configService as ConfigService);
+
+    // Speed up tests by mocking the rate limit delay
+    jest.spyOn(agent as any, 'handleRateLimitRetry').mockResolvedValue(undefined);
   });
 
   describe('generate', () => {
@@ -225,11 +228,15 @@ describe('BaseAgent', () => {
 
       mockProviderFactory = {
         getAvailableProviders: jest.fn().mockReturnValue(['gemini', 'openai']),
+        getEnabledProviders: jest.fn().mockReturnValue(['gemini', 'openai']),
         getProvider: jest.fn().mockReturnValue(mockSecondaryProvider),
       };
 
       // Create agent instance with provider factory for fallback testing
       agent = new TestAgent(configService as ConfigService, mockProviderFactory as unknown as AIProviderFactory);
+
+      // Speed up tests by mocking the rate limit delay
+      jest.spyOn(agent as any, 'handleRateLimitRetry').mockResolvedValue(undefined);
     });
 
     it('should fallback to secondary provider on Gemini rate limit (429)', async () => {
@@ -262,10 +269,12 @@ describe('BaseAgent', () => {
 
       (agent as any).aiClient = client;
 
+      // Default maxRetries is 5 in implementation, but let's check what it actually does
+      // Actually executeGeminiCall has maxRetries = 5 fixed in code.
+      // So it should call 5 times.
       await agent.generate('test', 'context');
 
-      // Default maxRetries is 3
-      expect(generativeModel.generateContent).toHaveBeenCalledTimes(3);
+      expect(generativeModel.generateContent).toHaveBeenCalledTimes(5);
     });
 
     it('should throw InternalServerErrorException if both primary and fallbacks fail', async () => {
@@ -283,6 +292,54 @@ describe('BaseAgent', () => {
 
       await expect(agent.generate('test', 'context')).rejects.toThrow(
         'API rate limit exceeded. We attempted multiple retries and fallbacks.'
+      );
+    });
+
+    it('should throw InternalServerErrorException on timeout', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockRejectedValue(new Error('Gemini API timeout after 60 seconds')),
+      };
+      (agent as any).aiClient = { getGenerativeModel: () => generativeModel };
+
+      await expect(agent.generate('test', 'context')).rejects.toThrow(
+        'AI analysis is taking too long'
+      );
+    });
+
+    it('should throw InternalServerErrorException on auth error (401)', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockRejectedValue(new Error('401 Unauthorized')),
+      };
+      (agent as any).aiClient = { getGenerativeModel: () => generativeModel };
+
+      await expect(agent.generate('test', 'context')).rejects.toThrow(
+        'API configuration error'
+      );
+    });
+
+    it('should throw InternalServerErrorException on empty response', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockResolvedValue({
+          response: { text: () => '' },
+        }),
+      };
+      (agent as any).aiClient = { getGenerativeModel: () => generativeModel };
+
+      await expect(agent.generate('test', 'context')).rejects.toThrow(
+        'AI model returned empty response'
+      );
+    });
+
+    it('should throw InternalServerErrorException on malformed JSON', async () => {
+      const generativeModel = {
+        generateContent: jest.fn().mockResolvedValue({
+          response: { text: () => 'Not JSON' },
+        }),
+      };
+      (agent as any).aiClient = { getGenerativeModel: () => generativeModel };
+
+      await expect(agent.generate('test', 'context')).rejects.toThrow(
+        'The AI model produced malformed JSON'
       );
     });
   });

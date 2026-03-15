@@ -3,8 +3,6 @@
 # Full-stack deployment with all services
 # ========================================
 
-version: '3.9'
-
 services:
   # PostgreSQL Database with pgVector support
   postgres:
@@ -60,6 +58,11 @@ services:
         - NODE_ENV=production
     restart: unless-stopped
     environment:
+      # Build encoding (fixes Prisma Unicode issues)
+      PYTHONIOENCODING: utf-8
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+      
       # Database
       DATABASE_URL: postgresql://${POSTGRES_USER:-atlas_user}:${POSTGRES_PASSWORD:-atlas_password}@postgres:5432/${POSTGRES_DB:-atlas_db}
       
@@ -123,7 +126,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:3000}
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-/api}
     restart: unless-stopped
     ports:
       - ${FRONTEND_PORT:-5173}:8080

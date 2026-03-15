@@ -1,5 +1,5 @@
-apiVersion: 2024-05-01-preview
-location: westus2
+apiVersion: 2023-05-01
+location: eastus
 name: atlasinstance
 type: Microsoft.ContainerInstance/containerGroups
 tags:
@@ -12,7 +12,7 @@ properties:
   sku: Standard
   ipAddress:
     type: Public
-    dnsNameLabel: atlas-ai-incubator-app
+    dnsNameLabel: atlas-ai-app-v2
     ports:
       - port: 8080
         protocol: TCP
