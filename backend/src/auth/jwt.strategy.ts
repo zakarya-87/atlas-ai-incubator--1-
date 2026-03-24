@@ -9,6 +9,11 @@ import { User } from '@prisma/client';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   private readonly logger = new Logger(JwtStrategy.name);
   constructor(private usersService: UsersService) {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET environment variable is not set');
+    }
+
     super({
       jwtFromRequest: (req: Request) => {
         const cookies = req.cookies as Record<string, string> | undefined;
@@ -18,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         }
         return token || null;
       },
-      secretOrKey: process.env.JWT_SECRET || 'default-secret',
+      secretOrKey: secret,
     });
   }
 
