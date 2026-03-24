@@ -119,12 +119,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       // Clear venture ID to prevent ownership mismatch on next login
       localStorage.removeItem('atlas_venture_id');
 
+      // Call backend to clear the authentication cookie
+      // Read token before removing so it can be sent in the Authorization header
+      const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+
       // Clear access token
       localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-
-      // Call backend to clear the authentication cookie
-      // Pass token in header if available for the logout call itself
-      const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
       const headers: Record<string, string> = {};
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
