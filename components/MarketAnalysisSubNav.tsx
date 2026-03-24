@@ -12,10 +12,10 @@ interface MarketAnalysisSubNavProps {
 // (activeTool string and handleToolChange callback from App.tsx).
 // This prevents unnecessary re-renders of the navigation bar on every keystroke
 // when the user types in the business description textarea in the parent AppContent.
-const MarketAnalysisSubNav: React.FC<MarketAnalysisSubNavProps> = React.memo(({
+const MarketAnalysisSubNav = React.memo(({
   activeTool,
   onToolChange,
-}) => {
+}: MarketAnalysisSubNavProps) => {
   const { t } = useLanguage();
 
   const navItems: { key: MarketAnalysisTool; label: string }[] = [

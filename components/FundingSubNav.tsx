@@ -12,10 +12,10 @@ interface FundingSubNavProps {
 // (activeTool string and handleToolChange callback from App.tsx).
 // This prevents unnecessary re-renders of the navigation bar on every keystroke
 // when the user types in the business description textarea in the parent AppContent.
-const FundingSubNav: React.FC<FundingSubNavProps> = React.memo(({
+const FundingSubNav = React.memo(({
   activeTool,
   onToolChange,
-}) => {
+}: FundingSubNavProps) => {
   const { t } = useLanguage();
 
   const navItems: { key: FundingTool; label: string }[] = [

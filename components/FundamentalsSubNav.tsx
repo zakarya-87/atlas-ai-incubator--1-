@@ -12,10 +12,10 @@ interface FundamentalsSubNavProps {
 // (activeTool string and handleToolChange callback from App.tsx).
 // This prevents unnecessary re-renders of the navigation bar on every keystroke
 // when the user types in the business description textarea in the parent AppContent.
-const FundamentalsSubNav: React.FC<FundamentalsSubNavProps> = React.memo(({
+const FundamentalsSubNav = React.memo(({
   activeTool,
   onToolChange,
-}) => {
+}: FundamentalsSubNavProps) => {
   const { t } = useLanguage();
 
   const navItems: { key: FundamentalsTool; label: string }[] = [

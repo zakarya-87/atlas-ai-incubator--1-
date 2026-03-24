@@ -12,10 +12,10 @@ interface GrowthSubNavProps {
 // (activeTool string and handleToolChange callback from App.tsx).
 // This prevents unnecessary re-renders of the navigation bar on every keystroke
 // when the user types in the business description textarea in the parent AppContent.
-const GrowthSubNav: React.FC<GrowthSubNavProps> = React.memo(({
+const GrowthSubNav = React.memo(({
   activeTool,
   onToolChange,
-}) => {
+}: GrowthSubNavProps) => {
   const { t } = useLanguage();
 
   const navItems: { key: GrowthTool; label: string }[] = [

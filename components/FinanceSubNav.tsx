@@ -12,10 +12,10 @@ interface FinanceSubNavProps {
 // (activeTool string and handleToolChange callback from App.tsx).
 // This prevents unnecessary re-renders of the navigation bar on every keystroke
 // when the user types in the business description textarea in the parent AppContent.
-const FinanceSubNav: React.FC<FinanceSubNavProps> = React.memo(({
+const FinanceSubNav = React.memo(({
   activeTool,
   onToolChange,
-}) => {
+}: FinanceSubNavProps) => {
   const { t } = useLanguage();
 
   const navItems: { key: FinanceTool; label: string }[] = [

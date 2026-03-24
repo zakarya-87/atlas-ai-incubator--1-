@@ -12,10 +12,10 @@ interface StrategySubNavProps {
 // (activeTool string and handleToolChange callback from App.tsx).
 // This prevents unnecessary re-renders of the navigation bar on every keystroke
 // when the user types in the business description textarea in the parent AppContent.
-const StrategySubNav: React.FC<StrategySubNavProps> = React.memo(({
+const StrategySubNav = React.memo(({
   activeTool,
   onToolChange,
-}) => {
+}: StrategySubNavProps) => {
   const { t } = useLanguage();
 
   const navItems: { key: StrategyTool; label: string }[] = [
