@@ -35,17 +35,16 @@ async function resetAdminCredits() {
       // Reset credits for all admin users
       console.log('\nResetting credits for all admin users...');
       
-      for (const user of adminUsers) {
-        const updated = await prisma.user.update({
-          where: { id: user.id },
-          data: { 
-            credits: 1000,
-            subscriptionStatus: 'active',
-            subscriptionPlan: 'pro'
-          }
-        });
-        console.log(`✓ Updated ${updated.email}: credits = ${updated.credits} (was ${user.credits})`);
-      }
+      const updatedCount = await prisma.user.updateMany({
+        where: { role: 'ADMIN' },
+        data: {
+          credits: 1000,
+          subscriptionStatus: 'active',
+          subscriptionPlan: 'pro'
+        }
+      });
+
+      console.log(`✓ Updated ${updatedCount.count} admin user(s) successfully to 1000 credits.`);
     }
 
     console.log('\n✅ Admin credits reset successfully!');
