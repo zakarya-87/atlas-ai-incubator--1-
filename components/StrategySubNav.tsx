@@ -7,7 +7,12 @@ interface StrategySubNavProps {
   onToolChange: (tool: StrategyTool) => void;
 }
 
-const StrategySubNav: React.FC<StrategySubNavProps> = ({
+// ⚡ Bolt Performance Optimization:
+// Wrapped in React.memo() because this sub-navigation component receives stable props
+// (activeTool string and handleToolChange callback from App.tsx).
+// This prevents unnecessary re-renders of the navigation bar on every keystroke
+// when the user types in the business description textarea in the parent AppContent.
+const StrategySubNav: React.FC<StrategySubNavProps> = React.memo(({
   activeTool,
   onToolChange,
 }) => {
@@ -39,6 +44,6 @@ const StrategySubNav: React.FC<StrategySubNavProps> = ({
       ))}
     </div>
   );
-};
+});
 
 export default StrategySubNav;

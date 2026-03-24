@@ -7,7 +7,12 @@ interface FundingSubNavProps {
   onToolChange: (tool: FundingTool) => void;
 }
 
-const FundingSubNav: React.FC<FundingSubNavProps> = ({
+// ⚡ Bolt Performance Optimization:
+// Wrapped in React.memo() because this sub-navigation component receives stable props
+// (activeTool string and handleToolChange callback from App.tsx).
+// This prevents unnecessary re-renders of the navigation bar on every keystroke
+// when the user types in the business description textarea in the parent AppContent.
+const FundingSubNav: React.FC<FundingSubNavProps> = React.memo(({
   activeTool,
   onToolChange,
 }) => {
@@ -37,6 +42,6 @@ const FundingSubNav: React.FC<FundingSubNavProps> = ({
       ))}
     </div>
   );
-};
+});
 
 export default FundingSubNav;
