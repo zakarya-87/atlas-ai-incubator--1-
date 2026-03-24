@@ -89,7 +89,10 @@ describe('AuthContext', () => {
           <TestComponent />
         </AuthProvider>
       );
-      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    // Wait for the initialization effect to settle
+    await waitFor(() => {
+      expect(screen.getByTestId('loading')).toHaveTextContent('false');
     });
     consoleSpy.mockRestore();
     return result;
@@ -134,7 +137,11 @@ describe('AuthContext', () => {
     const loginButton = screen.getByText('Login');
     await act(async () => {
       loginButton.click();
-      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('token')).toHaveTextContent('fake-token');
+      expect(screen.getByTestId('user-email')).toHaveTextContent('test@example.com');
     });
 
     expect(mockSignIn).toHaveBeenCalledWith({
@@ -142,8 +149,6 @@ describe('AuthContext', () => {
       password: 'password123',
     });
     expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBe('fake-token');
-    expect(screen.getByTestId('token')).toHaveTextContent('fake-token');
-    expect(screen.getByTestId('user-email')).toHaveTextContent('test@example.com');
   });
 
   it('should logout on login failure', async () => {
@@ -154,10 +159,11 @@ describe('AuthContext', () => {
     const loginButton = screen.getByText('Login');
     await act(async () => {
       loginButton.click();
-      await new Promise((resolve) => setTimeout(resolve, 10));
     });
 
-    expect(mockFetch).toHaveBeenCalledWith('/api/auth/logout', expect.any(Object));
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith('/api/auth/logout', expect.any(Object));
+    });
   });
 
   it('should call signUp on register and auto-login', async () => {
@@ -170,14 +176,16 @@ describe('AuthContext', () => {
     const registerButton = screen.getByText('Register');
     await act(async () => {
       registerButton.click();
-      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+
+    await waitFor(() => {
+      expect(mockSignIn).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        password: 'password123',
+      });
     });
 
     expect(mockSignUp).toHaveBeenCalledWith({
-      email: 'test@example.com',
-      password: 'password123',
-    });
-    expect(mockSignIn).toHaveBeenCalledWith({
       email: 'test@example.com',
       password: 'password123',
     });
@@ -198,25 +206,26 @@ describe('AuthContext', () => {
     const logoutButton = screen.getByText('Logout');
     await act(async () => {
       logoutButton.click();
-      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('token')).toHaveTextContent('null');
+      expect(screen.getByTestId('user-email')).toHaveTextContent('null');
     });
 
     expect(localStorage.getItem('demo_admin_user')).toBeNull();
     expect(localStorage.getItem('atlas_venture_id')).toBeNull();
     expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
 
-    // Note: logout() in AuthContext clears the token from localStorage BEFORE reading it again for the fetch call!
-    // So the token in the fetch call will be null. Let's adjust expectations.
+    // AuthContext passes token properly since it reads before removal now
     expect(mockFetch).toHaveBeenCalledWith(
       '/api/auth/logout',
       expect.objectContaining({
         method: 'POST',
-        headers: {}, // since localStorage.removeItem is called before retrieving it
+        headers: { Authorization: 'Bearer test-token' },
         credentials: 'include',
       })
     );
-    expect(screen.getByTestId('token')).toHaveTextContent('null');
-    expect(screen.getByTestId('user-email')).toHaveTextContent('null');
   });
 
   it('should refresh authentication and verify session', async () => {
@@ -226,10 +235,11 @@ describe('AuthContext', () => {
     const refreshButton = screen.getByText('Refresh');
     await act(async () => {
       refreshButton.click();
-      await new Promise((resolve) => setTimeout(resolve, 10));
     });
 
-    expect(mockFetchUserProfile).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(mockFetchUserProfile).toHaveBeenCalled();
+    });
   });
 
   it('should skip refresh verification if demo admin is active', async () => {
@@ -241,9 +251,10 @@ describe('AuthContext', () => {
     const refreshButton = screen.getByText('Refresh');
     await act(async () => {
       refreshButton.click();
-      await new Promise((resolve) => setTimeout(resolve, 10));
     });
 
+    // Wait briefly to ensure no effect has run
+    await new Promise((r) => setTimeout(r, 0));
     expect(mockFetchUserProfile).not.toHaveBeenCalled();
   });
 
@@ -254,10 +265,11 @@ describe('AuthContext', () => {
     const refreshButton = screen.getByText('Refresh');
     await act(async () => {
       refreshButton.click();
-      await new Promise((resolve) => setTimeout(resolve, 10));
     });
 
-    expect(mockFetch).toHaveBeenCalledWith('/api/auth/logout', expect.any(Object));
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith('/api/auth/logout', expect.any(Object));
+    });
   });
 
   it('should handle signInAsAdminDemo success correctly', async () => {
@@ -281,8 +293,10 @@ describe('AuthContext', () => {
     const adminButton = screen.getByText('SignInAsAdminDemo');
     await act(async () => {
       adminButton.click();
-      // wait for all promises to settle
-      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('token')).toHaveTextContent('demo-admin-token');
     });
 
     expect(mockFetch).toHaveBeenCalledWith(
@@ -294,9 +308,6 @@ describe('AuthContext', () => {
     );
 
     expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBe('demo-admin-token');
-
-    // AuthContext updates token via setToken
-    expect(screen.getByTestId('token')).toHaveTextContent('demo-admin-token');
 
     const storedDemoUser = JSON.parse(localStorage.getItem('demo_admin_user') || '{}');
     expect(storedDemoUser.email).toBe('admin@atlas.com');
@@ -319,7 +330,10 @@ describe('AuthContext', () => {
 
     await act(async () => {
       adminButton.click();
-      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('token')).toHaveTextContent('demo-token');
     });
 
     const storedDemoUser = JSON.parse(localStorage.getItem('demo_admin_user') || '{}');
@@ -328,7 +342,6 @@ describe('AuthContext', () => {
 
     expect(screen.getByTestId('user-email')).toHaveTextContent('admin@atlas.com');
     expect(screen.getByTestId('user-name')).toHaveTextContent('Atlas Admin (Demo)');
-    expect(screen.getByTestId('token')).toHaveTextContent('demo-token');
   });
 
   it('should throw error when useAuth is used outside provider', () => {
