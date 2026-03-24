@@ -7,6 +7,7 @@ import { EventsGateway } from '../events/events.gateway';
 import { UsersService } from '../users/users.service';
 import { ForbiddenException } from '@nestjs/common';
 import { GenerateAnalysisDto } from './dto/generate-analysis.dto';
+import { MetricsService } from '../health/metrics.service';
 
 describe('AnalysisService', () => {
   let service: AnalysisService;
@@ -15,6 +16,7 @@ describe('AnalysisService', () => {
   let agentFactory: any;
   let eventsGateway: any;
   let usersService: any;
+  let metricsService: any;
 
   const mockUser = { id: 'user-123' };
   const mockVenture = { id: 'venture-123', userId: 'user-123' };
@@ -69,6 +71,11 @@ describe('AnalysisService', () => {
       checkAndDeductCredits: jest.fn().mockResolvedValue(true),
     };
 
+    metricsService = {
+      recordCacheHit: jest.fn(),
+      recordCacheMiss: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AnalysisService,
@@ -77,6 +84,7 @@ describe('AnalysisService', () => {
         { provide: AnalysisAgentFactory, useValue: agentFactory },
         { provide: EventsGateway, useValue: eventsGateway },
         { provide: UsersService, useValue: usersService },
+        { provide: MetricsService, useValue: metricsService },
       ],
     }).compile();
 

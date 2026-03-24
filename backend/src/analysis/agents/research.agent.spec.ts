@@ -90,7 +90,7 @@ describe('ResearchAgent', () => {
       expect(executeSpy).toHaveBeenNthCalledWith(
         2,
         '',
-        expect.stringContaining('Convert the detailed research notes'),
+        expect.stringContaining('Convert the research notes above into a JSON object that EXACTLY matches the schema'),
         { type: 'object' },
         'You are a strict JSON formatting engine.'
       );

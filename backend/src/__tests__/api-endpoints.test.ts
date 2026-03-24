@@ -19,6 +19,7 @@ import { AnalysisAgentFactory } from '../analysis/analysis.factory';
 import { EventsGateway } from '../events/events.gateway';
 import { EmailService } from '../email/email.service';
 import { JwtStrategy } from '../auth/jwt.strategy';
+import { MetricsService } from '../health/metrics.service';
 
 // Mock external services
 jest.mock('@google/generative-ai');
@@ -232,6 +233,7 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
         { provide: EventsGateway, useValue: mockEventsGateway },
         { provide: HistoryService, useValue: mockHistoryService },
         { provide: EmailService, useValue: mockEmailService },
+        { provide: MetricsService, useValue: { recordCacheHit: jest.fn(), recordCacheMiss: jest.fn() } },
       ],
     }).compile();
 
@@ -526,12 +528,12 @@ describe('Backend API Endpoint Unit and Integration Tests (TC015)', () => {
 
   describe('Rate limiting', () => {
     it('should handle multiple requests', async () => {
-      const requests = Array(5).fill(null).map(async () => {
+      // Create sequential requests instead of parallel to avoid ECONNRESET in test env
+      for (let i = 0; i < 5; i++) {
         const response = await request(app.getHttpServer())
           .get('/api/health');
         expect([200, 404]).toContain(response.status);
-      });
-      await Promise.all(requests);
+      }
     });
   });
 });
