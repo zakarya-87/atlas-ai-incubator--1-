@@ -3,6 +3,7 @@ import globals from 'globals';
 import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import reactPlugin from 'eslint-plugin-react';
+import unusedImportsPlugin from 'eslint-plugin-unused-imports';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
@@ -31,6 +32,7 @@ export default [
       'react': reactPlugin,
       'react-hooks': reactHooksPlugin,
       'prettier': prettierPlugin,
+      'unused-imports': unusedImportsPlugin,
     },
     settings: {
       react: {
@@ -44,7 +46,8 @@ export default [
       ...prettierConfig.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'warn',
       '@typescript-eslint/no-explicit-any': 'off',
       'no-console': 'off',
       'no-undef': 'off',

@@ -35,7 +35,7 @@ import {
   generateBrandIdentity,
 } from './services/geminiService';
 import { useLanguage } from './context/LanguageContext';
-import { translations, TranslationKey } from './locales';
+import { TranslationKey } from './locales';
 import BusinessInputForm from './components/BusinessInputForm';
 import ExportControls from './components/ExportControls';
 import useUndoRedo from './hooks/useUndoRedo';
@@ -129,10 +129,10 @@ const AppContent: React.FC = () => {
   }, [ventureId, isAuthenticated]); // Added missing dependencies
 
   // --- Navigation Logic ---
-  const clearAnalysisData = () => {
+  const clearAnalysisData = useCallback(() => {
     resetHistory(null);
     setError(null);
-  };
+  }, [resetHistory]);
 
   const handleNavigate = useCallback((module: ModuleType, tool: AnyTool) => {
     clearAnalysisData();
@@ -140,7 +140,7 @@ const AppContent: React.FC = () => {
     setActiveModule(module);
     setActiveTool(tool);
     setIsFocusMode(false); // Exit focus on nav
-  }, []);
+  }, [clearAnalysisData]);
 
   const handleModuleChange = useCallback(
     (module: ModuleType) => {
@@ -189,7 +189,7 @@ const AppContent: React.FC = () => {
           setActiveTool('swot');
       }
     },
-    [activeModule]
+    [activeModule, clearAnalysisData]
   );
 
   const handleToolChange = useCallback(
@@ -199,17 +199,17 @@ const AppContent: React.FC = () => {
       setViewingHistoryRecord(null);
       setActiveTool(tool);
     },
-    [activeTool]
+    [activeTool, clearAnalysisData]
   );
 
   // --- History Logic ---
-  const handleViewHistoryRecord = (record: GenerationRecord) => {
+  const handleViewHistoryRecord = useCallback((record: GenerationRecord) => {
     resetHistory(record.data);
     setActiveModule(record.module);
     setActiveTool(record.tool);
     setBusinessDescription(record.inputDescription);
     setViewingHistoryRecord(record);
-  };
+  }, [resetHistory, setBusinessDescription]);
 
   const handleDeleteHistoryRecord = async (id: string) => {
     try {
@@ -220,10 +220,10 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleReturnToWorkspace = () => {
+  const handleReturnToWorkspace = useCallback(() => {
     setViewingHistoryRecord(null);
     clearAnalysisData();
-  };
+  }, [clearAnalysisData]);
 
   const handleSaveNewVersion = useCallback(
     (
@@ -241,7 +241,7 @@ const AppContent: React.FC = () => {
       setGenerationHistory((prev) => [newRecord, ...prev]);
       handleViewHistoryRecord(newRecord);
     },
-    []
+    [handleViewHistoryRecord]
   );
 
   // --- AI Generation Logic ---
@@ -378,6 +378,7 @@ const AppContent: React.FC = () => {
       t,
       ventureId,
       setCurrentAnalysis,
+      clearAnalysisData,
       isAuthenticated,
       lastSubmittedImage,
     ]

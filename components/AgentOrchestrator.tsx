@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import type { AnyTool, AgentType, AgentLog, AnyAnalysisData } from '../types';
 import { TranslationKey } from '../locales';
 import AnalysisSkeleton from './AnalysisSkeleton';
-import { STORAGE_KEYS, WS_CONFIG, API_CONFIG } from '../utils/constants';
+import { STORAGE_KEYS, WS_CONFIG } from '../utils/constants';
 import { logger } from '../utils/logger';
 
 interface AgentOrchestratorProps {
@@ -31,8 +31,11 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const heartbeatIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Refs to break the circular dependency between connectWebSocket and handleReconnect
+  const connectRef = useRef<() => void>(() => {});
+  const handleReconnectRef = useRef<() => void>(() => {});
 
-  // Define which agents are involved for each tool type for UI display (active status)
+  // Define which agents are involvedfor each tool type for UI display (active status)
   const getAgentsForTool = (tool: AnyTool): AgentType[] => {
     switch (tool) {
       case 'swot':
@@ -92,185 +95,7 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
     }
   }, []);
 
-  // Connect to WebSocket with authentication
-  const connectWebSocket = useCallback(() => {
-    cleanup(); // Clean up existing connection
-
-    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-
-    logger.info('Connecting to WebSocket...', { ventureId });
-    setConnectionStatus('connecting');
-
-    // Initialize WebSocket with authentication
-    // Connect to root namespace '/' - the backend gateway is not under /api
-    socketRef.current = io('/', {
-      path: '/socket.io',
-      auth: {
-        token: token || '',
-      },
-      reconnection: false, // We handle reconnection manually
-      timeout: WS_CONFIG.CONNECTION_TIMEOUT,
-    });
-
-    socketRef.current.on('connect', () => {
-      logger.info('WebSocket connected successfully');
-      setConnectionStatus('connected');
-      reconnectAttempts.current = 0; // Reset on successful connection
-
-      // Clear connection timeout on successful connection
-      if (connectionTimeoutRef.current) {
-        clearTimeout(connectionTimeoutRef.current);
-        connectionTimeoutRef.current = null;
-      }
-
-      // Join the venture room
-      socketRef.current?.emit('joinRoom', ventureId);
-
-      // Start heartbeat
-      heartbeatIntervalRef.current = setInterval(() => {
-        if (socketRef.current?.connected) {
-          let timeoutFired = false;
-          const pongTimeout = setTimeout(() => {
-            timeoutFired = true;
-            logger.warn('WebSocket heartbeat timeout - missing pong');
-            socketRef.current?.disconnect();
-          }, 4000);
-
-          socketRef.current.once('pong', () => {
-            if (!timeoutFired) clearTimeout(pongTimeout);
-          });
-
-          socketRef.current.emit('ping');
-        }
-      }, WS_CONFIG.HEARTBEAT_INTERVAL);
-    });
-
-    socketRef.current.on('connect_error', (error) => {
-      logger.error('WebSocket connection error:', error);
-      setConnectionStatus('disconnected');
-      handleReconnect();
-    });
-
-    socketRef.current.on('disconnect', (reason) => {
-      logger.warn('WebSocket disconnected:', reason);
-      setConnectionStatus('disconnected');
-
-      // Clear heartbeat
-      if (heartbeatIntervalRef.current) {
-        clearInterval(heartbeatIntervalRef.current);
-        heartbeatIntervalRef.current = null;
-      }
-
-      // Attempt reconnection if not a manual disconnect
-      if (reason !== 'io client disconnect') {
-        handleReconnect();
-      }
-    });
-
-    socketRef.current.on('agentLog', (log: AgentLog) => {
-      setActiveAgent(log.agent);
-      setLogs((prev) => [...prev, log]);
-    });
-
-    socketRef.current.on('analysisResult', (data: { jobId: string; result: AnyAnalysisData }) => {
-      logger.info('Analysis result received via WebSocket:', data);
-      if (onAnalysisResult) {
-        onAnalysisResult(data);
-      }
-    });
-
-    socketRef.current.on('error', (error) => {
-      logger.error('WebSocket error:', error);
-    });
-
-    // Fallback: If not connected within 2 seconds, start simulated logs
-    connectionTimeoutRef.current = setTimeout(() => {
-      if (!socketRef.current?.connected) {
-        logger.warn('WebSocket connection timeout, starting simulated logs');
-        startSimulatedLogs();
-      }
-    }, 2000);
-  }, [ventureId]);
-
-  // Handle reconnection with exponential backoff
-  const handleReconnect = useCallback(() => {
-    if (reconnectAttempts.current >= WS_CONFIG.RECONNECT_ATTEMPTS) {
-      logger.error(
-        'Max reconnection attempts reached. Falling back to simulated logs.'
-      );
-      startSimulatedLogs();
-      return;
-    }
-
-    const delay = Math.min(
-      WS_CONFIG.RECONNECT_DELAY * Math.pow(2, reconnectAttempts.current),
-      30000 // Max 30 seconds
-    );
-
-    logger.info(
-      `Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current + 1}/${WS_CONFIG.RECONNECT_ATTEMPTS})`
-    );
-
-    reconnectTimeoutRef.current = setTimeout(() => {
-      reconnectAttempts.current++;
-      connectWebSocket();
-    }, delay);
-  }, [connectWebSocket]);
-
-  // Initialize WebSocket connection and network listeners
-  useEffect(() => {
-    connectWebSocket();
-
-    const handleOffline = () => {
-      logger.warn('Browser network offline detected');
-      setConnectionStatus('disconnected');
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-    };
-
-    const handleOnline = () => {
-      logger.info('Browser network online detected');
-      if (reconnectAttempts.current < WS_CONFIG.RECONNECT_ATTEMPTS) {
-        handleReconnect();
-      }
-    };
-
-    window.addEventListener('offline', handleOffline);
-    window.addEventListener('online', handleOnline);
-
-    return () => {
-      window.removeEventListener('offline', handleOffline);
-      window.removeEventListener('online', handleOnline);
-      cleanup();
-    };
-  }, [ventureId, connectWebSocket, cleanup, handleReconnect]); // Reconnect when ventureId changes
-
-  const startSimulatedLogs = () => {
-    // Fallback for when backend WS isn't reachable or ready
-    const sequence = getLogsForToolSimulated(activeTool);
-    let currentIndex = 0;
-    const intervalId = setInterval(() => {
-      if (currentIndex < sequence.length) {
-        const item = sequence[currentIndex];
-        setActiveAgent(item.agent);
-        setLogs((prev) => [
-          ...prev,
-          {
-            id: Math.random().toString(36).substr(2, 9),
-            agent: item.agent,
-            messageKey: item.messageKey,
-            timestamp: Date.now(),
-          },
-        ]);
-        currentIndex++;
-      } else {
-        clearInterval(intervalId);
-      }
-    }, 1500);
-  };
-
-  const getLogsForToolSimulated = (
+  const getLogsForToolSimulated = useCallback((
     tool: AnyTool
   ): { agent: AgentType; messageKey: string }[] => {
     // Simulate a "thought process" sequence
@@ -327,7 +152,187 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
 
     baseLogs.push({ agent: agents[0], messageKey: 'agentLogFinalizingOutput' });
     return baseLogs;
-  };
+  }, []);
+
+  const startSimulatedLogs = useCallback(() => {
+    // Fallback for when backend WS isn't reachable or ready
+    const sequence = getLogsForToolSimulated(activeTool);
+    let currentIndex = 0;
+    const intervalId = setInterval(() => {
+      if (currentIndex < sequence.length) {
+        const item = sequence[currentIndex];
+        setActiveAgent(item.agent);
+        setLogs((prev) => [
+          ...prev,
+          {
+            id: Math.random().toString(36).substr(2, 9),
+            agent: item.agent,
+            messageKey: item.messageKey,
+            timestamp: Date.now(),
+          },
+        ]);
+        currentIndex++;
+      } else {
+        clearInterval(intervalId);
+      }
+    }, 1500);
+  }, [activeTool, getLogsForToolSimulated]);
+
+  // Connect to WebSocket with authentication
+  const connectWebSocket = useCallback(() => {
+    cleanup(); // Clean up existing connection
+
+    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+
+    logger.info('Connecting to WebSocket...', { ventureId });
+    setConnectionStatus('connecting');
+
+    // Initialize WebSocket with authentication
+    // Connect to root namespace '/' - the backend gateway is not under /api
+    socketRef.current = io('/', {
+      path: '/socket.io',
+      auth: {
+        token: token || '',
+      },
+      reconnection: false, // We handle reconnection manually
+      timeout: WS_CONFIG.CONNECTION_TIMEOUT,
+    });
+
+    socketRef.current.on('connect', () => {
+      logger.info('WebSocket connected successfully');
+      setConnectionStatus('connected');
+      reconnectAttempts.current = 0; // Reset on successful connection
+
+      // Clear connection timeout on successful connection
+      if (connectionTimeoutRef.current) {
+        clearTimeout(connectionTimeoutRef.current);
+        connectionTimeoutRef.current = null;
+      }
+
+      // Join the venture room
+      socketRef.current?.emit('joinRoom', ventureId);
+
+      // Start heartbeat
+      heartbeatIntervalRef.current = setInterval(() => {
+        if (socketRef.current?.connected) {
+          let timeoutFired = false;
+          const pongTimeout = setTimeout(() => {
+            timeoutFired = true;
+            logger.warn('WebSocket heartbeat timeout - missing pong');
+            socketRef.current?.disconnect();
+          }, 4000);
+
+          socketRef.current.once('pong', () => {
+            if (!timeoutFired) clearTimeout(pongTimeout);
+          });
+
+          socketRef.current.emit('ping');
+        }
+      }, WS_CONFIG.HEARTBEAT_INTERVAL);
+    });
+
+    socketRef.current.on('connect_error', (error) => {
+      logger.error('WebSocket connection error:', error);
+      setConnectionStatus('disconnected');
+      handleReconnectRef.current();
+    });
+
+    socketRef.current.on('disconnect', (reason) => {
+      logger.warn('WebSocket disconnected:', reason);
+      setConnectionStatus('disconnected');
+
+      // Clear heartbeat
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
+
+      // Attempt reconnection if not a manual disconnect
+      if (reason !== 'io client disconnect') {
+        handleReconnectRef.current();
+      }
+    });
+
+    socketRef.current.on('agentLog', (log: AgentLog) => {
+      setActiveAgent(log.agent);
+      setLogs((prev) => [...prev, log]);
+    });
+
+    socketRef.current.on('analysisResult', (data: { jobId: string; result: AnyAnalysisData }) => {
+      logger.info('Analysis result received via WebSocket:', data);
+      if (onAnalysisResult) {
+        onAnalysisResult(data);
+      }
+    });
+
+    socketRef.current.on('error', (error) => {
+      logger.error('WebSocket error:', error);
+    });
+
+    // Fallback: If not connected within 2 seconds, start simulated logs
+    connectionTimeoutRef.current = setTimeout(() => {
+      if (!socketRef.current?.connected) {
+        logger.warn('WebSocket connection timeout, starting simulated logs');
+        startSimulatedLogs();
+      }
+    }, 2000);
+  }, [ventureId, onAnalysisResult, cleanup, startSimulatedLogs]);
+  connectRef.current = connectWebSocket;
+
+  // Handle reconnection with exponential backoff
+  const handleReconnect = useCallback(() => {
+    if (reconnectAttempts.current >= WS_CONFIG.RECONNECT_ATTEMPTS) {
+      logger.error(
+        'Max reconnection attempts reached. Falling back to simulated logs.'
+      );
+      startSimulatedLogs();
+      return;
+    }
+
+    const delay = Math.min(
+      WS_CONFIG.RECONNECT_DELAY * Math.pow(2, reconnectAttempts.current),
+      30000 // Max 30 seconds
+    );
+
+    logger.info(
+      `Reconnecting in ${delay}ms (attempt ${reconnectAttempts.current + 1}/${WS_CONFIG.RECONNECT_ATTEMPTS})`
+    );
+
+    reconnectTimeoutRef.current = setTimeout(() => {
+      reconnectAttempts.current++;
+      connectRef.current();
+    }, delay);
+  }, [startSimulatedLogs]);
+  handleReconnectRef.current = handleReconnect;
+
+  // Initialize WebSocket connection and network listeners
+  useEffect(() => {
+    connectWebSocket();
+
+    const handleOffline = () => {
+      logger.warn('Browser network offline detected');
+      setConnectionStatus('disconnected');
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+
+    const handleOnline = () => {
+      logger.info('Browser network online detected');
+      if (reconnectAttempts.current < WS_CONFIG.RECONNECT_ATTEMPTS) {
+        handleReconnect();
+      }
+    };
+
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+      cleanup();
+    };
+  }, [ventureId, connectWebSocket, cleanup, handleReconnect]); // Reconnect when ventureId changes
 
   // Auto-scroll to bottom of log
   useEffect(() => {

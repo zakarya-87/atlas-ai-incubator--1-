@@ -3,8 +3,6 @@ import {
   render,
   screen,
   act,
-  fireEvent,
-  waitFor,
 } from '@testing-library/react';
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';

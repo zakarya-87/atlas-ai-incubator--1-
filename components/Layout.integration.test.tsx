@@ -3,19 +3,16 @@ import {
   render,
   screen,
   fireEvent,
-  waitFor,
   within,
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import Layout from './Layout';
 import SidebarNav from './SidebarNav';
-import Header from './Header';
-import AuthModal from './AuthModal';
 import { LanguageProvider } from '../context/LanguageContext';
 import { AuthProvider } from '../context/AuthContext';
 import { ToastProvider } from '../context/ToastContext';
-import type { ModuleType, AnyTool } from '../types';
+import type { ModuleType } from '../types';
 
 // Mock child component for testing
 const MockChildComponent = () => (

@@ -22,7 +22,7 @@ function getSocketUrl(): string {
   // Vite replaces import.meta.env at build time
   const envUrl =
     typeof import.meta !== 'undefined' &&
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     (import.meta as any).env?.VITE_BACKEND_URL;
   if (envUrl) return envUrl as string;
   // In SSR / test environments window may not exist
@@ -79,7 +79,7 @@ export const useWebSocket = (
       socketRef.current = null;
     };
     // Empty deps – socket is created once per component mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
   // ── Room joining – runs whenever `room` or connection state changes ──────

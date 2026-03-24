@@ -12,7 +12,6 @@ import type {
   GrowthTool,
   FundingTool,
   ProductivityTool,
-  DashboardTool,
 } from '../types';
 
 // SubNavs (Keep eager loaded as they are small and critical for navigation)

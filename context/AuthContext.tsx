@@ -9,7 +9,6 @@ import React, {
 import {
   signIn,
   signUp,
-  AuthResponse,
   fetchUserProfile,
 } from '../services/authService';
 import { AuthCredentials } from '../types';
@@ -99,11 +98,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const profile = await fetchUserProfile();
       setUser({ email: profile.email });
     } catch (error) {
-      // Clear any partial state
-      logout();
+      // Clear any partial state on login failure
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      setToken(null);
+      setUser(null);
       throw error;
     }
-  }, []); // Removed logout dependency to avoid cycle, used internal logic if needed or just throw
+  }, []);
 
   const register = useCallback(async (credentials: AuthCredentials) => {
     await signUp(credentials);
