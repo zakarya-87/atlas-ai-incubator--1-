@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HealthController } from './health.controller';
 import { PrismaService } from '../prisma/prisma.service';
+import { MetricsService } from './metrics.service';
 
 describe('HealthController', () => {
   let controller: HealthController;
@@ -23,6 +24,12 @@ describe('HealthController', () => {
               ping: jest.fn().mockResolvedValue('PONG'),
               info: jest.fn().mockResolvedValue('used_memory_human:10MB\nuptime_in_seconds:3600'),
             }),
+          },
+        },
+        {
+          provide: MetricsService,
+          useValue: {
+            getMetrics: jest.fn().mockResolvedValue({ cacheHits: 10, cacheMisses: 5 }),
           },
         },
       ],

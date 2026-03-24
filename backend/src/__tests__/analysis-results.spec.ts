@@ -18,6 +18,7 @@ import { JobStatusResponse } from '../analysis/jobs.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventsGateway } from '../events/events.gateway';
 import { getJob, hasJob, setJob } from '../analysis/job-store';
+import { MetricsService } from '../health/metrics.service';
 
 describe('Analysis Results Display Edge Cases', () => {
     let processor: AnalysisProcessor;
@@ -64,6 +65,10 @@ describe('Analysis Results Display Edge Cases', () => {
                 {
                     provide: EventsGateway,
                     useValue: mockEventsGateway,
+                },
+                {
+                    provide: MetricsService,
+                    useValue: { recordCacheHit: jest.fn(), recordCacheMiss: jest.fn() },
                 },
             ],
         }).compile();
