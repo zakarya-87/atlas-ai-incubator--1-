@@ -2,7 +2,6 @@ import React from 'react';
 import { motion, Variants } from 'framer-motion';
 import type {
   BudgetGeneratorData,
-  AnalysisPoint,
   BudgetScenario,
   BudgetCategory,
 } from '../types';

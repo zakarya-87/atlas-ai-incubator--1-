@@ -9,7 +9,6 @@ import React, {
 import {
   signIn,
   signUp,
-  AuthResponse,
   fetchUserProfile,
 } from '../services/authService';
 import { AuthCredentials } from '../types';
@@ -100,7 +99,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setUser({ email: profile.email });
     } catch (error) {
       // Clear any partial state
-      logout();
+      setIsAuthenticated(false);
+      setUser(null);
+      setVentureId(null);
       throw error;
     }
   }, []); // Removed logout dependency to avoid cycle, used internal logic if needed or just throw

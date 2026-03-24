@@ -26,7 +26,6 @@ import type {
   PitchDeckData,
   InvestorMatchingData,
   FundraisingRoadmapData,
-  AnalysisPoint,
 } from '../types';
 
 type AnalysisData = (

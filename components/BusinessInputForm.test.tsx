@@ -10,7 +10,6 @@ import { vi } from 'vitest';
 import '@testing-library/jest-dom';
 import BusinessInputForm from './BusinessInputForm';
 import { LanguageProvider } from '../context/LanguageContext';
-import LoadingSpinner from './LoadingSpinner';
 
 // Mock FileReader
 global.FileReader = class {

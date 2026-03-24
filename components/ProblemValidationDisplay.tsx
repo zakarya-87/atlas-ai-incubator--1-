@@ -6,7 +6,6 @@ import type {
   MarketSizePoint,
 } from '../types';
 import { useLanguage } from '../context/LanguageContext';
-import { TranslationKey } from '../locales';
 import DataStructureDebugger from './DataStructureDebugger';
 
 const containerVariants: Variants = {

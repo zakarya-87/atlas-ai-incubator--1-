@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import type { AnyTool, AgentType, AgentLog, AnyAnalysisData } from '../types';
 import { TranslationKey } from '../locales';
 import AnalysisSkeleton from './AnalysisSkeleton';
-import { STORAGE_KEYS, WS_CONFIG, API_CONFIG } from '../utils/constants';
+import { STORAGE_KEYS, WS_CONFIG } from '../utils/constants';
 import { logger } from '../utils/logger';
 
 interface AgentOrchestratorProps {
@@ -190,7 +190,7 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
         startSimulatedLogs();
       }
     }, 2000);
-  }, [ventureId]);
+  }, [ventureId, startSimulatedLogs, onAnalysisResult, cleanup, handleReconnect]);
 
   // Handle reconnection with exponential backoff
   const handleReconnect = useCallback(() => {
@@ -215,7 +215,7 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
       reconnectAttempts.current++;
       connectWebSocket();
     }, delay);
-  }, [connectWebSocket]);
+  }, [connectWebSocket, startSimulatedLogs]);
 
   // Initialize WebSocket connection and network listeners
   useEffect(() => {
@@ -246,7 +246,7 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
     };
   }, [ventureId, connectWebSocket, cleanup, handleReconnect]); // Reconnect when ventureId changes
 
-  const startSimulatedLogs = () => {
+  const startSimulatedLogs = useCallback(() => {
     // Fallback for when backend WS isn't reachable or ready
     const sequence = getLogsForToolSimulated(activeTool);
     let currentIndex = 0;
@@ -268,9 +268,9 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
         clearInterval(intervalId);
       }
     }, 1500);
-  };
+  }, [activeTool, setActiveAgent, setLogs, getLogsForToolSimulated]);
 
-  const getLogsForToolSimulated = (
+  const getLogsForToolSimulated = useCallback((
     tool: AnyTool
   ): { agent: AgentType; messageKey: string }[] => {
     // Simulate a "thought process" sequence
@@ -327,7 +327,7 @@ const AgentOrchestrator: React.FC<AgentOrchestratorProps> = ({
 
     baseLogs.push({ agent: agents[0], messageKey: 'agentLogFinalizingOutput' });
     return baseLogs;
-  };
+  }, []);
 
   // Auto-scroll to bottom of log
   useEffect(() => {

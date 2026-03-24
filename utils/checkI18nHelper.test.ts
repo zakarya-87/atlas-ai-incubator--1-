@@ -1,7 +1,6 @@
 import { expect, describe, it, vi, beforeEach, afterEach } from 'vitest';
 import { readLocales } from './checkI18nHelper';
 import fs from 'fs';
-import path from 'node:path';
 
 vi.mock('fs');
 

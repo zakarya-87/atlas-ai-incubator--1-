@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { FaUpload, FaTimes } from 'react-icons/fa';
-import LoadingSpinner from './LoadingSpinner';
 import type { AnyTool } from '../types';
 
 interface BusinessInputFormProps {

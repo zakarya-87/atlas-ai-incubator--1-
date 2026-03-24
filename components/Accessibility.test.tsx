@@ -1,8 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
-import { axe, toHaveNoViolations } from 'jest-axe';
-import * as geminiService from '../services/geminiService';
+import { toHaveNoViolations } from 'jest-axe';
 
 // Mock downloadReportPdf to avoid actual API calls
 vi.mock('../services/geminiService', () => ({
@@ -52,7 +51,6 @@ import LoadingSpinner from './LoadingSpinner';
 import ExportControls from './ExportControls';
 import { LanguageProvider } from '../context/LanguageContext';
 import { AuthProvider } from '../context/AuthContext';
-import { ToastProvider } from '../context/ToastContext';
 
 describe('Accessibility Compliance Verification (TC020)', () => {
   describe('AuthModal Accessibility', () => {

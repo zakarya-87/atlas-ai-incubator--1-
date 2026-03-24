@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';

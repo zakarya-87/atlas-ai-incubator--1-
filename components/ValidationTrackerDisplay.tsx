@@ -3,9 +3,6 @@ import { motion, Variants } from 'framer-motion';
 import type {
   ValidationTrackerData,
   ValidationTrackerMetric,
-  CompetitorActivity,
-  EmergingTrend,
-  FundingInsight,
 } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 

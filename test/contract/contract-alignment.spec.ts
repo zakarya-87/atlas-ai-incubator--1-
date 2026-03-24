@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { swotSchema, pestelSchema } from '../../services/geminiService';
 import type { SwotData, PestelData } from '../../types';
 
 /**

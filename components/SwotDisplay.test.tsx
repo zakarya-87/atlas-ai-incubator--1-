@@ -1,8 +1,8 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { expect, it, describe, vi, beforeEach } from 'vitest';
 import React from 'react';
 import SwotDisplay from './SwotDisplay';
-import type { SwotData, AnalysisPoint } from '../types';
+import type { SwotData } from '../types';
 import { LanguageProvider } from '../context/LanguageContext';
 
 const mockSwotData: SwotData = {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLanguage } from '../context/LanguageContext';
 
 interface UndoRedoControlsProps {
   onUndo: () => void;

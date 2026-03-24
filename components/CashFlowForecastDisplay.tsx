@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, Variants } from 'framer-motion';
-import type { CashFlowForecastData, AnalysisPoint } from '../types';
+import type { CashFlowForecastData } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
 const containerVariants: Variants = {

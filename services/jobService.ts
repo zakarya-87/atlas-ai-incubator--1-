@@ -1,5 +1,4 @@
 import { API_CONFIG, STORAGE_KEYS } from '../utils/constants';
-import { logger } from '../utils/logger';
 
 // Job status types
 export type JobStatus = 'queued' | 'active' | 'completed' | 'failed';
