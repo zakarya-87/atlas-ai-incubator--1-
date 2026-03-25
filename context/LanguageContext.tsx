@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useCallback,
   ReactNode,
+  useMemo,
 } from 'react';
 import { translations, Language, TranslationKey } from '../locales';
 
@@ -35,8 +36,15 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
     [language]
   );
 
+  // ⚡ Bolt: Memoize the context value to prevent unnecessary re-renders
+  // of consuming components when the provider's parent re-renders
+  const value = useMemo(
+    () => ({ language, setLanguage, t }),
+    [language, setLanguage, t]
+  );
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
