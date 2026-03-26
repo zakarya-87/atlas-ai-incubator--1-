@@ -148,7 +148,7 @@ const IdeaValidationDisplay: React.FC<IdeaValidationDisplayProps> = ({
   const { t } = useLanguage();
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('summary' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

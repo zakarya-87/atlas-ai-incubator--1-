@@ -134,6 +134,37 @@ const LazyWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </ErrorBoundary>
 );
 
+/**
+ * Normalizes AI analysis data before it reaches display components.
+ * Handles cases where the AI provider wraps the response in a single named key
+ * (e.g. { swot_analysis: { strengths: [...] } } → { strengths: [...] }).
+ * Also strips the database `id` field since display components don't use it.
+ */
+function normalizeAnalysisData(data: AnyAnalysisData | null): AnyAnalysisData | null {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return data;
+
+  const raw = data as Record<string, unknown>;
+
+  // Collect non-id keys
+  const dataKeys = Object.keys(raw).filter((k) => k !== 'id');
+
+  // If there is exactly one data key and its value is a plain (non-array) object,
+  // unwrap it — this is a provider wrapper (e.g. { swot_analysis: {...} })
+  if (
+    dataKeys.length === 1 &&
+    typeof raw[dataKeys[0]] === 'object' &&
+    raw[dataKeys[0]] !== null &&
+    !Array.isArray(raw[dataKeys[0]])
+  ) {
+    const inner = raw[dataKeys[0]] as Record<string, unknown>;
+    // Preserve the id if present
+    if (raw.id) inner.id = raw.id;
+    return inner as AnyAnalysisData;
+  }
+
+  return data;
+}
+
 const ModuleRouter = (props: ModuleRouterProps) => {
   const {
     activeModule,
@@ -155,16 +186,8 @@ const ModuleRouter = (props: ModuleRouterProps) => {
     onAnalysisResult,
   } = props;
 
-  // --- 0. Debug Logging ---
-  React.useEffect(() => {
-    if (currentAnalysis) {
-      console.log(`[ModuleRouter] Data arrived for ${activeModule}/${activeTool}:`, {
-        hasData: !!currentAnalysis,
-        keys: Object.keys(currentAnalysis),
-        id: (currentAnalysis as any).id
-      });
-    }
-  }, [currentAnalysis, activeModule, activeTool]);
+  // Normalize data before routing — strips wrappers and ensures flat structure
+  const analysis = normalizeAnalysisData(currentAnalysis);
 
   // --- 1. Sub Navigation Rendering ---
   const renderSubNav = () => {
@@ -316,7 +339,7 @@ const ModuleRouter = (props: ModuleRouterProps) => {
     }
 
     // Standard AI Result Displays
-    if (currentAnalysis) {
+    if (analysis) {
       let Component = null;
       switch (activeTool) {
         case 'swot':
@@ -368,7 +391,7 @@ const ModuleRouter = (props: ModuleRouterProps) => {
           return (
             <LazyWrapper>
               <FinancialForecastDisplay
-                data={currentAnalysis as any}
+                data={analysis as any}
                 originalRecord={viewingHistoryRecord}
                 onSaveVersion={onSaveVersion}
               />
@@ -401,7 +424,7 @@ const ModuleRouter = (props: ModuleRouterProps) => {
         return (
           <LazyWrapper>
             <Component
-              data={currentAnalysis as any}
+              data={analysis as any}
               onUpdate={onUpdateAnalysis}
             />
           </LazyWrapper>

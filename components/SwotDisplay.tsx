@@ -317,7 +317,7 @@ const SwotDisplay: React.FC<SwotDisplayProps> = ({ data: initialData, onUpdate }
   const data = (initialData as any)?.swot_analysis || initialData;
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('strengths' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

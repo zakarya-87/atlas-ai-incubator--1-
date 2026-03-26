@@ -27,7 +27,7 @@ const phaseVariants: Variants = {
 
 const RoadmapDisplay: React.FC<RoadmapDisplayProps> = ({ data }) => {
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('phases' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

@@ -117,7 +117,7 @@ const OkrWorkflowDisplay: React.FC<{ data: OkrWorkflowData }> = ({ data }) => {
   const { t } = useLanguage();
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('visionStatement' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

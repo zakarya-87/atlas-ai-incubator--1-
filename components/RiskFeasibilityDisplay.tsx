@@ -236,7 +236,7 @@ const RiskFeasibilityDisplay: React.FC<{ data: RiskFeasibilityData }> = ({
   const { t } = useLanguage();
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('feasibilityScore' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

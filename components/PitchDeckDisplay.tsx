@@ -201,7 +201,7 @@ const PitchDeckDisplay: React.FC<{ data: PitchDeckData }> = ({ data }) => {
   const { t } = useLanguage();
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('slides' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}
@@ -218,7 +218,7 @@ const PitchDeckDisplay: React.FC<{ data: PitchDeckData }> = ({ data }) => {
   }
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('slides' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

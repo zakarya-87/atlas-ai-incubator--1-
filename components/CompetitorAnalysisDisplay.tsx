@@ -106,7 +106,7 @@ const CompetitorAnalysisDisplay: React.FC<{ data: CompetitorAnalysisData }> = ({
   const { t } = useLanguage();
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('competitors' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

@@ -151,7 +151,7 @@ const BudgetGeneratorDisplay: React.FC<{ data: BudgetGeneratorData }> = ({
   const { language, t } = useLanguage();
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('scenarios' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

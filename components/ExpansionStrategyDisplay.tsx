@@ -113,7 +113,7 @@ const ExpansionStrategyDisplay: React.FC<{ data: ExpansionStrategyData }> = ({
 }) => {
   const { t } = useLanguage();
 
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('recommendedStrategy' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

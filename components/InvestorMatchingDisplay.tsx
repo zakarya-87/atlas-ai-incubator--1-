@@ -71,7 +71,7 @@ const InvestorMatchingDisplay: React.FC<{ data: InvestorMatchingData }> = ({
   }, []);
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('investors' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

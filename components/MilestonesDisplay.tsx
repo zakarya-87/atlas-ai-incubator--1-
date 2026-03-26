@@ -65,7 +65,7 @@ const AlertCard: React.FC<{ alert: SmartAlert }> = ({ alert }) => {
 const MilestonesDisplay: React.FC<{ data: MilestonesData }> = ({ data }) => {
   const { t } = useLanguage();
 
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('milestones' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

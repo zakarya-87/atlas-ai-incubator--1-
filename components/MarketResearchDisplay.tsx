@@ -115,7 +115,7 @@ const MarketResearchDisplay: React.FC<MarketResearchDisplayProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('marketDrivers' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

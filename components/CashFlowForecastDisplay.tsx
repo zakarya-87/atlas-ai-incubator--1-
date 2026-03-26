@@ -51,7 +51,7 @@ const CashFlowForecastDisplay: React.FC<{ data: CashFlowForecastData }> = ({
   const { language, t } = useLanguage();
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('runwayMonths' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

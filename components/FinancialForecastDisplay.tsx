@@ -169,7 +169,7 @@ const FinancialForecastDisplay: React.FC<{
   }, [growthRate, cogsMargin, opexScaling, data?.forecast]);
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('forecast' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

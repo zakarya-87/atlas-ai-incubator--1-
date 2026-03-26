@@ -104,7 +104,7 @@ const KpiDashboardDisplay: React.FC<{ data: KpiDashboardData }> = ({
   const { t } = useLanguage();
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('executiveSummary' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

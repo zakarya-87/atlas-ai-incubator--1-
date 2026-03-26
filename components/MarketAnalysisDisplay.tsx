@@ -118,7 +118,7 @@ const MarketAnalysisDisplay: React.FC<MarketAnalysisDisplayProps> = ({
   const data = (initialData as any)?.market_analysis || initialData;
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('targetAudience' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}

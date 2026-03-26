@@ -65,7 +65,7 @@ const CustomerValidationDisplay: React.FC<{ data: CustomerValidationData }> = ({
   const { t } = useLanguage();
 
   // Handle undefined, null, non-object, or array data gracefully
-  if (!data || typeof data !== 'object' || Array.isArray(data) || !('validationScorecard' in data)) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return (
       <motion.div
         variants={containerVariants}
