@@ -89,8 +89,15 @@ export class ResearchAgent extends BaseAgent {
     }
 
     // --- PASS 2: STRUCTURE DATA (JSON Formatting) ---
+    // Extract language directive from sysInstruction if present (it starts with the CRITICAL LANGUAGE block)
+    const languageMatch = sysInstruction.match(/LANGUAGE:\s*([^\n]+)/);
+    const detectedLanguage = languageMatch ? languageMatch[1].trim() : null;
+    const pass2LanguageNote = detectedLanguage && !detectedLanguage.toLowerCase().startsWith('english')
+      ? `\n\nCRITICAL: ALL string values in the JSON output MUST be written in ${detectedLanguage}. Do NOT use English for any value.`
+      : '';
+
     const formattingPrompt = `
-      You are a Data Structuring Specialist. 
+      You are a Data Structuring Specialist.${pass2LanguageNote}
       
       SOURCE MATERIAL:
       ${rawText}
@@ -98,15 +105,19 @@ export class ResearchAgent extends BaseAgent {
       TASK:
       Convert the detailed research notes above into the following JSON structure.
       Ensure all fields are populated based on the research provided.
-      If specific data points are missing, make reasonable strategic estimates based on the context.
+      If specific data points are missing, make reasonable strategic estimates based on the context.${pass2LanguageNote}
     `;
 
-    this.agentLogger.log('[ResearchAgent] Structuring research into JSON via provider factory');
+    const pass2SystemInstruction = detectedLanguage && !detectedLanguage.toLowerCase().startsWith('english')
+      ? `You are a strict JSON formatting engine. CRITICAL LANGUAGE RULE: Every string VALUE in the JSON output MUST be written in ${detectedLanguage}. JSON keys may remain in English, but all text values must be in ${detectedLanguage}. This is mandatory.`
+      : 'You are a strict JSON formatting engine. Output valid JSON only.';
+
+    this.agentLogger.log(`[ResearchAgent] Structuring research into JSON via provider factory (language: ${detectedLanguage || 'English'})`);
     const formattedResponse = await this.providerFactory.completeWithFallback({
       prompt: formattingPrompt,
       context: '',
       schema: schema || undefined,
-      systemInstruction: 'You are a strict JSON formatting engine.',
+      systemInstruction: pass2SystemInstruction,
     });
 
     const finalData = {

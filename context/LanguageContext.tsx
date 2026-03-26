@@ -18,10 +18,31 @@ export const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined
 );
 
+const LANGUAGE_STORAGE_KEY = 'atlas_ui_language';
+
+const getSavedLanguage = (): Language => {
+  try {
+    const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (saved === 'ar' || saved === 'fr' || saved === 'en') return saved;
+  } catch {
+    // localStorage not available
+  }
+  return 'en';
+};
+
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>(getSavedLanguage);
+
+  const setLanguage = useCallback((lang: Language) => {
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    } catch {
+      // ignore
+    }
+    setLanguageState(lang);
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = language;

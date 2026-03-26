@@ -256,13 +256,24 @@ export class AnalysisService {
         en: 'English',
       };
       const outputLanguage = languageMap[dto.language] || 'English';
-      const languageDirective =
-        dto.language && dto.language !== 'en'
-          ? `\n\n### LANGUAGE REQUIREMENT:\nYou MUST write ALL text content in your JSON response in ${outputLanguage}.\nEvery string value inside the JSON output MUST be written in ${outputLanguage}.\nDo NOT use English for any text field — this is mandatory.`
-          : '';
+      const isNonEnglish = dto.language && dto.language !== 'en';
+      const languageDirectiveHeader = isNonEnglish
+        ? `### ⚠️ CRITICAL LANGUAGE INSTRUCTION — READ FIRST ⚠️
+LANGUAGE: ${outputLanguage}
+YOU MUST WRITE EVERY SINGLE STRING VALUE IN YOUR JSON RESPONSE IN ${outputLanguage.toUpperCase()}.
+THIS IS NON-NEGOTIABLE. DO NOT USE ENGLISH FOR ANY TEXT FIELD.
+ALL labels, descriptions, titles, summaries, recommendations, and explanations MUST be in ${outputLanguage}.
+JSON field names (keys) may remain in English, but ALL values must be in ${outputLanguage}.
 
-      const baseSystemInstruction = `
-You are the ATLAS AI Engine, a Lead Venture Architect and Tier-1 Strategy Consultant.
+`
+        : '';
+      const languageDirectiveFooter = isNonEnglish
+        ? `\n\n### LANGUAGE REMINDER:\nAll JSON string values MUST be in ${outputLanguage}. No English text in values.`
+        : '';
+
+      this.logger.log(`[AnalysisService] Language: ${dto.language} → ${outputLanguage} | Tool: ${dto.tool}`);
+
+      const baseSystemInstruction = `${languageDirectiveHeader}You are the ATLAS AI Engine, a Lead Venture Architect and Tier-1 Strategy Consultant.
 Your objective is to build a coherent, viable, and scalable business case for the user.
 
 ### CORE DIRECTIVES:
@@ -275,8 +286,7 @@ Your objective is to build a coherent, viable, and scalable business case for th
 
 ### CONTEXT AWARENESS:
 The user has provided a description and potentially a history of previous work.
-Synthesize this information to produce the next logical step in their business planning.
-${languageDirective}`;
+Synthesize this information to produce the next logical step in their business planning.${languageDirectiveFooter}`;
 
       const effectiveSystemInstruction = refinementSystemInstruction
         ? `${baseSystemInstruction}\n\n${refinementSystemInstruction}`
