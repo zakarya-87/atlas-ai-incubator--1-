@@ -185,19 +185,24 @@ const Search: React.FC<SearchProps> = ({ onNavigate }) => {
   const searchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (query.trim().length > 1) {
-      const lowerCaseQuery = query.toLowerCase();
-      const filteredResults = searchableTools.filter(
-        (item) =>
-          t(item.toolNameKey).toLowerCase().includes(lowerCaseQuery) ||
-          t(item.moduleNameKey).toLowerCase().includes(lowerCaseQuery)
-      );
-      setResults(filteredResults);
-      setIsOpen(true);
-    } else {
-      setResults([]);
-      setIsOpen(false);
-    }
+    // ⚡ Bolt: Debounce search input to prevent expensive filtering and re-renders on every keystroke
+    const debounceTimer = setTimeout(() => {
+      if (query.trim().length > 1) {
+        const lowerCaseQuery = query.toLowerCase();
+        const filteredResults = searchableTools.filter(
+          (item) =>
+            t(item.toolNameKey).toLowerCase().includes(lowerCaseQuery) ||
+            t(item.moduleNameKey).toLowerCase().includes(lowerCaseQuery)
+        );
+        setResults(filteredResults);
+        setIsOpen(true);
+      } else {
+        setResults([]);
+        setIsOpen(false);
+      }
+    }, 300); // 300ms debounce delay
+
+    return () => clearTimeout(debounceTimer);
   }, [query, t]);
 
   const handleSelect = (item: SearchableItem) => {
