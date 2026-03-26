@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BaseAgent } from './base.agent';
 import { AgentGenerationResponse } from '../interfaces/ai-agent.interface';
 import { AIProviderFactory } from '../providers/ai-provider.factory';
+import { AIProvider } from '../interfaces/ai-provider.interface';
 
 @Injectable()
 export class DefaultAgent extends BaseAgent {
+  private readonly agentLogger = new Logger(DefaultAgent.name);
+
   constructor(
     configService: ConfigService,
     protected readonly providerFactory: AIProviderFactory
@@ -20,14 +23,24 @@ export class DefaultAgent extends BaseAgent {
     systemInstruction?: string,
     images?: string[]
   ): Promise<AgentGenerationResponse> {
-    const fullPrompt = `${prompt}\n${context}`;
+    const fullPrompt = context ? `${prompt}\n${context}` : prompt;
+    const defaultProvider = this.configService.get<string>('DEFAULT_AI_PROVIDER') as AIProvider | undefined;
 
-    return this.executeGeminiCall(
-      '',
-      fullPrompt,
-      schema || null,
-      systemInstruction,
-      images
+    this.agentLogger.log(`[DefaultAgent] Starting generation via provider: ${defaultProvider || 'mistral'}`);
+
+    const response = await this.providerFactory.completeWithFallback(
+      {
+        prompt: fullPrompt,
+        context: '',
+        schema,
+        systemInstruction:
+          systemInstruction ||
+          'You are the ATLAS AI Engine. Provide actionable, structured business analysis.',
+        images,
+      },
+      defaultProvider
     );
+
+    return { text: response.text, data: response.data };
   }
 }

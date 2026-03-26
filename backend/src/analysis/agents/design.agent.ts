@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BaseAgent } from './base.agent';
 import { AgentGenerationResponse } from '../interfaces/ai-agent.interface';
@@ -6,6 +6,8 @@ import { AIProviderFactory } from '../providers/ai-provider.factory';
 
 @Injectable()
 export class DesignAgent extends BaseAgent {
+  private readonly agentLogger = new Logger(DesignAgent.name);
+
   constructor(
     configService: ConfigService,
     protected readonly providerFactory: AIProviderFactory
@@ -21,8 +23,6 @@ export class DesignAgent extends BaseAgent {
     _images?: string[]
   ): Promise<AgentGenerationResponse> {
     try {
-      // Generate brand identity concept (colors, rationale, prompt) using text model
-      // Note: Imagen image generation requires Vertex AI SDK which is not configured
       const brandPrompt = `
         CONTEXT: ${context}
         USER INPUT: ${prompt}
@@ -38,40 +38,29 @@ export class DesignAgent extends BaseAgent {
         Make the design modern, professional, and appropriate for the business type.
       `;
 
-      const response = await this.executeGeminiCall(
-        '',
-        brandPrompt,
-        schema || null,
-        'You are a creative director and brand strategist specializing in startup branding.'
-      );
+      this.agentLogger.log('[DesignAgent] Generating brand identity via provider factory');
 
-      // Ensure the response has all required fields
+      const response = await this.providerFactory.completeWithFallback({
+        prompt: brandPrompt,
+        context: '',
+        schema: schema || undefined,
+        systemInstruction: 'You are a creative director and brand strategist specializing in startup branding.',
+      });
+
       const data = {
         logoImage: response.data?.logoImage || '',
-        imagePrompt:
-          response.data?.imagePrompt || 'A modern, minimalist logo concept',
-        rationale:
-          response.data?.rationale ||
-          'Brand identity designed to convey professionalism and innovation',
-        palette: response.data?.palette || [
-          '#6366F1',
-          '#818CF8',
-          '#A5B4FC',
-          '#1E293B',
-          '#F8FAFC',
-        ],
+        imagePrompt: response.data?.imagePrompt || 'A modern, minimalist logo concept',
+        rationale: response.data?.rationale || 'Brand identity designed to convey professionalism and innovation',
+        palette: response.data?.palette || ['#6366F1', '#818CF8', '#A5B4FC', '#1E293B', '#F8FAFC'],
       };
 
       return {
-        text: 'Brand identity concept generated successfully. Note: Logo image generation requires Vertex AI setup.',
-        data: data,
+        text: 'Brand identity concept generated successfully.',
+        data,
       };
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown error';
-    // Use internal logging if needed, but for now we follow the existing pattern
-      throw new InternalServerErrorException(
-        `Failed to generate brand identity: ${message}`
-      );
+      throw new InternalServerErrorException(`Failed to generate brand identity: ${message}`);
     }
   }
 }

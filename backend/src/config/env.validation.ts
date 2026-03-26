@@ -12,7 +12,7 @@ export const EnvSchema = z.object({
     .min(20, 'JWT_SECRET must be at least 20 characters.')
     .nonempty(),
   JWT_TTL: z.string().default('15m'),
-  GEMINI_API_KEY: z.string().nonempty('GEMINI_API_KEY is required'),
+  GEMINI_API_KEY: z.string().optional(),
   DATABASE_URL: z.string().nonempty('DATABASE_URL is required'),
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
@@ -26,7 +26,9 @@ export const EnvSchema = z.object({
   REDIS_PASSWORD: z.string().optional(),
   REDIS_TLS: z.enum(['true', 'false']).default('false'),
   // AI Providers
-  DEFAULT_AI_PROVIDER: z.enum(['gemini', 'grok', 'mistral']).default('mistral'),
+  DEFAULT_AI_PROVIDER: z.enum(['gemini', 'grok', 'mistral', 'openai']).default('mistral'),
+  OPENAI_API_KEY: z.string().optional(),
+  OPENAI_MODEL: z.string().default('gpt-4o-mini'),
   GROK_API_KEY: z.string().optional(),
   GROK_MODEL: z.string().default('grok-beta'),
   MISTRAL_API_KEY: z.string().optional(),
