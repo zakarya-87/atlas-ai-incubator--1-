@@ -8,7 +8,7 @@ AI-powered SaaS platform for entrepreneurs to build ventures using multi-agent A
 - **Backend**: NestJS (Node.js) REST API + WebSockets (Socket.io), running on port 3000
 - **Database**: PostgreSQL (Replit built-in) with Prisma ORM + pgvector extension
 - **Queue**: BullMQ backed by Redis
-- **AI**: Google Gemini (primary), Grok, Mistral AI providers
+- **AI**: Mistral AI (primary), OpenAI (fallback), Grok (fallback) — Gemini optional/disabled
 
 ## Project Layout
 ```
@@ -48,21 +48,29 @@ Workflow: `bash start.sh` → waits for port 5000
 
 ## Environment Variables Required
 - `DATABASE_URL` - PostgreSQL connection (auto-set by Replit)
-- `JWT_SECRET` - JWT signing secret (set in env vars)
-- `GEMINI_API_KEY` - Google Gemini API key (**must be set to a real key for AI features**)
+- `JWT_SECRET` - JWT signing secret
+- `MISTRAL_API_KEY` - Primary AI provider (**required for AI features**)
 - `NODE_ENV` - development/production
 - `PORT` - Backend port (3000)
 - `REDIS_HOST` / `REDIS_PORT` - Redis connection
 
 ## Optional Environment Variables
+- `OPENAI_API_KEY` / `OPENAI_MODEL` - OpenAI fallback AI provider
+- `GEMINI_API_KEY` - Google Gemini (optional; only used for Research agent with grounding)
+- `GROK_API_KEY` - Grok AI fallback provider
 - `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` - Stripe payments
 - `SMTP_HOST/PORT/USER/PASS` - Email (dev mode logs to console if not set)
-- `GROK_API_KEY` - Grok AI provider
-- `MISTRAL_API_KEY` - Mistral AI provider
+- `DEFAULT_AI_PROVIDER` - Override primary provider (default: mistral)
+- `MISTRAL_MODEL` - Mistral model name (default: mistral-large-latest)
+
+## AI Provider System
+- **Primary**: Mistral AI (via `completeWithFallback` chain in AIProviderFactory)
+- **Fallback chain**: Mistral → OpenAI → Grok
+- **Schema enforcement**: Both Mistral and OpenAI providers inject a JSON template into the system prompt so the model produces the correct field structure
+- **Response normalization**: `AnalysisService.unwrapSingleKeyWrapper()` strips any single-key wrapper object that some models return (e.g. `{ business_idea_validation: {...} }` → `{...}`)
 
 ## Key Notes
-- GEMINI_API_KEY is required by backend env validation — set a real key for AI features
-- The placeholder GEMINI_API_KEY will allow the app to start but AI analysis will fail
 - Vite proxies `/api` and `/socket.io` to `localhost:3000`
 - Backend CORS allows all origins in development mode
 - pgvector extension is declared in schema but may not be installed — vector search may not work
+- Analysis jobs run through BullMQ queue with WebSocket real-time updates to frontend

@@ -8,6 +8,48 @@ import {
   ChatCompletionResponse,
 } from '../interfaces/ai-provider.interface';
 
+/**
+ * Recursively converts a Gemini-style JSON schema into a concrete JSON template
+ * that the model can follow verbatim.
+ */
+function schemaToTemplate(schema: Record<string, unknown>): unknown {
+  const type = schema['type'] as string | undefined;
+
+  if (type === 'OBJECT' || type === 'object') {
+    const props = (schema['properties'] as Record<string, unknown>) || {};
+    const result: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(props)) {
+      result[key] = schemaToTemplate(val as Record<string, unknown>);
+    }
+    return result;
+  }
+
+  if (type === 'ARRAY' || type === 'array') {
+    const items = schema['items'] as Record<string, unknown> | undefined;
+    return items ? [schemaToTemplate(items)] : [];
+  }
+
+  if (type === 'STRING' || type === 'string') return 'string value';
+  if (type === 'NUMBER' || type === 'number') return 0;
+  if (type === 'BOOLEAN' || type === 'boolean') return false;
+  if (type === 'INTEGER' || type === 'integer') return 0;
+
+  return null;
+}
+
+function buildSchemaInstruction(schema: Record<string, unknown>): string {
+  const template = schemaToTemplate(schema);
+  return [
+    '\n\n## OUTPUT FORMAT',
+    'You MUST respond with ONLY a valid JSON object — no markdown fences, no explanation, no extra text.',
+    'The JSON object MUST use EXACTLY these keys and value types (replace placeholder values with real content):',
+    '```json',
+    JSON.stringify(template, null, 2),
+    '```',
+    'Do NOT add any keys that are not listed above. Do NOT wrap the object in another key.',
+  ].join('\n');
+}
+
 @Injectable()
 export class OpenAIProvider implements AIProviderInterface {
   private readonly openaiApiKey: string;
@@ -46,9 +88,19 @@ export class OpenAIProvider implements AIProviderInterface {
 
   private buildMessages(request: AIProviderRequest): { role: string; content: string }[] {
     const messages: { role: string; content: string }[] = [];
-    if (request.systemInstruction) {
-      messages.push({ role: 'system', content: request.systemInstruction });
+
+    let systemContent = request.systemInstruction || '';
+    if (request.schema) {
+      const schemaInstruction = buildSchemaInstruction(request.schema as Record<string, unknown>);
+      systemContent = systemContent
+        ? `${systemContent}${schemaInstruction}`
+        : schemaInstruction;
     }
+
+    if (systemContent) {
+      messages.push({ role: 'system', content: systemContent });
+    }
+
     const userContent = request.context
       ? `${request.context}\n\nTask: ${request.prompt}`
       : request.prompt;
