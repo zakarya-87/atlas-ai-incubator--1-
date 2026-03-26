@@ -250,6 +250,17 @@ export class AnalysisService {
       this.emitLog(dto.ventureId, 'Lead Strategist', 'agentLogSynthesizing');
       const agent = this.agentFactory.getAgent(dto.module, dto.tool);
 
+      const languageMap: Record<string, string> = {
+        ar: 'Arabic (العربية)',
+        fr: 'French (Français)',
+        en: 'English',
+      };
+      const outputLanguage = languageMap[dto.language] || 'English';
+      const languageDirective =
+        dto.language && dto.language !== 'en'
+          ? `\n\n### LANGUAGE REQUIREMENT:\nYou MUST write ALL text content in your JSON response in ${outputLanguage}.\nEvery string value inside the JSON output MUST be written in ${outputLanguage}.\nDo NOT use English for any text field — this is mandatory.`
+          : '';
+
       const baseSystemInstruction = `
 You are the ATLAS AI Engine, a Lead Venture Architect and Tier-1 Strategy Consultant.
 Your objective is to build a coherent, viable, and scalable business case for the user.
@@ -265,7 +276,7 @@ Your objective is to build a coherent, viable, and scalable business case for th
 ### CONTEXT AWARENESS:
 The user has provided a description and potentially a history of previous work.
 Synthesize this information to produce the next logical step in their business planning.
-`;
+${languageDirective}`;
 
       const effectiveSystemInstruction = refinementSystemInstruction
         ? `${baseSystemInstruction}\n\n${refinementSystemInstruction}`
