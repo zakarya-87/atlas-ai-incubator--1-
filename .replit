@@ -1,0 +1,61 @@
+modules = ["nodejs-20", "python-3.12", "bash"]
+[agent]
+expertMode = true
+
+[nix]
+channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+NODE_ENV = "development"
+PORT = "3000"
+FRONTEND_URL = "http://localhost:5000"
+JWT_SECRET = "atlas-ai-incubator-super-secret-jwt-key-2024-replit"
+JWT_TTL = "15m"
+DEFAULT_AI_PROVIDER = "gemini"
+GEMINI_MODEL = "gemini-2.0-flash-lite"
+REDIS_HOST = "localhost"
+REDIS_PORT = "6379"
+REDIS_TLS = "false"
+GEMINI_API_KEY = "placeholder-set-your-gemini-api-key"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "bash start.sh"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 3000
+externalPort = 3001
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
+
+[[ports]]
+localPort = 6379
+externalPort = 80
+
+[deployment]
+deploymentTarget = "vm"
+run = ["bash", "start.sh"]
