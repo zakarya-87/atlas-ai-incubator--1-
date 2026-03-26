@@ -15,17 +15,22 @@ echo "Running database migrations..."
 cd backend
 npx prisma generate 2>&1 | tail -3
 npx prisma migrate deploy 2>&1 | tail -5
-cd ..
 
 # Start NestJS backend in background
 echo "Starting backend on port 3000..."
-cd backend
 npm run start:dev &
 BACKEND_PID=$!
 cd ..
 
-# Give backend a moment to initialize before starting frontend
-sleep 3
+# Wait for backend to be ready before starting frontend
+echo "Waiting for backend to be ready..."
+for i in $(seq 1 30); do
+  if curl -s http://localhost:3000/api/health > /dev/null 2>&1; then
+    echo "Backend is ready!"
+    break
+  fi
+  sleep 2
+done
 
 # Start Vite frontend on port 5000
 echo "Starting frontend on port 5000..."
