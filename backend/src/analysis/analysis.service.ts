@@ -292,14 +292,18 @@ Synthesize this information to produce the next logical step in their business p
         'agentLogFinalizingOutput'
       );
 
+      // Normalize: unwrap single-key wrapper objects that some providers (e.g. Mistral)
+      // return (e.g. { business_idea_validation: {...} } → {...}).
+      const normalizedData = this.unwrapSingleKeyWrapper(response.data);
+
       const savedRecord = await this.persistAnalysisResult(
         dto,
         userId,
-        response.data
+        normalizedData
       );
 
       return {
-        ...response.data,
+        ...normalizedData,
         id: savedRecord.id,
       };
     } catch (error: unknown) {
@@ -309,6 +313,31 @@ Synthesize this information to produce the next logical step in their business p
         error instanceof Error ? error.message : 'Failed to generate analysis';
       throw new InternalServerErrorException(errorMessage);
     }
+  }
+
+  /**
+   * Unwraps single-key wrapper objects that AI providers sometimes return.
+   * e.g. { business_idea_validation: { summary: "...", ... } } → { summary: "...", ... }
+   * Only unwraps one level deep, and only when exactly one key is present and its
+   * value is a plain (non-array) object.
+   */
+  private unwrapSingleKeyWrapper(
+    data: Record<string, unknown>
+  ): Record<string, unknown> {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return data;
+    const keys = Object.keys(data);
+    if (
+      keys.length === 1 &&
+      typeof data[keys[0]] === 'object' &&
+      data[keys[0]] !== null &&
+      !Array.isArray(data[keys[0]])
+    ) {
+      this.logger.log(
+        `Unwrapping single-key wrapper '${keys[0]}' from AI response`
+      );
+      return data[keys[0]] as Record<string, unknown>;
+    }
+    return data;
   }
 
   private async persistAnalysisResult(
