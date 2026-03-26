@@ -355,6 +355,7 @@ export const ar = {
   VentureCapitalist: 'مستثمر رأس المال المخاطر',
   SystemsArchitect: 'مهندس الأنظمة',
   CreativeDirector: 'المدير الإبداعي',
+  'Creative Director': 'المدير الإبداعي',
 
   // Agent Logs
   agentLogAnalyzingContext: 'تحليل سياق العمل ونية المستخدم...',
@@ -592,6 +593,196 @@ export const ar = {
   // Search
   searchPlaceholder: 'بحث...',
   searchNoResults: 'لا نتائج.',
+
+  // View Controls (missing keys)
+  viewEnterFocus: 'تفعيل وضع التركيز',
+  viewExitFocus: 'إلغاء وضع التركيز',
+
+  // Tour (missing keys)
+  tourPrev: 'السابق',
+  tourNext: 'التالي',
+  tourDone: 'إنهاء',
+
+  // Sources
+  sourcesVerifiedTitle: 'المصادر والمراجع المتحققة',
+
+  // === DISPLAY LABELS ===
+
+  // SWOT Display
+  swotStrengths: 'نقاط القوة',
+  swotWeaknesses: 'نقاط الضعف',
+  swotOpportunities: 'الفرص',
+  swotThreats: 'التهديدات',
+
+  // PESTEL Display
+  pestelPolitical: 'السياسي',
+  pestelEconomic: 'الاقتصادي',
+  pestelSocial: 'الاجتماعي',
+  pestelTechnological: 'التكنولوجي',
+  pestelEnvironmental: 'البيئي',
+  pestelLegal: 'القانوني',
+
+  // Market Analysis Display
+  marketTargetAudience: 'الجمهور المستهدف',
+  marketSizeAndTrends: 'حجم السوق والاتجاهات',
+  marketCompetitorLandscape: 'المشهد التنافسي',
+  marketResearchDrivers: 'محركات السوق',
+  marketResearchCustomerBehavior: 'سلوك العملاء',
+  marketResearchBarriersToEntry: 'عوائق الدخول',
+
+  // Lean Canvas Display
+  leanCanvasProblem: 'المشكلة',
+  leanCanvasSolution: 'الحل',
+  leanCanvasKeyMetrics: 'المقاييس الرئيسية',
+  leanCanvasUniqueValueProposition: 'عرض القيمة الفريد',
+  leanCanvasUnfairAdvantage: 'الميزة التنافسية',
+  leanCanvasChannels: 'القنوات',
+  leanCanvasCustomerSegments: 'شرائح العملاء',
+  leanCanvasCostStructure: 'هيكل التكاليف',
+  leanCanvasRevenueStreams: 'مصادر الإيرادات',
+
+  // Idea Validation Display
+  ideaValidationSummary: 'الملخص التنفيذي',
+  ideaValidationProblemStatement: 'بيان المشكلة',
+  ideaValidationSolutionStatement: 'بيان الحل',
+  ideaValidationValueProposition: 'عرض القيمة',
+  ideaValidationKeyAssumptions: 'الافتراضات الرئيسية',
+
+  // Problem Validation Display
+  problemValidationMarketSize: 'تقدير حجم السوق',
+  problemValidationTAM: 'إجمالي السوق المتاح (TAM)',
+  problemValidationSAM: 'السوق الخدمي المتاح (SAM)',
+  problemValidationSOM: 'السوق الخدمي القابل للحصول (SOM)',
+  problemValidationCustomerSegments: 'شرائح العملاء',
+  problemValidationProblemSignificance: 'أهمية المشكلة',
+
+  // Competitor Analysis Display
+  competitorAnalysisMap: 'خريطة المشهد التنافسي',
+  competitorAnalysisHeaderName: 'الاسم',
+  competitorAnalysisHeaderType: 'النوع',
+  competitorAnalysisHeaderFeatures: 'الميزات الرئيسية',
+  competitorAnalysisHeaderPricing: 'نموذج التسعير',
+  competitorAnalysisHeaderPositioning: 'التموضع',
+  competitorAnalysisGaps: 'فجوات السوق',
+  competitorAnalysisDifferentiators: 'عوامل التمييز',
+  competitorAnalysisRisks: 'المخاطر التنافسية',
+
+  // Customer Validation Display
+  customerValidationScorecard: 'بطاقة التحقق',
+  customerValidationLandingPage: 'مفهوم صفحة الهبوط',
+  customerValidationAds: 'أمثلة النصوص الإعلانية',
+  customerValidationSurvey: 'أسئلة الاستبيان',
+
+  // Risk Feasibility Display
+  riskFeasibilityScore: 'درجة الجدوى',
+  riskFeasibilityResources: 'تقديرات الموارد',
+  riskFeasibilityRegulatory: 'المخاطر التنظيمية',
+  riskFeasibilityFinancial: 'المخاطر المالية',
+  riskFeasibilityOperational: 'المخاطر التشغيلية',
+
+  // Validation Tracker Display
+  validationTrackerKeyMetrics: 'تتبع المقاييس المباشرة',
+  validationTrackerCompetitorActivity: 'نشاط المنافسين',
+  validationTrackerEmergingTrends: 'الاتجاهات الناشئة',
+  validationTrackerFundingInsights: 'رؤى التمويل',
+
+  // OKR Workflow Display
+  okrWorkflowVision: 'بيان الرؤية',
+  okrWorkflowStrategicGoals: 'الأهداف الاستراتيجية',
+  okrWorkflowCascadingAlignment: 'التوافق المتتالي',
+  okrWorkflowTracking: 'التتبع والمراجعة',
+  okrWorkflowReflection: 'التأمل ودورة العمل القادمة',
+
+  // Budget Generator Display
+  budgetGeneratorSummary: 'ملخص الميزانية',
+  budgetGeneratorScenarios: 'نظرة عامة على السيناريوهات',
+  budgetGeneratorScenario: 'سيناريو',
+  budgetGeneratorTotalRevenue: 'إجمالي الإيرادات',
+  budgetGeneratorTotalExpenses: 'إجمالي المصروفات',
+  budgetGeneratorNetProfitLoss: 'صافي الربح/الخسارة',
+  budgetGeneratorBreakdown: 'التفصيل التفصيلي',
+  budgetGeneratorItem: 'البند',
+  budgetGeneratorType: 'النوع',
+  budgetGeneratorAmount: 'المبلغ (سنوي)',
+  budgetGeneratorRecommendations: 'توصيات الذكاء الاصطناعي',
+
+  // Financial Forecast Display
+  financialForecastTitle: 'التوقعات المالية لـ 5 سنوات',
+  financialForecastReset: 'إعادة تعيين',
+  financialForecastSaveVersion: 'حفظ النسخة',
+  financialForecastProjections: 'جدول التوقعات',
+  financialForecastYear: 'السنة',
+  financialForecastRevenue: 'الإيرادات',
+  financialForecastCOGS: 'تكلفة البضاعة المباعة',
+  financialForecastGrossProfit: 'إجمالي الربح',
+  financialForecastOPEX: 'المصروفات التشغيلية',
+  financialForecastNetProfit: 'صافي الربح',
+  financialForecastAssumptions: 'تعديل الافتراضات',
+
+  // Cash Flow Forecast Display
+  cashFlowForecastTitle: 'توقعات التدفق النقدي لـ 12 شهرًا',
+  cashFlowForecastRunway: 'مدة التمويل المقدرة',
+  cashFlowForecastMonths: 'أشهر',
+  cashFlowForecastBurnRate: 'متوسط معدل الإنفاق',
+  cashFlowForecastMonthlyView: 'العرض الشهري',
+  cashFlowForecastMonth: 'الشهر',
+  cashFlowForecastInflows: 'التدفقات الداخلة',
+  cashFlowForecastOutflows: 'التدفقات الخارجة',
+  cashFlowForecastNetFlow: 'صافي التدفق',
+  cashFlowForecastEndBalance: 'الرصيد النهائي',
+  cashFlowForecastInsights: 'رؤى التدفق النقدي',
+
+  // KPI Dashboard Display
+  kpiDashboardTitle: 'مؤشرات الأداء الرئيسية',
+  kpiDashboardExecutiveSummary: 'الملخص التنفيذي',
+
+  // Milestones Display
+  milestonesRoadmap: 'خارطة الطريق الاستراتيجية',
+  milestonesSmartAlerts: 'التنبيهات الذكية',
+
+  // Expansion Strategy Display
+  expansionStrategyRecommended: 'الاستراتيجية الموصى بها',
+  expansionStrategyMarket: 'اقتراحات التوسع في السوق',
+  expansionStrategyModeling: 'رؤى النمذجة التنبؤية',
+  expansionStrategyPartnerships: 'توصيات الشراكات',
+
+  // Pitch Deck Display
+  pitchDeckTitle: 'شرائح العرض التقديمي',
+  pitchDeckVisualSuggestion: 'اقتراح بصري',
+
+  // Investor Matching Display
+  investorMatchingTitle: 'مطابقة المستثمرين',
+  investorMatchingFilters: 'الفلاتر',
+  investorMatchingFilterType: 'جميع الأنواع',
+  investorMatchingFilterStage: 'جميع المراحل',
+  investorMatchingFilterSector: 'التصفية حسب القطاع...',
+  investorMatchingSortByAlignment: 'ترتيب حسب التوافق',
+  investorMatchingOutreachButton: 'صياغة رسالة تواصل',
+  investorMatchingNoResults: 'لم يتم العثور على مستثمرين مطابقين.',
+  investorMatchingOutreachTitle: 'مسودة رسالة التواصل مع المستثمر',
+  investorMatchingClose: 'إغلاق',
+
+  // Fundraising Roadmap Display
+  fundraisingRoadmapTitle: 'خارطة طريق جمع التمويل',
+  fundraisingRoadmapTimeline: 'الجدول الزمني للتنفيذ',
+  fundraisingRoadmapAlerts: 'التنبيهات الاستراتيجية',
+  fundraisingRoadmapAlternatives: 'خيارات التمويل البديلة',
+
+  // Experiment Builder
+  experimentBuilderSaveBoard: 'حفظ اللوحة',
+  experimentBuilderColumnHypotheses: 'الفرضيات',
+  experimentBuilderColumnMethods: 'الأساليب',
+  experimentBuilderColumnMetrics: 'المقاييس',
+  experimentBuilderCardPlaceholder: 'عنصر جديد...',
+  experimentBuilderCancel: 'إلغاء',
+  experimentBuilderSave: 'حفظ',
+  experimentBuilderAddCard: 'إضافة بطاقة',
+
+  // Task Manager
+  taskManagerTitle: 'مدير المهام',
+  taskManagerAddPlaceholder: 'إضافة مهمة جديدة...',
+  taskManagerAddButton: 'إضافة',
+  taskManagerNoTasks: 'لا توجد مهام بعد. أضف واحدة أعلاه!',
 
   // AI Prompts (Arabic)
   geminiPromptSwot: 'قم بإنشاء تحليل SWOT تفصيلي لوصف العمل التالي: {businessDescription}.',
