@@ -166,17 +166,35 @@ export class ReportsService {
     analysisIds: string[],
     userId?: string
   ): Promise<Array<{ id: string; success: boolean; error?: string }>> {
-    const results: Array<{ id: string; success: boolean; error?: string }> = [];
+    // ⚡ Bolt: Implemented manual concurrency control with a limit of 5 to safely handle
+    // parallel PDF generation (Puppeteer) without external libraries like `p-limit`.
+    // Improves throughput by executing in parallel while protecting memory/CPU.
+    const results: Array<Promise<{ id: string; success: boolean; error?: string }>> = [];
+    const executing = new Set<Promise<void>>();
+    const limit = 5;
+
     for (const id of analysisIds) {
-      try {
-        await this.generatePDFReport(id, userId);
-        results.push({ id, success: true });
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        results.push({ id, success: false, error: errorMessage });
+      const p = Promise.resolve().then(async () => {
+        try {
+          await this.generatePDFReport(id, userId);
+          return { id, success: true };
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          return { id, success: false, error: errorMessage };
+        }
+      });
+
+      results.push(p);
+
+      const clean = p.then(() => { executing.delete(clean); }).catch(() => { executing.delete(clean); });
+      executing.add(clean);
+
+      if (executing.size >= limit) {
+        await Promise.race(executing);
       }
     }
-    return results;
+
+    return Promise.all(results);
   }
 
   private buildHtml(tool: string, data: Record<string, unknown>, description: string): string {
