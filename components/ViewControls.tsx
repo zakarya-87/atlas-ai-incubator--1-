@@ -68,4 +68,6 @@ const ViewControls: React.FC<ViewControlsProps> = ({
   );
 };
 
-export default ViewControls;
+// ⚡ Bolt: Wrapped in React.memo() to prevent unnecessary re-renders of the view controls
+// during heavy AppContent state updates, keeping the typing experience responsive.
+export default React.memo(ViewControls);

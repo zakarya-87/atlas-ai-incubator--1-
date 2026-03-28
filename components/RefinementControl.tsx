@@ -72,4 +72,6 @@ const RefinementControl: React.FC<RefinementControlProps> = ({
   );
 };
 
-export default RefinementControl;
+// ⚡ Bolt: Wrapped in React.memo() to prevent unnecessary re-renders of the refinement controls
+// during AppContent state updates (like typing), significantly boosting perceived responsiveness.
+export default React.memo(RefinementControl);

@@ -76,4 +76,6 @@ const SourcesList: React.FC<SourcesListProps> = ({ sources }) => {
   );
 };
 
-export default SourcesList;
+// ⚡ Bolt: Wrapped in React.memo() to prevent unnecessary re-renders of the sources list
+// whenever AppContent state updates during typing, ensuring smooth user input.
+export default React.memo(SourcesList);

@@ -246,4 +246,6 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
   );
 };
 
-export default BusinessInputForm;
+// ⚡ Bolt: Wrapped in React.memo() to prevent unnecessary re-renders of this heavy form component
+// when the parent AppContent state updates on every keystroke. This improves typing responsiveness.
+export default React.memo(BusinessInputForm);
