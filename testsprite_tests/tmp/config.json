@@ -6,12 +6,12 @@
   "backendAuthType": "public",
   "executionArgs": {
     "projectName": "atlas-ai-incubator",
-    "projectPath": "c:\\Users\\zboud\\ATLAS AI Incubator",
+    "projectPath": "<local-path>",
     "testIds": [],
-    "additionalInstruction": "Generate comprehensive tests for the ATLAS AI Incubator project focusing on both frontend and backend components. Ensure tests cover authentication, business analysis generation, venture management, and all major features identified in the code summary.",
+    "additionalInstruction": "Generate comprehensive tests for the ATLAS AI Incubator project focusing on both frontend and backend components.",
     "envs": {
-      "API_KEY": "sk-user-5cBLFVbOvnHbjFNBu8Ap8hbPEX1KAqbJR7FHSikthYysmbHQojiv7eRIhIQSVWEncWY1aM0dpvn85p_Sao2BirwJSVPPmqvKK4Yj64UastuYMFsmdMvYN7sW65iuyP_Pz98"
+      "API_KEY": "<redacted>"
     }
   },
-  "proxy": "http://6c1feb26-8378-497b-a0a6-e76e08b44330:JoYZuX9D4hikBHIzLzur1vVPpLwDYGZa@tun.testsprite.com:8080"
+  "proxy": "<redacted>"
 }

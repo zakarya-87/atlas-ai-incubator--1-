@@ -59,8 +59,9 @@ const BrandIdentityDisplay: React.FC<{ data: BrandIdentityData }> = ({
             />
             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <a
-                href={data.logoImage}
+                href={/^https?:\/\//i.test(data.logoImage || '') ? data.logoImage : '#'}
                 download="atlas-logo-concept.jpg"
+                rel="noopener noreferrer"
                 className="px-4 py-2 bg-brand-teal hover:bg-teal-500 text-white rounded-full font-bold shadow-lg transform hover:scale-105 transition-all"
               >
                 Download

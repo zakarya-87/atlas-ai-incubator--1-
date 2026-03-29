@@ -43,6 +43,16 @@ backend/.env.local
 backend/.env
 .idx/
 
+# Test runner secrets and generated artifacts
+testsprite_tests/tmp/
+testsprite_tests/test_results.json
+
+# Database backups (may contain hashed credentials)
+backups/
+
+# Azure / cloud deployment logs
+webapp_logs/
+
 # Optional stylelint cache
 .stylelintcache
 

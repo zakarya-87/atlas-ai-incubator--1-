@@ -49,7 +49,7 @@ async function setupDemoAdmin() {
       });
       
       console.log(`✅ Created demo admin: ${demoAdmin.email}`);
-      console.log(`   Password: ${demoPassword}`);
+      console.log(`   Password: [set via DEMO_ADMIN_PASSWORD env var or default]`);
       console.log(`   Credits: ${demoAdmin.credits}`);
       console.log(`   Status: ${demoAdmin.subscriptionStatus}`);
       console.log(`   Role: ${demoAdmin.role}`);

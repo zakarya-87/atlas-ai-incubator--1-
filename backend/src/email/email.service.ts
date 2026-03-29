@@ -2,6 +2,16 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
+/** Escape user-supplied strings before embedding them in HTML email bodies. */
+function escapeHtml(str: string): string {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
@@ -49,11 +59,13 @@ export class EmailService {
   }
 
   async sendInviteEmail(to: string, inviterName: string, ventureName: string): Promise<void> {
-    const subject = `${inviterName} invited you to join "${ventureName}" on ATLAS`;
+    const safeInviter = escapeHtml(inviterName);
+    const safeVenture = escapeHtml(ventureName);
+    const subject = `${safeInviter} invited you to join "${safeVenture}" on ATLAS`;
     const html = `
         <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #00A896;">Team Invitation</h2>
-            <p>You have been invited to collaborate on the venture <strong>${ventureName}</strong>.</p>
+            <p>You have been invited to collaborate on the venture <strong>${safeVenture}</strong>.</p>
             <p>Log in to your ATLAS dashboard to access the shared workspace.</p>
             <br/>
             <a href="${this.configService.get('FRONTEND_URL') || 'http://localhost:5173'}" style="background-color: #00A896; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Accept Invitation</a>
