@@ -4,22 +4,26 @@ const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
 
 async function resetAdminPassword() {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@atlas.com';
+  const newPassword = process.env.ADMIN_PASSWORD;
+
+  if (!newPassword) {
+    console.error('❌ ADMIN_PASSWORD environment variable is required.');
+    console.error('   Usage: ADMIN_PASSWORD=<new-password> node reset-admin-password.js');
+    process.exit(1);
+  }
+
   try {
     console.log('🔑 Resetting admin password...\n');
 
-    const adminEmail = 'admin@atlas.com';
-    const newPassword = 'admin123';
-    
-    // Hash the password with bcrypt
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
     console.log('Creating new hashed password...');
-    console.log('Salt rounds: 10');
+    console.log('Salt rounds: 12');
     console.log('Password hash length:', hashedPassword.length);
     console.log();
 
-    // Update the admin user
     const updated = await prisma.user.update({
       where: { email: adminEmail },
       data: {
@@ -40,26 +44,21 @@ async function resetAdminPassword() {
     console.log(`   Credits: ${updated.credits}`);
     console.log(`   Subscription: ${updated.subscriptionStatus}`);
     console.log();
-    console.log('Login credentials:');
-    console.log(`   Email: ${adminEmail}`);
-    console.log(`   Password: ${newPassword}`);
-    console.log();
-    console.log('🎉 You can now login with these credentials!');
+    console.log('🎉 You can now login with the password you provided!');
 
   } catch (error) {
     console.error('❌ Error resetting password:', error.message);
-    
-    // If user doesn't exist, create it
+
     if (error.message.includes('Record to update not found')) {
       console.log('\nUser not found, creating new admin...');
-      
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash('admin123', salt);
-      
-      const newUser = await prisma.user.create({
+
+      const salt = await bcrypt.genSalt(12);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      await prisma.user.create({
         data: {
           id: 'f4b3c2a1-1234-5678-9abc-def012345678',
-          email: 'admin@atlas.com',
+          email: adminEmail,
           password: hashedPassword,
           fullName: 'Atlas Admin',
           role: 'ADMIN',
@@ -68,10 +67,10 @@ async function resetAdminPassword() {
           subscriptionPlan: 'enterprise',
         },
       });
-      
+
       console.log('✅ Admin user created!');
-      console.log('   Email: admin@atlas.com');
-      console.log('   Password: admin123');
+      console.log(`   Email: ${adminEmail}`);
+      console.log('   Password: [provided via ADMIN_PASSWORD env var]');
     }
   } finally {
     await prisma.$disconnect();

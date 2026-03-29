@@ -82,11 +82,25 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
     }
   };
 
+  const safeStripeRedirect = (url: string) => {
+    try {
+      const parsed = new URL(url);
+      const allowed = ['checkout.stripe.com', 'billing.stripe.com'];
+      if (parsed.protocol === 'https:' && allowed.includes(parsed.hostname)) {
+        window.location.href = url;
+      } else {
+        showToast('Invalid redirect URL received', 'error');
+      }
+    } catch {
+      showToast('Invalid redirect URL received', 'error');
+    }
+  };
+
   const handleSubscribe = async (planId: string) => {
     setIsLoading(true);
     try {
       const { url } = await createCheckoutSession(planId);
-      window.location.href = url;
+      safeStripeRedirect(url);
     } catch (e) {
       showToast('Failed to start checkout', 'error');
     } finally {
@@ -98,7 +112,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
     setIsLoading(true);
     try {
       const { url } = await createPortalSession();
-      window.location.href = url;
+      safeStripeRedirect(url);
     } catch (e) {
       showToast('Failed to open billing portal', 'error');
     } finally {

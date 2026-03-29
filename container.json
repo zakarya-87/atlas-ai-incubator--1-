@@ -15,7 +15,7 @@
         {
           "name": "DATABASE_URL",
           "secureValue": null,
-          "value": "postgresql://atlas_user:atlas_password@localhost:5432/atlas_db"
+          "secureValue": "${DATABASE_URL}"
         },
         {
           "name": "PGHOST",
@@ -35,7 +35,7 @@
         {
           "name": "JWT_SECRET",
           "secureValue": null,
-          "value": "a_very_secure_production_secret_key_that_is_long_and_random"
+          "secureValue": "${JWT_SECRET}"
         },
         {
           "name": "NODE_ENV",
@@ -65,7 +65,7 @@
         {
           "name": "REDIS_PASSWORD",
           "secureValue": null,
-          "value": "75gRN7xBbkFQfFc4Hl3GOfSTd5yXcSP4GAzCaCPjPNQ="
+          "secureValue": "${REDIS_PASSWORD}"
         },
         {
           "name": "REDIS_TLS",
@@ -90,7 +90,7 @@
         {
           "name": "MISTRAL_API_KEY",
           "secureValue": null,
-          "value": "KdHCoH9EObE6IkQVcDx74B9paobzCKNj"
+          "secureValue": "${MISTRAL_API_KEY}"
         },
         {
           "name": "MISTRAL_MODEL",
@@ -100,7 +100,7 @@
         {
           "name": "GEMINI_API_KEY",
           "secureValue": null,
-          "value": "AIzaSyCsOdTsRxaZRfMS2b5pSlnyCAACUPmiZFY"
+          "secureValue": "${GEMINI_API_KEY}"
         },
         {
           "name": "GEMINI_MODEL",
@@ -115,7 +115,7 @@
         {
           "name": "AZURE_OPENAI_API_KEY",
           "secureValue": null,
-          "value": "99xaOFbJpTwaSqke1VRQvZfTdWMXdLFkf9HRjh0IMIgkDDQWLsinJQQJ99CAAC5T7U2XJ3w3AAABACOGlry5"
+          "secureValue": "${AZURE_OPENAI_API_KEY}"
         },
         {
           "name": "AZURE_OPENAI_API_VERSION",
@@ -412,7 +412,7 @@
         {
           "name": "POSTGRES_PASSWORD",
           "secureValue": null,
-          "value": "atlas_password"
+          "secureValue": "${POSTGRES_PASSWORD}"
         },
         {
           "name": "PGDATA",
