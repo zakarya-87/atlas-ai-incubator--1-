@@ -3,6 +3,7 @@ import React, {
   useState,
   useContext,
   useCallback,
+  useMemo,
   ReactNode,
 } from 'react';
 import { AnimatePresence } from 'framer-motion';
@@ -31,8 +32,12 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
+  // ⚡ Bolt: Memoize the context value to prevent unnecessary re-renders of all consuming components
+  // when the provider's parent re-renders.
+  const contextValue = useMemo(() => ({ showToast }), [showToast]);
+
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={contextValue}>
       {children}
       <div className="fixed bottom-4 right-4 z-[100] flex flex-col items-end pointer-events-none">
         {/* Helper container to ensure toasts are clickable but container passes through clicks */}

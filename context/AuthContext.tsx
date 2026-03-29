@@ -5,6 +5,7 @@ import React, {
   useContext,
   ReactNode,
   useCallback,
+  useMemo,
 } from 'react';
 import {
   signIn,
@@ -240,18 +241,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  const value = {
-    user,
-    token,
-    isAuthenticated: !!user, // Check if user is set instead of token
-    isAdmin: !!user && user.role === 'admin',
-    login,
-    register,
-    logout,
-    loading,
-    refreshAuth,
-    signInAsAdminDemo,
-  };
+  // ⚡ Bolt: Memoize the context value to prevent unnecessary re-renders of all consuming components
+  // when the provider's parent re-renders.
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      isAuthenticated: !!user, // Check if user is set instead of token
+      isAdmin: !!user && user.role === 'admin',
+      login,
+      register,
+      logout,
+      loading,
+      refreshAuth,
+      signInAsAdminDemo,
+    }),
+    [
+      user,
+      token,
+      login,
+      register,
+      logout,
+      loading,
+      refreshAuth,
+      signInAsAdminDemo,
+    ]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
