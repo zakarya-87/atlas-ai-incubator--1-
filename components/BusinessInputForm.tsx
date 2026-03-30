@@ -246,4 +246,5 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
   );
 };
 
-export default BusinessInputForm;
+// ⚡ Bolt: Wrap BusinessInputForm in React.memo to prevent unnecessary re-renders when AppContent updates
+export default React.memo(BusinessInputForm);

@@ -68,4 +68,5 @@ const ViewControls: React.FC<ViewControlsProps> = ({
   );
 };
 
-export default ViewControls;
+// ⚡ Bolt: Wrap ViewControls in React.memo to prevent unnecessary re-renders when AppContent updates
+export default React.memo(ViewControls);

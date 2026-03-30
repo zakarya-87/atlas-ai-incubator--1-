@@ -384,16 +384,18 @@ const AppContent: React.FC = () => {
     ]
   );
 
-  const handleRetry = () => {
+  // ⚡ Bolt: Memoize handleRetry to prevent unnecessary re-renders of child components
+  const handleRetry = useCallback(() => {
     setIsRetrying(true);
     handleGenerate(lastSubmittedImage);
-  };
+  }, [handleGenerate, lastSubmittedImage]);
 
-  const handleCancel = () => {
+  // ⚡ Bolt: Memoize handleCancel to prevent unnecessary re-renders of BusinessInputForm
+  const handleCancel = useCallback(() => {
     setIsLoading(false);
     setIsRetrying(false);
     // State cleans up effectively allowing the user to start a new job.
-  };
+  }, []);
 
   const handleAnalysisResult = (data: { jobId: string; result: AnyAnalysisData }) => {
     try {
@@ -445,13 +447,19 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleRefinement = (instruction: string) => {
+  // ⚡ Bolt: Memoize handleRefinement to prevent unnecessary re-renders of RefinementControl
+  const handleRefinement = useCallback((instruction: string) => {
     // Find the ID of the current analysis being viewed/edited
     const currentId = (currentAnalysis as any)?.id || viewingHistoryRecord?.id;
     if (currentId) {
       handleGenerate(lastSubmittedImage, { instruction, parentId: currentId });
     }
-  };
+  }, [currentAnalysis, viewingHistoryRecord, handleGenerate, lastSubmittedImage]);
+
+  // ⚡ Bolt: Memoize handleToggleFocusMode to prevent unnecessary re-renders of ViewControls
+  const handleToggleFocusMode = useCallback(() => {
+    setIsFocusMode((prev) => !prev);
+  }, []);
 
   // --- Render Helpers ---
   const showInputForm =
@@ -542,7 +550,7 @@ const AppContent: React.FC = () => {
             />
             <ViewControls
               isFocusMode={isFocusMode}
-              onToggleFocusMode={() => setIsFocusMode(!isFocusMode)}
+              onToggleFocusMode={handleToggleFocusMode}
             />
             <ExportControls
               analysisData={currentAnalysis as any}
