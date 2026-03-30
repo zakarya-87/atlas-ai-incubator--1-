@@ -27,7 +27,7 @@ const itemVariants = {
 
 const Dashboard: React.FC<DashboardProps> = ({ ventureId, onNavigate }) => {
   const { t } = useLanguage();
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [credits, setCredits] = useState<number | null>(null);
   const [isPro, setIsPro] = useState(false);
   const [history, setHistory] = useState<GenerationRecord[]>([]);
@@ -64,8 +64,12 @@ const Dashboard: React.FC<DashboardProps> = ({ ventureId, onNavigate }) => {
           setHistory([]);
           setIntegrations([]);
         }
-      } catch (e) {
-        console.error('Dashboard load error', e);
+      } catch (e: any) {
+        if (e?.message === 'SESSION_EXPIRED') {
+          logout();
+        } else {
+          console.error('Dashboard load error', e);
+        }
       } finally {
         setIsLoading(false);
       }

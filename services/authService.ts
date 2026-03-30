@@ -64,14 +64,14 @@ const getAuthHeaders = () => {
 
 export const fetchUserProfile = async (): Promise<UserProfile> => {
   const headers = getAuthHeaders();
-  // Remove content-type for GET request if not needed, but keep Auth
-  delete headers['Content-Type']; 
+  delete headers['Content-Type'];
 
   const response = await fetch(`${BACKEND_URL}/users/profile`, {
     headers,
-    credentials: 'include', // Include cookies in request
+    credentials: 'include',
   });
 
+  if (response.status === 401) throw new Error('SESSION_EXPIRED');
   if (!response.ok) throw new Error('Failed to fetch profile');
   return response.json();
 };

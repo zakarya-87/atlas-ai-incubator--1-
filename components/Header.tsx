@@ -46,8 +46,13 @@ const Header: React.FC<HeaderProps> = memo(
             const profile = await fetchUserProfile();
             setCredits(profile.credits);
             setIsPro(profile.subscriptionStatus === 'active');
-          } catch (e) {
-            console.error('Failed to load credits');
+          } catch (e: any) {
+            if (e?.message === 'SESSION_EXPIRED') {
+              console.warn('[Header] Session expired, logging out');
+              logout();
+            } else {
+              console.error('Failed to load credits');
+            }
           }
         };
         loadCredits();

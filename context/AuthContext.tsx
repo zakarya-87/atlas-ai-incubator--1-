@@ -60,16 +60,48 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Demo admin session check first
+        // Demo admin session check: verify token is still valid
         const demoRaw = localStorage.getItem(DEMO_ADMIN_KEY);
         if (demoRaw) {
-          const demoUser = JSON.parse(demoRaw);
-          setUser(demoUser);
+          try {
+            // Verify the stored token works; if expired, re-authenticate silently
+            const profile = await fetchUserProfile();
+            const demoUser = JSON.parse(demoRaw);
+            setUser({ ...demoUser, email: profile.email, role: profile.role });
+          } catch (err: any) {
+            if (err?.message === 'SESSION_EXPIRED') {
+              // Token expired — re-authenticate with admin credentials to get a fresh one
+              const res = await fetch('/api/auth/signin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: 'admin@atlas.com', password: 'admin123' }),
+                credentials: 'include',
+              });
+              if (res.ok) {
+                const data = await res.json();
+                if (data.access_token) {
+                  localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.access_token);
+                  setToken(data.access_token);
+                }
+                const demoUser = JSON.parse(demoRaw);
+                setUser(demoUser);
+              } else {
+                // Admin re-auth failed — clear stale session
+                localStorage.removeItem(DEMO_ADMIN_KEY);
+                localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+                setToken(null);
+              }
+            } else {
+              // Non-auth error (network) — still restore user but token may work via cookie
+              const demoUser = JSON.parse(demoRaw);
+              setUser(demoUser);
+            }
+          }
           return;
         }
-        // Try to fetch user profile to verify the current session
+        // Regular user: verify the current session
         const profile = await fetchUserProfile();
-        setUser({ email: profile.email });
+        setUser({ email: profile.email, role: profile.role, name: profile.fullName });
       } catch (error) {
         // If the session is invalid, user remains unauthenticated
         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
@@ -97,7 +129,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       // If signIn succeeds, fetch user profile to set current user state
       const profile = await fetchUserProfile();
-      setUser({ email: profile.email });
+      setUser({ email: profile.email, role: profile.role, name: profile.fullName });
     } catch (error) {
       // Clear any partial state
       logout();
