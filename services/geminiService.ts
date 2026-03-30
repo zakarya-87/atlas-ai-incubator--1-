@@ -976,7 +976,6 @@ async function pollJobCompletion<T>(
   pollInterval = 2000,
   timeout = 900000
 ): Promise<T> {
-  const token = getAuthToken();
   const startTime = Date.now();
 
   return new Promise((resolve, reject) => {
@@ -997,6 +996,9 @@ async function pollJobCompletion<T>(
           return;
         }
 
+        // Read token fresh on every poll so a refreshed token is always used
+        const token = getAuthToken();
+
         const statusResponse = await fetch(
           `${API_CONFIG.BACKEND_URL}/jobs/${jobId}`,
           {
@@ -1004,8 +1006,19 @@ async function pollJobCompletion<T>(
           }
         );
 
+        if (statusResponse.status === 401) {
+          // Session expired while job was running — stop polling with a clear message
+          cleanup();
+          reject(new Error('Session expired. Please sign in again to see your results.'));
+          return;
+        }
+
         if (!statusResponse.ok) {
-          throw new Error('Failed to fetch job status');
+          // Transient error — keep polling instead of giving up immediately
+          logger.warn(`[Frontend] Job ${jobId} status check failed (${statusResponse.status}), retrying...`);
+          timeoutId = setTimeout(poll, pollInterval);
+          activeTimers.add(timeoutId);
+          return;
         }
 
         const status = await statusResponse.json();

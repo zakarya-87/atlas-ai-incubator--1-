@@ -57,6 +57,7 @@ export async function submitAnalysisJob(payload: {
 
 // Poll job status
 export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
+  // Always read token fresh so a refreshed token is used automatically
   const token = getAuthToken();
 
   const response = await fetch(`${API_CONFIG.BACKEND_URL}/jobs/${jobId}`, {
@@ -66,8 +67,12 @@ export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
     credentials: 'include',
   });
 
+  if (response.status === 401) {
+    throw new Error('SESSION_EXPIRED');
+  }
+
   if (!response.ok) {
-    throw new Error('Failed to fetch job status');
+    throw new Error(`Failed to fetch job status (${response.status})`);
   }
 
   return await response.json();
@@ -82,9 +87,13 @@ export async function waitForJobCompletion<T>(
   const startTime = Date.now();
 
   return new Promise((resolve, reject) => {
+    let consecutiveErrors = 0;
+    const MAX_CONSECUTIVE_ERRORS = 3;
+
     const poll = async () => {
       try {
         const status = await getJobStatus(jobId);
+        consecutiveErrors = 0; // Reset on success
 
         if (status.status === 'completed') {
           clearInterval(intervalId);
@@ -96,9 +105,18 @@ export async function waitForJobCompletion<T>(
           clearInterval(intervalId);
           reject(new Error('Job timeout'));
         }
-      } catch (error) {
-        clearInterval(intervalId);
-        reject(error);
+      } catch (error: any) {
+        if (error?.message === 'SESSION_EXPIRED') {
+          clearInterval(intervalId);
+          reject(new Error('Session expired. Please sign in again to see your results.'));
+          return;
+        }
+        // Allow a few transient failures before giving up
+        consecutiveErrors++;
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          clearInterval(intervalId);
+          reject(error);
+        }
       }
     };
 
