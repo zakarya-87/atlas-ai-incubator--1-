@@ -419,4 +419,5 @@ const ExportControls: React.FC<ExportControlsProps> = ({
   );
 };
 
-export default ExportControls;
+// ⚡ Bolt: Wrap ExportControls in React.memo to prevent unnecessary re-renders when AppContent updates
+export default React.memo(ExportControls);

@@ -83,4 +83,5 @@ const UndoRedoControls: React.FC<UndoRedoControlsProps> = ({
   );
 };
 
-export default UndoRedoControls;
+// ⚡ Bolt: Wrap UndoRedoControls in React.memo to prevent unnecessary re-renders when AppContent updates
+export default React.memo(UndoRedoControls);

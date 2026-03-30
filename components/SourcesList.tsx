@@ -76,4 +76,5 @@ const SourcesList: React.FC<SourcesListProps> = ({ sources }) => {
   );
 };
 
-export default SourcesList;
+// ⚡ Bolt: Wrap SourcesList in React.memo to prevent unnecessary re-renders when AppContent updates
+export default React.memo(SourcesList);

@@ -72,4 +72,5 @@ const RefinementControl: React.FC<RefinementControlProps> = ({
   );
 };
 
-export default RefinementControl;
+// ⚡ Bolt: Wrap RefinementControl in React.memo to prevent unnecessary re-renders when AppContent updates
+export default React.memo(RefinementControl);
