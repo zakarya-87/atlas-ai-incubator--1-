@@ -7,7 +7,7 @@ interface ViewControlsProps {
   onToggleFocusMode: () => void;
 }
 
-const ViewControls: React.FC<ViewControlsProps> = ({
+const ViewControls: React.FC<ViewControlsProps> = React.memo(({
   isFocusMode,
   onToggleFocusMode,
 }) => {
@@ -66,6 +66,6 @@ const ViewControls: React.FC<ViewControlsProps> = ({
       </motion.div>
     </AnimatePresence>
   );
-};
+});
 
 export default ViewControls;

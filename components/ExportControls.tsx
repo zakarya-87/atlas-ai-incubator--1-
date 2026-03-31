@@ -89,7 +89,7 @@ const PdfContent: React.FC<{
   );
 };
 
-const ExportControls: React.FC<ExportControlsProps> = ({
+const ExportControls: React.FC<ExportControlsProps> = React.memo(({
   analysisData,
   analysisType,
   businessDescription,
@@ -417,6 +417,6 @@ const ExportControls: React.FC<ExportControlsProps> = ({
       </AnimatePresence>
     </>
   );
-};
+});
 
 export default ExportControls;

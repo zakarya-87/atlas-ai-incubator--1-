@@ -14,7 +14,7 @@ interface BusinessInputFormProps {
   extraFields?: React.ReactNode;
 }
 
-const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
+const BusinessInputForm: React.FC<BusinessInputFormProps> = React.memo(({
   value,
   onChange,
   onSubmit,
@@ -244,6 +244,6 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
       </div>
     </form>
   );
-};
+});
 
 export default BusinessInputForm;

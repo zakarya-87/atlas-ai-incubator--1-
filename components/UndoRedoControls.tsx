@@ -8,7 +8,7 @@ interface UndoRedoControlsProps {
   canRedo: boolean;
 }
 
-const UndoRedoControls: React.FC<UndoRedoControlsProps> = ({
+const UndoRedoControls: React.FC<UndoRedoControlsProps> = React.memo(({
   onUndo,
   onRedo,
   canUndo,
@@ -81,6 +81,6 @@ const UndoRedoControls: React.FC<UndoRedoControlsProps> = ({
       </motion.div>
     </AnimatePresence>
   );
-};
+});
 
 export default UndoRedoControls;
