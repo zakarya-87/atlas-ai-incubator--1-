@@ -696,4 +696,108 @@ export const en = {
   // View Controls
   viewEnterFocus: 'Enter Focus Mode',
   viewExitFocus: 'Exit Focus Mode',
+
+  // Landing Page — Nav
+  landingNavFeatures: 'Features',
+  landingNavHowItWorks: 'How It Works',
+  landingNavPricing: 'Pricing',
+  landingStartFree: 'Start Free',
+  landingOpenDashboard: 'Open Dashboard',
+
+  // Landing Page — Hero
+  landingBadge: 'Introducing ATLAS 2.0',
+  landingHeroSubtitle: 'AI-Powered Strategic Planning',
+  landingHeroDesc: 'Transform raw startup concepts into structured, validated ventures. 23 intelligent agents working for your vision.',
+  landingHeroCtaPrimary: 'Start Building Free',
+  landingHeroStat1: '23 AI Tools',
+  landingHeroStat2: '5 Languages',
+  landingHeroStat3: 'Real-Time Analysis',
+
+  // Landing Page — Features Strip
+  landingFeature1: 'Market Intelligence',
+  landingFeature2: 'Competitor Analysis',
+  landingFeature3: 'Financial Modeling',
+  landingFeature4: 'Brand Identity',
+  landingFeature5: 'Funding Strategy',
+  landingFeature6: 'Problem Validation',
+
+  // Landing Page — How It Works
+  landingHiwTitle: 'From Concept to Venture in Minutes',
+  landingHiwSubtitle: 'Our multi-agent system processes your ideas through rigorous strategic frameworks automatically.',
+  landingHiwStep1Title: 'Describe Your Venture',
+  landingHiwStep1Desc: 'Input your core concept, target audience, and initial hypothesis in plain language.',
+  landingHiwStep2Title: 'AI Agents Analyze',
+  landingHiwStep2Desc: '23 specialized AI agents collaborate to validate, model, and research your market.',
+  landingHiwStep3Title: 'Receive Structured Reports',
+  landingHiwStep3Desc: 'Get comprehensive, actionable business plans, financial models, and pitch materials.',
+
+  // Landing Page — Tools Showcase
+  landingToolsTitle: '23 AI-Powered Tools,',
+  landingToolsTitleSub: 'One Platform',
+  landingToolsDesc: 'An entire startup studio packed into a single dashboard. Everything you need from ideation to Series A.',
+  landingViewAllTools: 'View All Tools',
+  landingTool1Title: 'Market Analysis',
+  landingTool1Desc: 'Deep market sizing and opportunity mapping',
+  landingTool2Title: 'Competitor Intelligence',
+  landingTool2Desc: 'AI-powered competitive landscape analysis',
+  landingTool3Title: 'Financial Modeling',
+  landingTool3Desc: 'Revenue projections and burn rate planning',
+  landingTool4Title: 'Brand Identity',
+  landingTool4Desc: 'Logo concepts, color systems, and voice',
+  landingTool5Title: 'Funding Strategy',
+  landingTool5Desc: 'Investor targeting and pitch optimization',
+  landingTool6Title: 'Problem Validation',
+  landingTool6Desc: 'Evidence-based problem-solution fit',
+
+  // Landing Page — Stats
+  landingStatVenturesLabel: 'Ventures Analyzed',
+  landingStatAgentsLabel: 'AI Agents',
+  landingStatProvidersLabel: 'AI Providers',
+  landingStatLanguagesLabel: 'Languages',
+
+  // Landing Page — Pricing
+  landingPricingTitle: 'Simple, Transparent Pricing',
+  landingPricingSubtitle: 'Scale your strategic planning without scaling your budget.',
+  landingPricingStarterTitle: 'Starter',
+  landingPricingStarterDesc: 'Perfect for exploring your first ideas.',
+  landingPricingFree: 'Free',
+  landingPricingForever: 'forever',
+  landingPricingStarterF1: '5 analysis credits per month',
+  landingPricingStarterF2: 'Core validation tools',
+  landingPricingStarterF3: 'Community access',
+  landingPricingStarterF4: 'Export reports',
+  landingPricingGetStarted: 'Get Started Free',
+  landingPricingProTitle: 'Pro',
+  landingPricingProDesc: 'For serious founders and incubators.',
+  landingPricingProMonth: '/month',
+  landingPricingMostPopular: 'Most Popular',
+  landingPricingProF1: 'Unlimited analyses',
+  landingPricingProF2: 'All 23 AI tools',
+  landingPricingProF3: 'Priority AI processing',
+  landingPricingProF4: 'Export full reports (PDF/Doc)',
+  landingPricingProF5: 'Team collaboration (up to 3)',
+  landingPricingUpgradePro: 'Upgrade to Pro',
+
+  // Landing Page — CTA Banner
+  landingCtaTitle: 'Ready to Launch Your Venture?',
+  landingCtaSubtitle: 'Start with ATLAS today — no credit card required.',
+  landingCtaButton: 'Start Building Free',
+
+  // Landing Page — Footer
+  landingFooterDesc: 'Transform raw startup concepts into structured, validated ventures with AI.',
+  landingFooterCopyright: '© 2026 ATLAS AI Incubator.',
+  landingFooterProduct: 'Product',
+  landingFooterResources: 'Resources',
+  landingFooterCompany: 'Company',
+  landingFooterFeatures: 'Features',
+  landingFooterApiRef: 'API Reference',
+  landingFooterRoadmap: 'Roadmap',
+  landingFooterDocs: 'Documentation',
+  landingFooterBlog: 'Blog',
+  landingFooterGuides: 'Strategic Guides',
+  landingFooterExamples: 'Example Ventures',
+  landingFooterAbout: 'About Us',
+  landingFooterCareers: 'Careers',
+  landingFooterPrivacy: 'Privacy Policy',
+  landingFooterTerms: 'Terms of Service',
 };
