@@ -7,7 +7,7 @@ interface SourcesListProps {
   sources?: Source[];
 }
 
-const SourcesList: React.FC<SourcesListProps> = ({ sources }) => {
+const SourcesList: React.FC<SourcesListProps> = React.memo(({ sources }) => {
   const { t } = useLanguage();
 
   if (!sources || sources.length === 0) return null;
@@ -74,6 +74,6 @@ const SourcesList: React.FC<SourcesListProps> = ({ sources }) => {
       </div>
     </motion.div>
   );
-};
+});
 
 export default SourcesList;

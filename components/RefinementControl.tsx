@@ -7,7 +7,7 @@ interface RefinementControlProps {
   isLoading: boolean;
 }
 
-const RefinementControl: React.FC<RefinementControlProps> = ({
+const RefinementControl: React.FC<RefinementControlProps> = React.memo(({
   onRefine,
   isLoading,
 }) => {
@@ -70,6 +70,6 @@ const RefinementControl: React.FC<RefinementControlProps> = ({
       </p>
     </motion.div>
   );
-};
+});
 
 export default RefinementControl;

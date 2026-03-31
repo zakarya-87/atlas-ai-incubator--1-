@@ -445,13 +445,15 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleRefinement = (instruction: string) => {
+  const handleRefinement = useCallback((instruction: string) => {
     // Find the ID of the current analysis being viewed/edited
     const currentId = (currentAnalysis as any)?.id || viewingHistoryRecord?.id;
     if (currentId) {
       handleGenerate(lastSubmittedImage, { instruction, parentId: currentId });
     }
-  };
+  }, [currentAnalysis, viewingHistoryRecord, handleGenerate, lastSubmittedImage]);
+
+  const handleToggleFocusMode = useCallback(() => setIsFocusMode(prev => !prev), []);
 
   // --- Render Helpers ---
   const showInputForm =
@@ -507,8 +509,8 @@ const AppContent: React.FC = () => {
         <div className="max-w-4xl mx-auto mb-8">
           <BusinessInputForm
             value={businessDescription}
-            onChange={(value) => setBusinessDescription(value)}
-            onSubmit={(img) => handleGenerate(img)}
+            onChange={setBusinessDescription}
+            onSubmit={handleGenerate}
             onCancel={handleCancel}
             isLoading={isLoading}
             activeTool={activeTool}
@@ -542,7 +544,7 @@ const AppContent: React.FC = () => {
             />
             <ViewControls
               isFocusMode={isFocusMode}
-              onToggleFocusMode={() => setIsFocusMode(!isFocusMode)}
+              onToggleFocusMode={handleToggleFocusMode}
             />
             <ExportControls
               analysisData={currentAnalysis as any}
