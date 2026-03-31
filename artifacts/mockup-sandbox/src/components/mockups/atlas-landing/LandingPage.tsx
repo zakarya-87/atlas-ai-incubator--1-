@@ -5,11 +5,68 @@ import {
   Sparkles, Check, Zap, MessageSquare, Monitor
 } from 'lucide-react';
 
+const dynamicBgStyles = `
+  @keyframes orb1 {
+    0%   { transform: translate(0px, 0px) scale(1); }
+    33%  { transform: translate(120px, -80px) scale(1.15); }
+    66%  { transform: translate(-60px, 100px) scale(0.9); }
+    100% { transform: translate(80px, 40px) scale(1.05); }
+  }
+  @keyframes orb2 {
+    0%   { transform: translate(0px, 0px) scale(1); }
+    25%  { transform: translate(-140px, 60px) scale(1.2); }
+    50%  { transform: translate(40px, 120px) scale(0.85); }
+    75%  { transform: translate(-80px, -60px) scale(1.1); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+  @keyframes orb3 {
+    0%   { transform: translate(0px, 0px) scale(0.95); }
+    40%  { transform: translate(160px, -110px) scale(1.25); }
+    70%  { transform: translate(-100px, -40px) scale(0.85); }
+    100% { transform: translate(0px, 0px) scale(0.95); }
+  }
+  @keyframes orb4 {
+    0%   { transform: translate(0px, 0px) scale(1.1); }
+    30%  { transform: translate(-120px, 80px) scale(0.8); }
+    60%  { transform: translate(80px, 150px) scale(1.2); }
+    100% { transform: translate(0px, 0px) scale(1.1); }
+  }
+  @keyframes orb5 {
+    0%   { transform: translate(0px, 0px) scale(1); }
+    50%  { transform: translate(200px, -140px) scale(1.3); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+  @keyframes gridDrift {
+    0%   { transform: translate(0px, 0px); }
+    50%  { transform: translate(-30px, -20px); }
+    100% { transform: translate(0px, 0px); }
+  }
+  @keyframes floatDot1 {
+    0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.4; }
+    50%       { transform: translateY(-28px) translateX(12px); opacity: 0.9; }
+  }
+  @keyframes floatDot2 {
+    0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
+    50%       { transform: translateY(20px) translateX(-16px); opacity: 0.8; }
+  }
+  @keyframes floatDot3 {
+    0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.5; }
+    50%       { transform: translateY(-18px) translateX(-10px); opacity: 1; }
+  }
+  @keyframes scanLine {
+    0%   { transform: translateY(-100%); opacity: 0; }
+    10%  { opacity: 0.06; }
+    90%  { opacity: 0.06; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+`;
+
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#0D1B2A] text-[#E0E1DD] font-['Noto_Sans',system-ui,sans-serif] overflow-x-hidden selection:bg-[#00A896]/30 selection:text-[#E0E1DD]">
+      <style dangerouslySetInnerHTML={{ __html: dynamicBgStyles }} />
       
       {/* 1. NAV BAR */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
@@ -85,16 +142,117 @@ export default function LandingPage() {
 
       {/* 2. HERO SECTION */}
       <section className="relative min-h-screen flex flex-col justify-center pt-20 overflow-hidden">
-        {/* Background Image & Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="/__mockup/images/atlas-hero-bg.png" 
-            alt="ATLAS Hero Background" 
-            className="w-full h-full object-cover opacity-60 mix-blend-luminosity"
+        {/* Dynamic Animated Background */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* Base deep bg */}
+          <div className="absolute inset-0 bg-[#0D1B2A]" />
+
+          {/* Hero image — very subtle texture underneath orbs */}
+          <img
+            src="/__mockup/images/atlas-hero-bg.png"
+            alt=""
+            aria-hidden
+            className="absolute inset-0 w-full h-full object-cover opacity-10 mix-blend-luminosity"
           />
-          <div className="absolute inset-0 bg-[#0D1B2A]/75 backdrop-blur-[2px]"></div>
-          {/* Subtle animated teal glow orb */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#00A896]/20 rounded-full blur-[120px] pointer-events-none animate-pulse opacity-50"></div>
+
+          {/* Orb 1 — large teal, top-left, slowest */}
+          <div
+            className="absolute rounded-full blur-[130px] pointer-events-none"
+            style={{
+              width: 700, height: 700,
+              top: '-5%', left: '-5%',
+              background: 'radial-gradient(circle, rgba(0,168,150,0.22) 0%, transparent 70%)',
+              animation: 'orb1 22s ease-in-out infinite',
+            }}
+          />
+          {/* Orb 2 — deep blue, top-right */}
+          <div
+            className="absolute rounded-full blur-[110px] pointer-events-none"
+            style={{
+              width: 600, height: 600,
+              top: '5%', right: '-8%',
+              background: 'radial-gradient(circle, rgba(0,80,255,0.14) 0%, transparent 70%)',
+              animation: 'orb2 18s ease-in-out infinite',
+            }}
+          />
+          {/* Orb 3 — teal accent, bottom-center */}
+          <div
+            className="absolute rounded-full blur-[150px] pointer-events-none"
+            style={{
+              width: 800, height: 800,
+              bottom: '-20%', left: '25%',
+              background: 'radial-gradient(circle, rgba(0,168,150,0.16) 0%, transparent 65%)',
+              animation: 'orb3 26s ease-in-out infinite',
+            }}
+          />
+          {/* Orb 4 — blue-purple, mid-left */}
+          <div
+            className="absolute rounded-full blur-[120px] pointer-events-none"
+            style={{
+              width: 500, height: 500,
+              top: '35%', left: '5%',
+              background: 'radial-gradient(circle, rgba(60,0,180,0.10) 0%, transparent 70%)',
+              animation: 'orb4 14s ease-in-out infinite',
+            }}
+          />
+          {/* Orb 5 — small bright teal, center-right */}
+          <div
+            className="absolute rounded-full blur-[80px] pointer-events-none"
+            style={{
+              width: 300, height: 300,
+              top: '30%', right: '20%',
+              background: 'radial-gradient(circle, rgba(0,200,180,0.25) 0%, transparent 70%)',
+              animation: 'orb5 10s ease-in-out infinite',
+            }}
+          />
+
+          {/* Drifting mesh grid */}
+          <div
+            className="absolute inset-[-60px] pointer-events-none"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(224,225,221,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(224,225,221,0.03) 1px, transparent 1px)',
+              backgroundSize: '72px 72px',
+              animation: 'gridDrift 30s ease-in-out infinite',
+            }}
+          />
+
+          {/* Floating particles */}
+          {[
+            { top: '15%', left: '22%', size: 3, anim: 'floatDot1 6s ease-in-out infinite', delay: '0s' },
+            { top: '28%', left: '68%', size: 2, anim: 'floatDot2 8s ease-in-out infinite', delay: '1s' },
+            { top: '55%', left: '14%', size: 4, anim: 'floatDot3 7s ease-in-out infinite', delay: '2s' },
+            { top: '72%', left: '45%', size: 2, anim: 'floatDot1 9s ease-in-out infinite', delay: '0.5s' },
+            { top: '40%', left: '80%', size: 3, anim: 'floatDot2 5s ease-in-out infinite', delay: '1.5s' },
+            { top: '18%', left: '85%', size: 2, anim: 'floatDot3 10s ease-in-out infinite', delay: '3s' },
+            { top: '62%', left: '72%', size: 3, anim: 'floatDot1 7s ease-in-out infinite', delay: '2.5s' },
+            { top: '82%', left: '30%', size: 2, anim: 'floatDot2 6s ease-in-out infinite', delay: '4s' },
+          ].map((p, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full pointer-events-none"
+              style={{
+                top: p.top, left: p.left,
+                width: p.size, height: p.size,
+                background: '#00A896',
+                boxShadow: `0 0 ${p.size * 4}px rgba(0,168,150,0.8)`,
+                animation: p.anim,
+                animationDelay: p.delay,
+              }}
+            />
+          ))}
+
+          {/* Slow horizontal scan line — subtle CRT effect */}
+          <div
+            className="absolute left-0 right-0 h-[2px] pointer-events-none"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(0,168,150,0.15), transparent)',
+              animation: 'scanLine 12s linear infinite',
+            }}
+          />
+
+          {/* Bottom fade into page */}
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0D1B2A] to-transparent" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center mt-12 sm:mt-0">
@@ -145,8 +303,6 @@ export default function LandingPage() {
           </div>
         </div>
         
-        {/* Fade into next section */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0D1B2A] to-transparent z-10"></div>
       </section>
 
       {/* 3. FEATURES STRIP */}
