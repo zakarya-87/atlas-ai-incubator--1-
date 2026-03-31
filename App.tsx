@@ -73,6 +73,7 @@ const AppContent: React.FC = () => {
     string | undefined
   >(undefined);
   const [ventureId, setVentureId] = useState<string>('');
+  const [showLanding, setShowLanding] = useState(true);
   const [activeModule, setActiveModule] = useState<ModuleType>('dashboard'); // Default to Dashboard
   const [activeTool, setActiveTool] = useState<AnyTool>('overview');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -114,6 +115,14 @@ const AppContent: React.FC = () => {
     const hasTakenTour = localStorage.getItem('atlas-ai-tour-complete');
     if (!hasTakenTour) setIsTourOpen(true);
   }, []); // Empty deps array is correct - should only run once on mount
+
+  // Auto-enter dashboard after successful login from the landing page
+  useEffect(() => {
+    if (isAuthenticated && showLanding && isAuthModalOpen) {
+      setIsAuthModalOpen(false);
+      setShowLanding(false);
+    }
+  }, [isAuthenticated]);
 
   // Load History when authenticated or ventureId changes
   useEffect(() => {
@@ -465,13 +474,20 @@ const AppContent: React.FC = () => {
     onAnalysisResult: handleAnalysisResult,
   });
 
-  if (!isAuthenticated) {
+  if (showLanding) {
     return (
       <>
-        <LandingPage onSignIn={() => setIsAuthModalOpen(true)} />
+        <LandingPage
+          isAuthenticated={isAuthenticated}
+          onSignIn={() => setIsAuthModalOpen(true)}
+          onEnterApp={() => setShowLanding(false)}
+        />
         <AuthModal
           isOpen={isAuthModalOpen}
-          onClose={() => setIsAuthModalOpen(false)}
+          onClose={() => {
+            setIsAuthModalOpen(false);
+            if (isAuthenticated) setShowLanding(false);
+          }}
         />
       </>
     );

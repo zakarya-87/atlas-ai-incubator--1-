@@ -67,10 +67,14 @@ const dynamicBgStyles = `
 
 interface LandingPageProps {
   onSignIn: () => void;
+  onEnterApp: () => void;
+  isAuthenticated: boolean;
 }
 
-const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onEnterApp, isAuthenticated }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const handlePrimary = () => isAuthenticated ? onEnterApp() : onSignIn();
+  const handleSecondary = () => isAuthenticated ? onEnterApp() : onSignIn();
 
   const tools = [
     { icon: <MdBarChart className="w-6 h-6 text-[#00A896]" />, title: 'Market Analysis', desc: 'Deep market sizing and opportunity mapping' },
@@ -107,17 +111,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
+              {!isAuthenticated && (
+                <button
+                  onClick={onSignIn}
+                  className="text-[#E0E1DD] hover:text-white transition-colors text-sm font-medium px-4 py-2"
+                >
+                  Sign In
+                </button>
+              )}
               <button
-                onClick={onSignIn}
-                className="text-[#E0E1DD] hover:text-white transition-colors text-sm font-medium px-4 py-2"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={onSignIn}
+                onClick={handlePrimary}
                 className="bg-[#00A896] hover:bg-[#00A896]/90 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all hover:shadow-[0_0_20px_rgba(0,168,150,0.4)]"
               >
-                Start Free
+                {isAuthenticated ? 'Open Dashboard' : 'Start Free'}
               </button>
             </div>
 
@@ -148,17 +154,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
                 </a>
               ))}
               <div className="pt-4 flex flex-col gap-3">
+                {!isAuthenticated && (
+                  <button
+                    onClick={onSignIn}
+                    className="w-full text-center border border-white/20 text-[#E0E1DD] px-5 py-3 rounded-lg font-medium hover:bg-white/5 transition-colors"
+                  >
+                    Sign In
+                  </button>
+                )}
                 <button
-                  onClick={onSignIn}
-                  className="w-full text-center border border-white/20 text-[#E0E1DD] px-5 py-3 rounded-lg font-medium hover:bg-white/5 transition-colors"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={onSignIn}
+                  onClick={handlePrimary}
                   className="w-full text-center bg-[#00A896] text-white px-5 py-3 rounded-lg font-semibold shadow-lg shadow-[#00A896]/20"
                 >
-                  Start Free
+                  {isAuthenticated ? 'Open Dashboard' : 'Start Free'}
                 </button>
               </div>
             </div>
@@ -250,19 +258,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mb-16">
             <button
-              onClick={onSignIn}
+              onClick={handlePrimary}
               className="w-full sm:w-auto group relative flex items-center justify-center gap-2 bg-[#00A896] hover:bg-[#00A896]/90 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(0,168,150,0.5)] overflow-hidden"
             >
-              <span className="relative z-10">Start Building Free</span>
+              <span className="relative z-10">
+                {isAuthenticated ? 'Open Dashboard' : 'Start Building Free'}
+              </span>
               <HiArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
             </button>
-            <button
-              onClick={onSignIn}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 border border-[#415A77] hover:border-[#E0E1DD] hover:bg-white/5 text-[#E0E1DD] px-8 py-4 rounded-xl text-lg font-semibold transition-all"
-            >
-              Sign In
-            </button>
+            {!isAuthenticated && (
+              <button
+                onClick={onSignIn}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 border border-[#415A77] hover:border-[#E0E1DD] hover:bg-white/5 text-[#E0E1DD] px-8 py-4 rounded-xl text-lg font-semibold transition-all"
+              >
+                Sign In
+              </button>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 text-sm font-medium text-[#778DA9]">
@@ -341,7 +353,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
               <p className="text-lg text-[#E0E1DD] opacity-90">An entire startup studio packed into a single dashboard. Everything you need from ideation to Series A.</p>
             </div>
             <button
-              onClick={onSignIn}
+              onClick={handlePrimary}
               className="text-[#00A896] hover:text-[#E0E1DD] font-medium flex items-center gap-2 group transition-colors self-start md:self-auto"
             >
               View All Tools <HiArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -352,7 +364,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
             {tools.map((tool, i) => (
               <div
                 key={i}
-                onClick={onSignIn}
+                onClick={handlePrimary}
                 className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-8 hover:bg-white/10 hover:border-[#00A896]/50 transition-all duration-300 group cursor-pointer hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
               >
                 <div className="w-14 h-14 rounded-xl bg-[#0D1B2A] border border-[#415A77] flex items-center justify-center mb-6 group-hover:border-[#00A896] transition-colors">
@@ -414,10 +426,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
                 </li>
               </ul>
               <button
-                onClick={onSignIn}
+                onClick={handlePrimary}
                 className="w-full py-4 rounded-xl font-semibold border border-[#415A77] text-[#E0E1DD] hover:bg-white/5 transition-colors"
               >
-                Get Started Free
+                {isAuthenticated ? 'Open Dashboard' : 'Get Started Free'}
               </button>
             </div>
 
@@ -443,10 +455,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
                 ))}
               </ul>
               <button
-                onClick={onSignIn}
+                onClick={handlePrimary}
                 className="w-full py-4 rounded-xl font-semibold bg-gradient-to-r from-[#00A896] to-[#008f80] text-white hover:from-[#00bda9] hover:to-[#00A896] shadow-lg shadow-[#00A896]/20 transition-all hover:scale-[1.02]"
               >
-                Upgrade to Pro
+                {isAuthenticated ? 'Open Dashboard' : 'Upgrade to Pro'}
               </button>
             </div>
           </div>
@@ -463,10 +475,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">Ready to Launch Your Venture?</h2>
           <p className="text-xl text-white/90 mb-10 font-medium">Start with ATLAS today — no credit card required.</p>
           <button
-            onClick={onSignIn}
+            onClick={handlePrimary}
             className="bg-white text-[#005c6e] px-10 py-5 rounded-xl text-lg font-bold hover:bg-gray-50 transition-all hover:scale-105 hover:shadow-2xl shadow-xl inline-flex items-center gap-3 group"
           >
-            Start Building Free
+            {isAuthenticated ? 'Open Dashboard' : 'Start Building Free'}
             <HiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
