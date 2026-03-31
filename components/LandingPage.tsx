@@ -9,6 +9,7 @@ import {
   MdAttachMoney, MdPsychology, MdOutlineTrackChanges,
 } from 'react-icons/md';
 import { useLanguage } from '../context/LanguageContext';
+import { languages } from '../locales';
 
 const dynamicBgStyles = `
   @keyframes orb1 {
@@ -74,7 +75,7 @@ interface LandingPageProps {
 
 const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onEnterApp, isAuthenticated }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { t, language } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const isRTL = language === 'ar';
   const dir = isRTL ? 'rtl' : 'ltr';
   const ArrowIcon = isRTL ? HiArrowLeft : HiArrowRight;
@@ -160,6 +161,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onEnterApp, isAuthe
             </div>
 
             <div className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-4`}>
+              {/* Language switcher */}
+              <div className="flex items-center bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+                {languages.map(({ key, name }) => (
+                  <button
+                    key={key}
+                    onClick={() => setLanguage(key)}
+                    className={`px-3 py-1.5 text-xs font-semibold transition-all ${
+                      language === key
+                        ? 'bg-[#00A896] text-white shadow-inner'
+                        : 'text-[#778DA9] hover:text-[#E0E1DD] hover:bg-white/5'
+                    }`}
+                    aria-pressed={language === key}
+                    title={name}
+                  >
+                    {key.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+
               {!isAuthenticated && (
                 <button
                   onClick={onSignIn}
@@ -200,7 +220,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onEnterApp, isAuthe
                   {label}
                 </a>
               ))}
-              <div className="pt-4 flex flex-col gap-3">
+              {/* Mobile language switcher */}
+              <div className="flex items-center gap-2 pt-2 pb-1">
+                {languages.map(({ key, name }) => (
+                  <button
+                    key={key}
+                    onClick={() => { setLanguage(key); setIsMobileMenuOpen(false); }}
+                    className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                      language === key
+                        ? 'bg-[#00A896] text-white'
+                        : 'bg-white/5 border border-white/10 text-[#778DA9] hover:text-[#E0E1DD]'
+                    }`}
+                    aria-pressed={language === key}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+
+              <div className="pt-2 flex flex-col gap-3">
                 {!isAuthenticated && (
                   <button
                     onClick={onSignIn}
