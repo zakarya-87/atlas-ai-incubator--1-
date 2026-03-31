@@ -69,6 +69,14 @@ Workflow: `bash start.sh` → waits for port 5000
 - **Schema enforcement**: Both Mistral and OpenAI providers inject a JSON template into the system prompt so the model produces the correct field structure
 - **Response normalization**: `AnalysisService.unwrapSingleKeyWrapper()` strips any single-key wrapper object that some models return (e.g. `{ business_idea_validation: {...} }` → `{...}`)
 
+## Landing Page
+- `components/LandingPage.tsx` — public marketing landing page shown to unauthenticated visitors
+- Integrated into `App.tsx`: when `!isAuthenticated`, renders LandingPage instead of the dashboard
+- "Sign In" and "Start Free" buttons open the existing `AuthModal` (via `onSignIn` prop)
+- Dynamic animated background: 5 CSS-keyframe orbs + drifting mesh grid + floating particles + scan line
+- Hero background image at `public/atlas-hero-bg.png`
+- Design mockup source: `artifacts/mockup-sandbox/src/components/mockups/atlas-landing/LandingPage.tsx`
+
 ## Key Notes
 - Vite proxies `/api` and `/socket.io` to `localhost:3000`
 - Backend CORS allows all origins in development mode

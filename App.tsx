@@ -46,6 +46,8 @@ import RefinementControl from './components/RefinementControl';
 import Layout from './components/Layout';
 import ModuleRouter from './components/ModuleRouter';
 import usePersistedState from './hooks/usePersistedState';
+import LandingPage from './components/LandingPage';
+import AuthModal from './components/AuthModal';
 
 const generateUUID = () => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -462,6 +464,18 @@ const AppContent: React.FC = () => {
     onNavigate: handleNavigate,
     onAnalysisResult: handleAnalysisResult,
   });
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <LandingPage onSignIn={() => setIsAuthModalOpen(true)} />
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+        />
+      </>
+    );
+  }
 
   return (
     <Layout
