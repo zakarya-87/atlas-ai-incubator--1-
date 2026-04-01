@@ -419,4 +419,4 @@ const ExportControls: React.FC<ExportControlsProps> = ({
   );
 };
 
-export default ExportControls;
+export default React.memo(ExportControls);
