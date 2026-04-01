@@ -67,6 +67,12 @@ const AppContent: React.FC = () => {
   const [businessDescription, setBusinessDescription] =
     usePersistedState<string>('atlas_input_draft', '');
 
+  // Ref for businessDescription to avoid dependency changes on keystrokes
+  const businessDescriptionRef = React.useRef(businessDescription);
+  useEffect(() => {
+    businessDescriptionRef.current = businessDescription;
+  }, [businessDescription]);
+
   const [lastSubmittedImage, setLastSubmittedImage] = useState<
     string | undefined
   >(undefined);
@@ -244,13 +250,43 @@ const AppContent: React.FC = () => {
     [handleViewHistoryRecord]
   );
 
+  // Ref for other dependencies to avoid handleGenerate recreating on keystroke
+  const stateRefs = React.useRef({
+    lastSubmittedImage,
+    activeTool,
+    activeModule,
+    language,
+    ventureId,
+    isAuthenticated,
+  });
+  useEffect(() => {
+    stateRefs.current = {
+      lastSubmittedImage,
+      activeTool,
+      activeModule,
+      language,
+      ventureId,
+      isAuthenticated,
+    };
+  }, [lastSubmittedImage, activeTool, activeModule, language, ventureId, isAuthenticated]);
+
   // --- AI Generation Logic ---
   const handleGenerate = useCallback(
     async (
       image?: string,
       refinement?: { instruction: string; parentId: string }
     ) => {
-      if (!businessDescription.trim() && !refinement) {
+      const currentDesc = businessDescriptionRef.current;
+      const {
+        lastSubmittedImage: refLastSubmittedImage,
+        activeTool: refActiveTool,
+        activeModule: refActiveModule,
+        language: refLanguage,
+        ventureId: refVentureId,
+        isAuthenticated: refIsAuthenticated,
+      } = stateRefs.current;
+
+      if (!currentDesc.trim() && !refinement) {
         setError({
           code: 'errorEmptyDescription',
           message: t('errorEmptyDescription'),
@@ -258,7 +294,7 @@ const AppContent: React.FC = () => {
         return;
       }
 
-      if (!isAuthenticated) {
+      if (!refIsAuthenticated) {
         setIsAuthModalOpen(true);
         return;
       }
@@ -310,16 +346,16 @@ const AppContent: React.FC = () => {
         fundraisingRoadmap: generateFundraisingRoadmap,
       };
 
-      const generate = generationFunctions[activeTool];
+      const generate = generationFunctions[refActiveTool];
 
       if (generate) {
         try {
           // Pass the optional image and refinement arguments
           const data = await generate(
-            businessDescription,
-            language,
-            ventureId,
-            image || lastSubmittedImage,
+            currentDesc,
+            refLanguage,
+            refVentureId,
+            image || refLastSubmittedImage,
             refinement
           );
           console.log('[DEBUG handleGenerate] Setting state with:', {
@@ -337,13 +373,13 @@ const AppContent: React.FC = () => {
           const newRecord: GenerationRecord = {
             id: data.id || `${Date.now()}-${Math.random()}`,
             timestamp: new Date().toISOString(),
-            module: activeModule,
-            tool: activeTool,
+            module: refActiveModule,
+            tool: refActiveTool,
             toolNameKey:
-              `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
+              `${refActiveModule}Nav${refActiveTool.charAt(0).toUpperCase() + refActiveTool.slice(1)}` as TranslationKey,
             inputDescription: refinement
               ? `Refinement: ${refinement.instruction}`
-              : businessDescription,
+              : currentDesc,
             data: data,
           };
           setGenerationHistory((prev) => [newRecord, ...prev]);
@@ -371,31 +407,24 @@ const AppContent: React.FC = () => {
       }
     },
     [
-      businessDescription,
-      activeTool,
-      activeModule,
-      language,
       t,
-      ventureId,
       setCurrentAnalysis,
       clearAnalysisData,
-      isAuthenticated,
-      lastSubmittedImage,
     ]
   );
 
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     setIsRetrying(true);
-    handleGenerate(lastSubmittedImage);
-  };
+    handleGenerate(stateRefs.current.lastSubmittedImage);
+  }, [handleGenerate]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setIsLoading(false);
     setIsRetrying(false);
     // State cleans up effectively allowing the user to start a new job.
-  };
+  }, []);
 
-  const handleAnalysisResult = (data: { jobId: string; result: AnyAnalysisData }) => {
+  const handleAnalysisResult = useCallback((data: { jobId: string; result: AnyAnalysisData }) => {
     try {
       if (!data || !data.result) {
         throw new Error('errorInvalidData');
@@ -426,11 +455,11 @@ const AppContent: React.FC = () => {
       const newRecord: GenerationRecord = {
         id: unwrappedResult.id || `${Date.now()}-${Math.random()}`,
         timestamp: new Date().toISOString(),
-        module: activeModule,
-        tool: activeTool,
+        module: stateRefs.current.activeModule,
+        tool: stateRefs.current.activeTool,
         toolNameKey:
-          `${activeModule}Nav${activeTool.charAt(0).toUpperCase() + activeTool.slice(1)}` as TranslationKey,
-        inputDescription: businessDescription,
+          `${stateRefs.current.activeModule}Nav${stateRefs.current.activeTool.charAt(0).toUpperCase() + stateRefs.current.activeTool.slice(1)}` as TranslationKey,
+        inputDescription: businessDescriptionRef.current,
         data: unwrappedResult,
       };
       setGenerationHistory((prev) => [newRecord, ...prev]);
@@ -443,15 +472,17 @@ const AppContent: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [t, setCurrentAnalysis]);
 
-  const handleRefinement = (instruction: string) => {
+  const handleRefinement = useCallback((instruction: string) => {
     // Find the ID of the current analysis being viewed/edited
     const currentId = (currentAnalysis as any)?.id || viewingHistoryRecord?.id;
     if (currentId) {
-      handleGenerate(lastSubmittedImage, { instruction, parentId: currentId });
+      handleGenerate(stateRefs.current.lastSubmittedImage, { instruction, parentId: currentId });
     }
-  };
+  }, [currentAnalysis, viewingHistoryRecord, handleGenerate]);
+
+  const handleToggleFocusMode = useCallback(() => setIsFocusMode(prev => !prev), []);
 
   // --- Render Helpers ---
   const showInputForm =
@@ -501,14 +532,14 @@ const AppContent: React.FC = () => {
       onReturnToWorkspace={handleReturnToWorkspace}
       timestamp={viewingHistoryRecord?.timestamp}
       isFocusMode={isFocusMode}
-      onToggleFocusMode={() => setIsFocusMode(!isFocusMode)}
+      onToggleFocusMode={handleToggleFocusMode}
     >
       {showInputForm && !isFocusMode && (
         <div className="max-w-4xl mx-auto mb-8">
           <BusinessInputForm
             value={businessDescription}
-            onChange={(value) => setBusinessDescription(value)}
-            onSubmit={(img) => handleGenerate(img)}
+            onChange={setBusinessDescription}
+            onSubmit={handleGenerate}
             onCancel={handleCancel}
             isLoading={isLoading}
             activeTool={activeTool}
@@ -542,7 +573,7 @@ const AppContent: React.FC = () => {
             />
             <ViewControls
               isFocusMode={isFocusMode}
-              onToggleFocusMode={() => setIsFocusMode(!isFocusMode)}
+              onToggleFocusMode={handleToggleFocusMode}
             />
             <ExportControls
               analysisData={currentAnalysis as any}

@@ -72,4 +72,4 @@ const RefinementControl: React.FC<RefinementControlProps> = ({
   );
 };
 
-export default RefinementControl;
+export default React.memo(RefinementControl);

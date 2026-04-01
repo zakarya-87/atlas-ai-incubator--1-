@@ -246,4 +246,4 @@ const BusinessInputForm: React.FC<BusinessInputFormProps> = ({
   );
 };
 
-export default BusinessInputForm;
+export default React.memo(BusinessInputForm);
