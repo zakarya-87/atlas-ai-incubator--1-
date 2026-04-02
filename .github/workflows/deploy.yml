@@ -10,7 +10,7 @@ env:
   BACKEND_IMAGE: atlas-backend
   WEBAPP_NAME: atlas-backend-app-dev26
   WEBAPP_RG: atlas-ai-webapp-rg
-  FRONTEND_URL: https://atlas-backend-app-dev26.azurewebsites.net
+  FRONTEND_URL: https://atlas-backend-app-dev26.azurewebsites.net/api
 
 jobs:
   deploy-frontend:

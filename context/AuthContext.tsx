@@ -14,6 +14,7 @@ import {
 } from '../services/authService';
 import { AuthCredentials } from '../types';
 import { STORAGE_KEYS } from '../utils/constants';
+import config from '../utils/config';
 
 /**
  * SECURITY UPDATE:
@@ -160,7 +161,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       await fetch(
-        `/api/auth/logout`,
+        `${config.apiBaseUrl}/auth/logout`,
         {
           method: 'POST',
           headers,
