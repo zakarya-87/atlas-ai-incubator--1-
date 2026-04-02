@@ -143,7 +143,7 @@ const LazyWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 function normalizeAnalysisData(data: AnyAnalysisData | null): AnyAnalysisData | null {
   if (!data || typeof data !== 'object' || Array.isArray(data)) return data;
 
-  const raw = data as Record<string, unknown>;
+  const raw = data as unknown as Record<string, unknown>;
 
   // Collect non-id keys
   const dataKeys = Object.keys(raw).filter((k) => k !== 'id');
@@ -159,7 +159,7 @@ function normalizeAnalysisData(data: AnyAnalysisData | null): AnyAnalysisData | 
     const inner = raw[dataKeys[0]] as Record<string, unknown>;
     // Preserve the id if present
     if (raw.id) inner.id = raw.id;
-    return inner as AnyAnalysisData;
+    return inner as unknown as AnyAnalysisData;
   }
 
   return data;
