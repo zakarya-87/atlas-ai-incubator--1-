@@ -37,9 +37,7 @@ export class UsersController {
     if (!freshUser) {
       throw new NotFoundException('User not found');
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = freshUser;
-    return result;
+    return this.sanitizeUser(freshUser);
   }
 
   @Patch('profile')
@@ -49,9 +47,7 @@ export class UsersController {
     @Body() dto: UpdateUserDto
   ): Promise<Omit<User, 'password'>> {
     const updatedUser = await this.usersService.updateUser(user.id, dto);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = updatedUser;
-    return result;
+    return this.sanitizeUser(updatedUser);
   }
 
   @Put('profile')
@@ -61,9 +57,7 @@ export class UsersController {
     @Body() dto: UpdateUserDto
   ): Promise<Omit<User, 'password'>> {
     const updatedUser = await this.usersService.updateUser(user.id, dto);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = updatedUser;
-    return result;
+    return this.sanitizeUser(updatedUser);
   }
 
   @Put('change-password')
@@ -87,5 +81,14 @@ export class UsersController {
     await this.usersService.updateUser(user.id, { password: dto.newPassword });
     
     return { success: true };
+  }
+
+  /**
+   * Removes sensitive fields like password from the user object.
+   */
+  private sanitizeUser(user: User): Omit<User, 'password'> {
+    const userClone = { ...user } as any;
+    delete userClone.password;
+    return userClone;
   }
 }
