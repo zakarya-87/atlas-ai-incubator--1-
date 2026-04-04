@@ -22,7 +22,11 @@ describe('JwtStrategy', () => {
     updatedAt: new Date(),
   };
 
+  const originalEnv = process.env;
+
   beforeEach(async () => {
+    process.env = { ...originalEnv, JWT_SECRET: 'test-secret' };
+
     const mockUsersService = {
       findById: jest.fn().mockResolvedValue(mockUser),
     };
@@ -54,5 +58,26 @@ describe('JwtStrategy', () => {
 
       await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
     });
+  });
+
+  describe('constructor', () => {
+    it('should throw an error if JWT_SECRET is not set', async () => {
+      delete process.env.JWT_SECRET;
+
+      const mockUsersService = {
+        findById: jest.fn().mockResolvedValue(mockUser),
+      };
+
+      try {
+        new JwtStrategy(mockUsersService as any);
+        fail('Expected an error to be thrown');
+      } catch (error: any) {
+        expect(error.message).toBe('JWT_SECRET environment variable is not set');
+      }
+    });
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
   });
 });
