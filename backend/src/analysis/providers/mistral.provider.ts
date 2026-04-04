@@ -126,7 +126,7 @@ export class MistralProvider implements AIProviderInterface {
 
       return {
         text,
-        data: data as Record<string, unknown>,
+        data: data,
         rawResponse: result,
       };
     } catch (error: unknown) {
