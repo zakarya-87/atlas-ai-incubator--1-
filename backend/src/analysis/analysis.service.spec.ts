@@ -111,6 +111,13 @@ describe('AnalysisService', () => {
       expect(prismaService.analysis.create).toHaveBeenCalled();
       expect(eventsGateway.emitLog).toHaveBeenCalled();
       expect(result).toEqual({ result: 'ok', id: 'analysis-123' });
+
+      // Verify log ID is a UUID
+      const logCall = eventsGateway.emitLog.mock.calls[0];
+      const logEntry = logCall[1];
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      expect(logEntry.id).toMatch(uuidRegex);
     });
 
     it('should create a new venture if one does not exist', async () => {

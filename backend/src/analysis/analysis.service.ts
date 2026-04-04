@@ -13,6 +13,7 @@ import { HistoryService } from '../history/history.service';
 import { AnalysisAgentFactory } from './analysis.factory';
 import { EventsGateway } from '../events/events.gateway';
 import { UsersService } from '../users/users.service';
+import { generateUUID } from '../common/utils/uuid';
 
 @Injectable()
 export class AnalysisService {
@@ -80,7 +81,7 @@ export class AnalysisService {
   private emitLog(ventureId: string, agent: string, messageKey: string): void {
     try {
       this.eventsGateway.emitLog(ventureId, {
-        id: Math.random().toString(36).substring(2, 9),
+        id: generateUUID(),
         agent: agent,
         messageKey: messageKey,
         timestamp: Date.now(),
