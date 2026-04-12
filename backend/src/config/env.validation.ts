@@ -32,6 +32,7 @@ export const EnvSchema = z.object({
   GROK_API_KEY: z.string().optional(),
   GROK_MODEL: z.string().default('grok-beta'),
   MISTRAL_API_KEY: z.string().optional(),
+  MISTRAL_API_URL: z.string().url().optional(),
   MISTRAL_MODEL: z.string().default('mistral-large-latest'),
   GEMINI_MODEL: z.string().default('gemini-2.0-flash-lite'),
 });

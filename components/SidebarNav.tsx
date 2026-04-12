@@ -72,12 +72,7 @@ const navigationConfig: NavItemConfig[] = [
     iconKey: 'integrations',
     tooltipKey: 'tooltipIntegrations',
   },
-  {
-    key: 'architecture',
-    labelKey: 'sidebarArchitecture',
-    iconKey: 'architecture',
-    tooltipKey: 'tooltipArchitecture',
-  },
+
   {
     key: 'audit',
     labelKey: 'sidebarAuditTrail',

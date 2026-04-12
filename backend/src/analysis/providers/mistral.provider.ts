@@ -43,11 +43,15 @@ function schemaToTemplate(schema: Record<string, unknown>): unknown {
 export class MistralProvider implements AIProviderInterface {
   private readonly apiKey: string;
   private readonly model: string;
-  private readonly apiUrl = 'https://api.mistral.ai/v1/chat/completions';
+  private readonly apiUrl: string;
 
   constructor(private configService: ConfigService) {
     this.apiKey = this.configService.get<string>('MISTRAL_API_KEY') || '';
     this.model = this.configService.get<string>('MISTRAL_MODEL', 'mistral-large-latest');
+    this.apiUrl = this.configService.get<string>(
+      'MISTRAL_API_URL',
+      'https://api.mistral.ai/v1/chat/completions'
+    );
   }
 
   getName(): AIProvider {
@@ -55,7 +59,10 @@ export class MistralProvider implements AIProviderInterface {
   }
 
   async complete(request: AIProviderRequest): Promise<AIProviderResponse> {
-    if (!this.apiKey) {
+    const isLocal =
+      this.apiUrl.includes('localhost') || this.apiUrl.includes('127.0.0.1');
+
+    if (!this.apiKey && !isLocal) {
       throw new Error('MISTRAL_API_KEY is not defined');
     }
 
@@ -97,7 +104,7 @@ export class MistralProvider implements AIProviderInterface {
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey || 'local'}`,
         },
         body: JSON.stringify({
           model: this.model,
@@ -117,7 +124,9 @@ export class MistralProvider implements AIProviderInterface {
 
       if (request.schema) {
         try {
-          data = JSON.parse(text) as Record<string, unknown>;
+          // Strip markdown fences if the model wraps JSON in ```json ... ```
+          const cleaned = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+          data = JSON.parse(cleaned) as Record<string, unknown>;
         } catch {
           console.error('[Mistral] JSON Parse Error:', text);
           throw new InternalServerErrorException('Mistral model produced malformed JSON');
